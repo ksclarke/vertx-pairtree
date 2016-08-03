@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+  <entry key="message-class-name">info.freelibrary.pairtree.MessageCodes</entry>
+
+  <!-- Messages to be stored in the MessageCodes class -->
+  <entry key="PT-001">Pairtree path '{}' contains no shorties</entry>
+  <entry key="PT-002">Pairtree path parts count should be '{}' but is '{}': {}</entry>
+  <entry key="PT-003">A Pairtree path may not be null</entry>
+  <entry key="PT-004">A Pairtree path's ID may not be null</entry>
+  <entry key="PT-005">Pairtree path '{}' has an incorrect number of parts</entry>
+  <entry key="PT-006">A Pairtree path's prefix may not be null</entry>
+  <entry key="PT-007">A Pairtree base path may not be null</entry>
+  <entry key="PT-008">Runtime environment does not support UTF-8 charset</entry>
+  <entry key="PT-009">Invalid Pairtree implementation type supplied: {}</entry>
+  <entry key="PT-010">A null handler was passed to the {}{} method</entry>
+  <entry key="PT-011">This directory conforms to Pairtree Version {}. Updated spec:</entry>
+  <entry key="PT-012">https://tools.ietf.org/id/draft-kunze-pairtree-01.txt</entry>
+  <entry key="PT-013">Didn't find expected Pairtree prefix file: {}</entry>
+  <entry key="PT-014">Found unexpected Pairtree prefix file: {}</entry>
+  
+  <!-- Debugging messages -->
+  <entry key="PT-DEBUG-001">Initializing Pairtree in '{}'</entry>
+  <entry key="PT-DEBUG-002">Initializing Pairtree in '{}' using '{}' as the prefix</entry>
+  <entry key="PT-DEBUG-003">Deleting Pairtree root: {}</entry>
+  <entry key="PT-DEBUG-004">Creating Pairtree root: {}</entry>
+  <entry key="PT-DEBUG-005">Creating version file for Pairtree: {}</entry>
+  <entry key="PT-DEBUG-006">Deleting version file for Pairtree: {}</entry>
+  <entry key="PT-DEBUG-007">Checking Pairtree's version file: {}</entry>
+  <entry key="PT-DEBUG-008">Found Pairtree's version file: {}</entry>
+  <entry key="PT-DEBUG-009">Checking that prefix file for Pairtree '{}' doesn't exist</entry>
+  <entry key="PT-DEBUG-010">Failed to create test Pairtree directory: {}</entry>
+  <entry key="PT-DEBUG-011">The delete handler failed to successfully complete for: {}</entry>
+  <entry key="PT-DEBUG-012">Failed to successfully detect Pairtree does not exist: {}</entry>
+  <entry key="PT-DEBUG-013">Failed to successfully detect Pairtree exists: {}</entry>
+  <entry key="PT-DEBUG-014">Failed to report expected failure when trying to create a Pairtree directory: {}</entry>
+  <entry key="PT-DEBUG-015">Failed to delete test Pairtree directory: {}</entry>
+  <entry key="PT-DEBUG-016">Failed to delete test Pairtree version file: {}</entry>
+  <entry key="PT-DEBUG-017">Unable to create test dir: {}</entry>
+  <entry key="PT-DEBUG-018">Unable to create conflict file: {}</entry>
+  <entry key="PT-DEBUG-019">Failed to successfully detect Pairtree object does not exist: {}</entry>
+  <entry key="PT-DEBUG-020">Failed to successfully detect Pairtree object exists: {}</entry>
+  <entry key="PT-DEBUG-021">Checking to see whether Pairtree object exists: {}</entry>
+  <entry key="PT-DEBUG-022">Deleting Pairtree object: {}</entry>
+  <entry key="PT-DEBUG-023">Creating Pairtree object: {}</entry>
+  <entry key="PT-DEBUG-024">Failed to delete Pairtree object: {}</entry>
+  <entry key="PT-DEBUG-025">Checking for Pairtree object resource: {}</entry>
+  <entry key="PT-DEBUG-026">Putting Pairtree object resource: {}</entry>
+  <entry key="PT-DEBUG-027">Getting Pairtree object resource: {}</entry>
+  <entry key="PT-DEBUG-028">Failed to create Pairtree object: {}</entry>
+  <entry key="PT-DEBUG-029">The create handler failed to successfully complete for: {}</entry>
+  <entry key="PT-DEBUG-030">The exists handler failed to successfully complete for: {}</entry>
+  <entry key="PT-DEBUG-031">Failed to create test Pairtree directory: {}</entry>
+  <entry key="PT-DEBUG-032">Failed to create test Pairtree version file: {}</entry>
+  <entry key="PT-DEBUG-033">Creating prefix file for Pairtree: {}</entry>
+  <entry key="PT-DEBUG-034">Deleting prefix file for Pairtree: {}</entry>
+  <entry key="PT-DEBUG-035">Checking Pairtree's prefix file: {}</entry>
+  <entry key="PT-DEBUG-036">Found prefix file for Pairtree: {}</entry>
+  <entry key="PT-DEBUG-037">Failed to successfully put Pairtree object resource: {}</entry>
+  <entry key="PT-DEBUG-038">Failed to find expected resource contents in: {}</entry>
+  <entry key="PT-DEBUG-039">Unable to create test file: {}</entry>
+  <entry key="PT-DEBUG-040">Creating test directory: {}</entry>
+  <entry key="PT-DEBUG-041">Creating test file: {}</entry>
+  <entry key="PT-DEBUG-042">Creating test file: {} [content: {}]</entry>
+  <entry key="PT-DEBUG-043">Failed to retrieve resource file's expected contents: {}</entry>
+  <entry key="PT-DEBUG-044">Failed to throw expected NullPointerException</entry>
+  <entry key="PT-DEBUG-045">Response status code [{}] for S3 key(s): {} [message: {}]</entry>
+  <entry key="PT-DEBUG-046">Failed to create S3 resource during test set up: {}</entry>
+  <entry key="PT-DEBUG-047">Failed to delete S3 resource during test tear down: {}</entry>
+  <entry key="PT-DEBUG-048">Didn't find expected S3 resource: {}</entry>
+  <entry key="PT-DEBUG-049">Please supply your own AWS access and secret key to run integration tests</entry>
+
+</properties>
