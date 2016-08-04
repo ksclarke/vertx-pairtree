@@ -1,4 +1,4 @@
-# vertx-pairtree [![Build Status](https://travis-ci.org/ksclarke/vertx-pairtree.png?branch=master)](https://travis-ci.org/ksclarke/vertx-pairtree)
+# vertx-pairtree [![Build Status](https://travis-ci.org/ksclarke/vertx-pairtree.png?branch=master)](https://travis-ci.org/ksclarke/vertx-pairtree) [![Coverage Status](https://coveralls.io/repos/github/ksclarke/vertx-pairtree/badge.svg?branch=master)](https://coveralls.io/github/ksclarke/vertx-pairtree?branch=master)
 
 A file system or S3 backed [Pairtree](https://wiki.ucop.edu/display/Curation/PairTree) library for use with the [Vert.x](http://vertx.io/) tool-kit. To use it, include its Jar file in your Vert.x project's classpath.
 
