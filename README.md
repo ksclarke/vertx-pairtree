@@ -1,4 +1,4 @@
-# vertx-pairtree [![Build Status](https://travis-ci.org/ksclarke/vertx-pairtree.png?branch=master)](https://travis-ci.org/ksclarke/vertx-pairtree) [![Coverage Status](https://coveralls.io/repos/github/ksclarke/vertx-pairtree/badge.svg?branch=master)](https://coveralls.io/github/ksclarke/vertx-pairtree?branch=master)
+# vertx-pairtree [![Build Status](http://img.shields.io/travis/ksclarke/vertx-pairtree/master.svg?style=flat)](https://travis-ci.org/ksclarke/vertx-pairtree) [![Coveralls](http://img.shields.io/coveralls/ksclarke/vertx-pairtree.svg?style=flat)](https://coveralls.io/github/ksclarke/vertx-pairtree) [![Maven Central](https://img.shields.io/maven-central/v/info.freelibrary/vertx-pairtree.svg)](http://mvnrepository.com/artifact/info.freelibrary/vertx-pairtree) [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
 
 A file system or S3 backed [Pairtree](https://wiki.ucop.edu/display/Curation/PairTree) library for use with the [Vert.x](http://vertx.io/) tool-kit. To use it, include its Jar file in your Vert.x project's classpath.
 
@@ -37,10 +37,6 @@ _Actually, this is not true yet because I haven't published a version to the cen
 ### Acknowledgements
 
 This library incorporates code from the [SuperS3t](https://github.com/spartango/SuperS3t/) project. It's published under the same license as this project.
-
-### License
-
-The MIT License
 
 ### Contact
 

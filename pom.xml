@@ -159,10 +159,15 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <!-- Have our tests use the SLF4J loggers -->
         <configuration>
+          <excludes>
+            <exclude>**/*IT.java</exclude>
+            <exclude>**/*IntegrationTest.java</exclude>
+          </excludes>
           <forkCount>1</forkCount>
           <systemPropertyVariables>
             <vertx.logger-delegate-factory-class-name>io.vertx.core.logging.SLF4JLogDelegateFactory</vertx.logger-delegate-factory-class-name>
           </systemPropertyVariables>
+          <argLine>-XX:MaxMetaspaceSize=512m ${jacoco.agent.unit.arg}</argLine>
         </configuration>
       </plugin>
       <plugin>
@@ -191,6 +196,11 @@
                 <vertx.pairtree.access_key>${vertx.pairtree.access_key}</vertx.pairtree.access_key>
                 <vertx.pairtree.secret_key>${vertx.pairtree.secret_key}</vertx.pairtree.secret_key>
               </systemPropertyVariables>
+              <argLine>-XX:MaxMetaspaceSize=128m ${jacoco.agent.it.arg}</argLine>
+              <includes>
+                <include>**/*IT.java</include>
+                <include>**/*IntegrationTest.java</include>
+              </includes>
             </configuration>
           </plugin>
         </plugins>
@@ -236,7 +246,7 @@
   <parent>
     <artifactId>freelib-parent</artifactId>
     <groupId>info.freelibrary</groupId>
-    <version>0.1.4</version>
+    <version>0.1.5</version>
   </parent>
 
 </project>
