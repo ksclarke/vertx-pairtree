@@ -3,9 +3,7 @@ language: java
 jdk:
 - oraclejdk8
 
-install: true
-
-script: mvn install -Psnapshots
+script: mvn install
 
 cache:
   directories:
