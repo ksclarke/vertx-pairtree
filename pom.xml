@@ -48,7 +48,7 @@
     <!-- Dependency versions -->
     <maven.compiler.plugin.version>3.5.1</maven.compiler.plugin.version>
     <vertx.hot.plugin.version>2.1.0</vertx.hot.plugin.version>
-    <freelib.utils.version>0.7.0-SNAPSHOT</freelib.utils.version>
+    <freelib.utils.version>0.7.0</freelib.utils.version>
     <aws.sdk.version>1.11.22</aws.sdk.version>
     <vertx.version>3.3.2</vertx.version>
 
@@ -207,32 +207,6 @@
       </build>
     </profile>
   </profiles>
-
-  <!-- Temporarily adding until snapshots are removed and stable versions added -->
-  <repositories>
-    <repository>
-      <id>dependency-snapshots-repo</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
-  <pluginRepositories>
-    <pluginRepository>
-      <id>plugin-snapshots-repo</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </pluginRepository>
-  </pluginRepositories>
 
   <!-- Enables pushing project documentation up to an S3 bucket -->
   <distributionManagement>
