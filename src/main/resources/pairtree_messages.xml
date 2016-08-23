@@ -18,6 +18,9 @@
   <entry key="PT-012">https://tools.ietf.org/id/draft-kunze-pairtree-01.txt</entry>
   <entry key="PT-013">Didn't find expected Pairtree prefix file: {}</entry>
   <entry key="PT-014">Found unexpected Pairtree prefix file: {}</entry>
+  <entry key="PT-015">S3 Pairtree bucket not supplied</entry>
+  <entry key="PT-016">S3 Pairtree access key not supplied</entry>
+  <entry key="PT-017">S3 Pairtree secret key not supplied</entry>
   
   <!-- Debugging messages -->
   <entry key="PT-DEBUG-001">Initializing Pairtree in '{}'</entry>

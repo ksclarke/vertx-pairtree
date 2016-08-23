@@ -1,6 +1,8 @@
 
 package info.freelibrary.pairtree;
 
+import java.util.List;
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
@@ -65,6 +67,14 @@ public interface PairtreeRoot {
      * @return The Pairtree object
      */
     public PairtreeObject getObject(final String aID);
+
+    /**
+     * Gets the Pairtree objects identified by the supplied ID.
+     *
+     * @param aIDList An object name
+     * @return The Pairtree objects for the supplied IDs
+     */
+    public List<PairtreeObject> getObjects(final List<String> aIDList);
 
     /**
      * Tests whether the Pairtree root exists.

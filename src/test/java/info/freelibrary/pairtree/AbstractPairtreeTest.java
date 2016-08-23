@@ -4,6 +4,8 @@ package info.freelibrary.pairtree;
 import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
 import static info.freelibrary.pairtree.MessageCodes.PT_010;
 
+import java.util.Objects;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -61,33 +63,27 @@ public abstract class AbstractPairtreeTest extends I18nObject {
      */
     protected void createTestPairtreeObject(final PairtreeImpl aPairtreeImpl,
             final Handler<AsyncResult<PairtreeObject>> aHandler, final String... aConfigVarargs) {
+        Objects.requireNonNull(aHandler, getI18n(PT_010, getClass().getSimpleName(), ".createTestPairtreeObject()"));
+
         final PairtreeRoot root = PairtreeFactory.getFactory(myVertx, aPairtreeImpl).getPairtree(aConfigVarargs);
-        final Future<PairtreeObject> future = Future.future();
+        final Future<PairtreeObject> future = Future.<PairtreeObject>future().setHandler(aHandler);
 
-        if (aHandler != null) {
-            future.setHandler(aHandler);
+        root.create(createPtResult -> {
+            if (createPtResult.succeeded()) {
+                // Last thing passed in via our configuration arguments is the test object's ID
+                final PairtreeObject ptObject = root.getObject(aConfigVarargs[aConfigVarargs.length - 1]);
 
-            root.create(createPtResult -> {
-                // FIXME: We don't get here!
-                if (createPtResult.succeeded()) {
-                    // Last thing passed in via our configuration arguments is the test object's ID
-                    final PairtreeObject ptObject = root.getObject(aConfigVarargs[aConfigVarargs.length - 1]);
-
-                    ptObject.create(createPtObjResult -> {
-                        if (createPtObjResult.succeeded()) {
-                            future.complete(ptObject);
-                        } else {
-                            future.fail(createPtObjResult.cause());
-                        }
-                    });
-                } else {
-                    future.fail(createPtResult.cause());
-                }
-            });
-        } else {
-            final String simpleName = getClass().getSimpleName();
-            throw new NullPointerException(getI18n(PT_010, simpleName, ".createTestPairtreeObject()"));
-        }
+                ptObject.create(createPtObjResult -> {
+                    if (createPtObjResult.succeeded()) {
+                        future.complete(ptObject);
+                    } else {
+                        future.fail(createPtObjResult.cause());
+                    }
+                });
+            } else {
+                future.fail(createPtResult.cause());
+            }
+        });
     }
 
 }

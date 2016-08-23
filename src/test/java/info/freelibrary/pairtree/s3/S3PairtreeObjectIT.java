@@ -3,6 +3,7 @@ package info.freelibrary.pairtree.s3;
 
 import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
 import static info.freelibrary.pairtree.PairtreeFactory.PairtreeImpl.S3Bucket;
+import static info.freelibrary.pairtree.PairtreeRoot.PAIRTREE_ROOT;
 import static java.util.UUID.randomUUID;
 
 import org.junit.Before;
@@ -29,6 +30,8 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
 
     private String myUID;
 
+    private String myS3Path;
+
     /**
      * Test setup creates a Pairtree object and puts an expected resource into S3
      *
@@ -46,6 +49,7 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
 
         // Create a test ID for each test run
         myUID = randomUUID().toString();
+        myS3Path = "/" + PAIRTREE_ROOT + "/" + PairtreeUtils.mapToPtPath(myUID) + "/" + myUID;
     }
 
     @Test
@@ -106,20 +110,17 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
 
     @Test
     public final void testGetPath(final TestContext aContext) {
-        final String expectedS3Path = PairtreeUtils.mapToPtPath(myUID) + "/" + myUID;
-        aContext.assertEquals(expectedS3Path, myPairtree.getObject(myUID).getPath());
+        aContext.assertEquals(myS3Path, myPairtree.getObject(myUID).getPath());
     }
 
     @Test
     public final void testGetPathString(final TestContext aContext) {
-        final String expectedS3Path = PairtreeUtils.mapToPtPath(myUID) + "/" + myUID + "/a/b/green.gif";
-        aContext.assertEquals(expectedS3Path, myPairtree.getObject(myUID).getPath("a/b/green.gif"));
+        aContext.assertEquals(myS3Path + "/a/b/green.gif", myPairtree.getObject(myUID).getPath("a/b/green.gif"));
     }
 
     @Test
     public final void testGetPathStringStartsWithSlash(final TestContext aContext) {
-        final String expectedS3Path = PairtreeUtils.mapToPtPath(myUID) + "/" + myUID + "/a/b/green.gif";
-        aContext.assertEquals(expectedS3Path, myPairtree.getObject(myUID).getPath("/a/b/green.gif"));
+        aContext.assertEquals(myS3Path + "/a/b/green.gif", myPairtree.getObject(myUID).getPath("/a/b/green.gif"));
     }
 
     @Test
@@ -140,9 +141,7 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
         final Async async = aContext.async();
 
         try {
-            final String s3Path = PairtreeUtils.mapToPtPath(myUID) + "/" + myUID;
-
-            myS3Client.putObject(myTestBucket, s3Path + "/a/b/green.gif", TEST_FILE);
+            myS3Client.putObject(myTestBucket, myS3Path + "/a/b/green.gif", TEST_FILE);
 
             myPairtree.getObject(myUID).get("a/b/green.gif", result -> {
                 if (!result.succeeded()) {
@@ -162,9 +161,7 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
         final Async async = aContext.async();
 
         try {
-            final String s3Path = PairtreeUtils.mapToPtPath(myUID) + "/" + myUID;
-
-            myS3Client.putObject(myTestBucket, s3Path + "/a/b/green.gif", TEST_FILE);
+            myS3Client.putObject(myTestBucket, myS3Path + "/a/b/green.gif", TEST_FILE);
 
             myPairtree.getObject(myUID).find("a/b/green.gif", result -> {
                 if (!result.succeeded()) {

@@ -12,6 +12,7 @@ import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_027;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 
 import info.freelibrary.pairtree.PairtreeObject;
 import info.freelibrary.pairtree.PairtreeUtils;
@@ -60,71 +61,53 @@ public class FsPairtreeObject extends I18nObject implements PairtreeObject {
 
     @Override
     public void exists(final Handler<AsyncResult<Boolean>> aHandler) {
-        final Future<Boolean> future = Future.future();
+        Objects.requireNonNull(aHandler, getI18n(PT_010, getClass().getSimpleName(), ".exists()"));
 
-        if (aHandler != null) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(PT_DEBUG_021, this);
+        final Future<Boolean> future = Future.<Boolean>future().setHandler(aHandler);
+
+        LOGGER.debug(PT_DEBUG_021, this);
+
+        myFileSystem.exists(getPath(), result -> {
+            if (result.succeeded()) {
+                future.complete(result.result());
+            } else {
+                future.fail(result.cause());
             }
-
-            future.setHandler(aHandler);
-
-            myFileSystem.exists(getPath(), result -> {
-                if (result.succeeded()) {
-                    future.complete(result.result());
-                } else {
-                    future.fail(result.cause());
-                }
-            });
-        } else {
-            throw new NullPointerException(getI18n(PT_010, getClass().getSimpleName(), ".exists()"));
-        }
+        });
     }
 
     @Override
     public void create(final Handler<AsyncResult<Void>> aHandler) {
-        final Future<Void> future = Future.future();
+        Objects.requireNonNull(aHandler, getI18n(PT_010, getClass().getSimpleName(), ".create()"));
 
-        if (aHandler != null) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(PT_DEBUG_023, this);
+        final Future<Void> future = Future.<Void>future().setHandler(aHandler);
+
+        LOGGER.debug(PT_DEBUG_023, this);
+
+        myFileSystem.mkdirs(getPath(), result -> {
+            if (result.succeeded()) {
+                future.complete();
+            } else {
+                future.fail(result.cause());
             }
-
-            future.setHandler(aHandler);
-
-            myFileSystem.mkdirs(getPath(), result -> {
-                if (result.succeeded()) {
-                    future.complete();
-                } else {
-                    future.fail(result.cause());
-                }
-            });
-        } else {
-            throw new NullPointerException(getI18n(PT_010, getClass().getSimpleName(), ".create()"));
-        }
+        });
     }
 
     @Override
     public void delete(final Handler<AsyncResult<Void>> aHandler) {
-        final Future<Void> future = Future.future();
+        Objects.requireNonNull(aHandler, getI18n(PT_010, getClass().getSimpleName(), ".delete()"));
 
-        if (aHandler != null) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(PT_DEBUG_022, this);
+        final Future<Void> future = Future.<Void>future().setHandler(aHandler);
+
+        LOGGER.debug(PT_DEBUG_022, this);
+
+        myFileSystem.deleteRecursive(getPath(), true, result -> {
+            if (result.succeeded()) {
+                future.complete();
+            } else {
+                future.fail(result.cause());
             }
-
-            future.setHandler(aHandler);
-
-            myFileSystem.deleteRecursive(getPath(), true, result -> {
-                if (result.succeeded()) {
-                    future.complete();
-                } else {
-                    future.fail(result.cause());
-                }
-            });
-        } else {
-            throw new NullPointerException(getI18n(PT_010, getClass().getSimpleName(), ".delete()"));
-        }
+        });
     }
 
     @Override
@@ -149,82 +132,64 @@ public class FsPairtreeObject extends I18nObject implements PairtreeObject {
 
     @Override
     public void put(final String aPath, final Buffer aBuffer, final Handler<AsyncResult<Void>> aHandler) {
+        Objects.requireNonNull(aHandler, getI18n(PT_010, getClass().getSimpleName(), ".put()"));
+
         final Path resourcePath = Paths.get(getPath(), aPath);
-        final Future<Void> future = Future.future();
+        final Future<Void> future = Future.<Void>future().setHandler(aHandler);
 
-        if (aHandler != null) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(PT_DEBUG_026, resourcePath.toString());
+        LOGGER.debug(PT_DEBUG_026, resourcePath.toString());
+
+        // First, create the parent directory path if it doesn't already exist
+        myFileSystem.mkdirs(resourcePath.getParent().toString(), mkdirsResult -> {
+            if (mkdirsResult.succeeded()) {
+                // Then, write the Pairtree object resource into that directory
+                myFileSystem.writeFile(resourcePath.toString(), aBuffer, writeResult -> {
+                    if (writeResult.succeeded()) {
+                        future.complete();
+                    } else {
+                        future.fail(writeResult.cause());
+                    }
+                });
+            } else {
+                future.fail(mkdirsResult.cause());
             }
-
-            future.setHandler(aHandler);
-
-            // First, create the parent directory path if it doesn't already exist
-            myFileSystem.mkdirs(resourcePath.getParent().toString(), mkdirsResult -> {
-                if (mkdirsResult.succeeded()) {
-                    // Then, write the Pairtree object resource into that directory
-                    myFileSystem.writeFile(resourcePath.toString(), aBuffer, writeResult -> {
-                        if (writeResult.succeeded()) {
-                            future.complete();
-                        } else {
-                            future.fail(writeResult.cause());
-                        }
-                    });
-                } else {
-                    future.fail(mkdirsResult.cause());
-                }
-            });
-        } else {
-            throw new NullPointerException(getI18n(PT_010, getClass().getSimpleName(), ".put()"));
-        }
+        });
     }
 
     @Override
     public void get(final String aPath, final Handler<AsyncResult<Buffer>> aHandler) {
+        Objects.requireNonNull(aHandler, getI18n(PT_010, getClass().getSimpleName(), ".get()"));
+
         final String resourcePath = Paths.get(getPath(), aPath).toString();
-        final Future<Buffer> future = Future.future();
+        final Future<Buffer> future = Future.<Buffer>future().setHandler(aHandler);
 
-        if (aHandler != null) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(PT_DEBUG_027, resourcePath.toString());
+        LOGGER.debug(PT_DEBUG_027, resourcePath.toString());
+
+        myFileSystem.readFile(resourcePath, result -> {
+            if (result.succeeded()) {
+                future.complete(result.result());
+            } else {
+                future.fail(result.cause());
             }
-
-            future.setHandler(aHandler);
-
-            myFileSystem.readFile(resourcePath, result -> {
-                if (result.succeeded()) {
-                    future.complete(result.result());
-                } else {
-                    future.fail(result.cause());
-                }
-            });
-        } else {
-            throw new NullPointerException(getI18n(PT_010, getClass().getSimpleName(), ".get()"));
-        }
+        });
     }
 
     @Override
     public void find(final String aPath, final Handler<AsyncResult<Boolean>> aHandler) {
+        Objects.requireNonNull(aHandler, getI18n(PT_010, getClass().getSimpleName(), ".find()"));
+
         final String resourcePath = Paths.get(getPath(), aPath).toString();
-        final Future<Boolean> future = Future.future();
+        final Future<Boolean> future = Future.<Boolean>future().setHandler(aHandler);
 
-        if (aHandler != null) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(PT_DEBUG_025, resourcePath.toString());
+        LOGGER.debug(PT_DEBUG_025, resourcePath.toString());
+
+        myFileSystem.exists(resourcePath, result -> {
+            if (result.succeeded()) {
+                future.complete(result.result());
+            } else {
+                future.fail(result.cause());
             }
-
-            future.setHandler(aHandler);
-
-            myFileSystem.exists(resourcePath, result -> {
-                if (result.succeeded()) {
-                    future.complete(result.result());
-                } else {
-                    future.fail(result.cause());
-                }
-            });
-        } else {
-            throw new NullPointerException(getI18n(PT_010, getClass().getSimpleName(), ".find()"));
-        }
+        });
     }
 
 }

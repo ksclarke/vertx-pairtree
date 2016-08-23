@@ -22,12 +22,17 @@ import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_035;
 import static java.io.File.separatorChar;
 
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
 
 import info.freelibrary.pairtree.AbstractPairtree;
 import info.freelibrary.pairtree.PairtreeException;
 import info.freelibrary.pairtree.PairtreeObject;
 import info.freelibrary.util.Logger;
 import info.freelibrary.util.LoggerFactory;
+import info.freelibrary.util.StringUtils;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -78,66 +83,71 @@ public class FsPairtree extends AbstractPairtree {
     }
 
     @Override
-    public void exists(final Handler<AsyncResult<Boolean>> aHandler) {
-        final Future<Boolean> future = Future.future();
+    public List<PairtreeObject> getObjects(final List<String> aIDList) {
+        final List<PairtreeObject> ptObjList = new ArrayList<>();
+        final Iterator<String> iterator = aIDList.iterator();
 
-        if (aHandler != null) {
-            future.setHandler(aHandler);
+        while (iterator.hasNext()) {
+            final String id = iterator.next();
 
-            myFileSystem.exists(myPath, result -> {
-                if (result.succeeded()) {
-                    if (result.result()) {
-                        checkVersion(future);
-                    } else {
-                        future.complete(result.result());
-                    }
-                } else {
-                    future.fail(result.cause());
-                }
-            });
-        } else {
-            throw new NullPointerException(getI18n(PT_010, getClass().getSimpleName(), ".exists()"));
+            Objects.requireNonNull(StringUtils.trimToNull(id));
+            ptObjList.add(new FsPairtreeObject(myFileSystem, this, id));
         }
+
+        return ptObjList;
+    }
+
+    @Override
+    public void exists(final Handler<AsyncResult<Boolean>> aHandler) {
+        Objects.requireNonNull(aHandler, getI18n(PT_010, getClass().getSimpleName(), ".exists()"));
+
+        final Future<Boolean> future = Future.<Boolean>future().setHandler(aHandler);
+
+        myFileSystem.exists(myPath, result -> {
+            if (result.succeeded()) {
+                if (result.result()) {
+                    checkVersion(future);
+                } else {
+                    future.complete(result.result());
+                }
+            } else {
+                future.fail(result.cause());
+            }
+        });
     }
 
     @Override
     public void create(final Handler<AsyncResult<Void>> aHandler) {
-        final Future<Void> future = Future.future();
+        Objects.requireNonNull(aHandler, getI18n(PT_010, getClass().getSimpleName(), ".create()"));
 
-        if (aHandler != null) {
-            future.setHandler(aHandler);
-            LOGGER.debug(PT_DEBUG_004, myPath);
+        final Future<Void> future = Future.<Void>future().setHandler(aHandler);
 
-            myFileSystem.mkdirs(myPath, result -> {
-                if (result.succeeded()) {
-                    setVersion(future);
-                } else {
-                    future.fail(result.cause());
-                }
-            });
-        } else {
-            throw new NullPointerException(getI18n(PT_010, getClass().getSimpleName(), ".create()"));
-        }
+        LOGGER.debug(PT_DEBUG_004, myPath);
+
+        myFileSystem.mkdirs(myPath, result -> {
+            if (result.succeeded()) {
+                setVersion(future);
+            } else {
+                future.fail(result.cause());
+            }
+        });
     }
 
     @Override
     public void delete(final Handler<AsyncResult<Void>> aHandler) {
-        final Future<Void> future = Future.future();
+        Objects.requireNonNull(aHandler, getI18n(PT_010, getClass().getSimpleName(), ".delete()"));
 
-        if (aHandler != null) {
-            future.setHandler(aHandler);
-            LOGGER.debug(PT_DEBUG_003, myPath);
+        final Future<Void> future = Future.<Void>future().setHandler(aHandler);
 
-            myFileSystem.deleteRecursive(myPath, true, result -> {
-                if (result.succeeded()) {
-                    deleteVersion(future);
-                } else {
-                    future.fail(result.cause());
-                }
-            });
-        } else {
-            throw new NullPointerException(getI18n(PT_010, getClass().getSimpleName(), ".delete()"));
-        }
+        LOGGER.debug(PT_DEBUG_003, myPath);
+
+        myFileSystem.deleteRecursive(myPath, true, result -> {
+            if (result.succeeded()) {
+                deleteVersion(future);
+            } else {
+                future.fail(result.cause());
+            }
+        });
     }
 
     @Override

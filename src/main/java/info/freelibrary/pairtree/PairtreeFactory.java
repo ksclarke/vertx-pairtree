@@ -25,7 +25,7 @@ public class PairtreeFactory {
     public static final PairtreeImpl DEFAULT_TYPE = PairtreeImpl.FileSystem;
 
     private static List<Map.Entry<PairtreeImpl, PairtreeFactory>> myFactories =
-            new ArrayList<Map.Entry<PairtreeImpl, PairtreeFactory>>(PairtreeImpl.values().length);
+            new ArrayList<>(PairtreeImpl.values().length);
 
     private final Vertx myVertx;
 
@@ -87,7 +87,7 @@ public class PairtreeFactory {
 
         if (factory == null) {
             factory = new PairtreeFactory(aVertx, aImpl);
-            myFactories.add(new AbstractMap.SimpleEntry<PairtreeImpl, PairtreeFactory>(aImpl, factory));
+            myFactories.add(new AbstractMap.SimpleEntry<>(aImpl, factory));
         }
 
         return factory;

@@ -7,11 +7,13 @@ package info.freelibrary.pairtree.s3;
 import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
 import static info.freelibrary.pairtree.MessageCodes.PT_010;
 import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_045;
+import static info.freelibrary.pairtree.PairtreeRoot.PAIRTREE_ROOT;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -68,121 +70,109 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
 
     @Override
     public void exists(final Handler<AsyncResult<Boolean>> aHandler) {
-        final Future<Boolean> future = Future.future();
+        Objects.requireNonNull(aHandler, getI18n(PT_010, getClass().getSimpleName(), ".exists()"));
 
-        if (aHandler != null) {
-            future.setHandler(aHandler);
+        final Future<Boolean> future = Future.<Boolean>future().setHandler(aHandler);
 
-            myS3Client.head(myPairtreeBucket, getPath() + "/README.txt", response -> {
-                final int statusCode = response.statusCode();
+        myS3Client.head(myPairtreeBucket, getPath() + "/README.txt", response -> {
+            final int statusCode = response.statusCode();
 
-                if (statusCode != 200) {
-                    final String statusMessage = response.statusMessage();
-                    future.fail(getI18n(PT_DEBUG_045, statusCode, getPath() + "/README.txt", statusMessage));
-                } else {
-                    final String contentLength = response.getHeader("Content-Length");
+            if (statusCode != 200) {
+                final String statusMessage = response.statusMessage();
+                future.fail(getI18n(PT_DEBUG_045, statusCode, getPath() + "/README.txt", statusMessage));
+            } else {
+                final String contentLength = response.getHeader("Content-Length");
 
-                    try {
-                        if (Integer.parseInt(contentLength) > 0) {
-                            future.complete(true);
-                        } else {
-                            future.complete(false);
-                        }
-                    } catch (final NumberFormatException details) {
-                        future.fail("Content-Length was not an integer: " + contentLength);
+                try {
+                    if (Integer.parseInt(contentLength) > 0) {
+                        future.complete(true);
+                    } else {
+                        future.complete(false);
                     }
+                } catch (final NumberFormatException details) {
+                    future.fail("Content-Length was not an integer: " + contentLength);
                 }
-            });
-        } else {
-            throw new NullPointerException(getI18n(PT_010, getClass().getSimpleName(), ".exists()"));
-        }
+            }
+        });
     }
 
     @Override
     public void create(final Handler<AsyncResult<Void>> aHandler) {
-        final Future<Void> future = Future.future();
+        Objects.requireNonNull(aHandler, getI18n(PT_010, getClass().getSimpleName(), ".create()"));
 
-        if (aHandler != null) {
-            future.setHandler(aHandler);
+        final Future<Void> future = Future.<Void>future().setHandler(aHandler);
 
-            myS3Client.put(myPairtreeBucket, getPath() + "/README.txt", Buffer.buffer(myID), response -> {
-                final int statusCode = response.statusCode();
+        myS3Client.put(myPairtreeBucket, getPath() + "/README.txt", Buffer.buffer(myID), response -> {
+            final int statusCode = response.statusCode();
 
-                if (statusCode != 200) {
-                    final String statusMessage = response.statusMessage();
-                    future.fail(getI18n(PT_DEBUG_045, statusCode, getPath() + "/README.txt", statusMessage));
-                } else {
-                    future.complete();
-                }
-            });
-        } else {
-            throw new NullPointerException(getI18n(PT_010, getClass().getSimpleName(), ".create()"));
-        }
+            if (statusCode != 200) {
+                final String statusMessage = response.statusMessage();
+                future.fail(getI18n(PT_DEBUG_045, statusCode, getPath() + "/README.txt", statusMessage));
+            } else {
+                future.complete();
+            }
+        });
     }
 
     @SuppressWarnings("rawtypes")
     @Override
     public void delete(final Handler<AsyncResult<Void>> aHandler) {
-        final Future<Void> future = Future.future();
+        Objects.requireNonNull(aHandler, getI18n(PT_010, getClass().getSimpleName(), ".delete()"));
 
-        if (aHandler != null) {
-            future.setHandler(aHandler);
+        final Future<Void> future = Future.<Void>future().setHandler(aHandler);
 
-            myS3Client.list(myPairtreeBucket, getPath(), listResponse -> {
-                final int statusCode = listResponse.statusCode();
+        myS3Client.list(myPairtreeBucket, getPath(), listResponse -> {
+            final int statusCode = listResponse.statusCode();
 
-                if (statusCode != 200) {
-                    future.fail(getI18n(PT_DEBUG_045, statusCode, getPath(), listResponse.statusMessage()));
-                } else {
-                    listResponse.bodyHandler(bodyHandler -> {
-                        final SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
+            if (statusCode != 200) {
+                future.fail(getI18n(PT_DEBUG_045, statusCode, getPath(), listResponse.statusMessage()));
+            } else {
+                listResponse.bodyHandler(bodyHandler -> {
+                    final SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
 
-                        saxParserFactory.setNamespaceAware(true);
+                    saxParserFactory.setNamespaceAware(true);
 
-                        try {
-                            final SAXParser saxParser = saxParserFactory.newSAXParser();
-                            final XMLReader xmlReader = saxParser.getXMLReader();
-                            final ObjectListHandler s3ListHandler = new ObjectListHandler();
-                            final List<Future> futures = new ArrayList<Future>();
-                            final List<String> keyList;
+                    try {
+                        final SAXParser saxParser = saxParserFactory.newSAXParser();
+                        final XMLReader xmlReader = saxParser.getXMLReader();
+                        final ObjectListHandler s3ListHandler = new ObjectListHandler();
+                        final List<Future> futures = new ArrayList<>();
+                        final List<String> keyList;
 
-                            xmlReader.setContentHandler(s3ListHandler);
-                            xmlReader.parse(new InputSource(new StringReader(bodyHandler.toString())));
-                            keyList = s3ListHandler.getKeys();
+                        xmlReader.setContentHandler(s3ListHandler);
+                        xmlReader.parse(new InputSource(new StringReader(bodyHandler.toString())));
+                        keyList = s3ListHandler.getKeys();
 
-                            for (final String key : keyList) {
-                                final Future<Void> keyFuture = Future.future();
+                        for (final String key : keyList) {
+                            final Future<Void> keyFuture = Future.future();
 
-                                futures.add(keyFuture);
+                            futures.add(keyFuture);
 
-                                myS3Client.delete(myPairtreeBucket, key, deleteResponse -> {
-                                    final int deleteStatusCode = deleteResponse.statusCode();
+                            myS3Client.delete(myPairtreeBucket, key, deleteResponse -> {
+                                final int deleteStatusCode = deleteResponse.statusCode();
 
-                                    if (deleteStatusCode != 204) {
-                                        final String statusMessage = deleteResponse.statusMessage();
-                                        keyFuture.fail(getI18n(PT_DEBUG_045, deleteStatusCode, key, statusMessage));
-                                    } else {
-                                        keyFuture.complete();
-                                    }
-                                });
-                            }
-
-                            CompositeFuture.all(futures).setHandler(result -> {
-                                if (result.succeeded()) {
-                                    future.complete();
+                                if (deleteStatusCode != 204) {
+                                    final String statusMessage = deleteResponse.statusMessage();
+                                    keyFuture.fail(getI18n(PT_DEBUG_045, deleteStatusCode, key, statusMessage));
                                 } else {
-                                    future.fail(result.cause());
+                                    keyFuture.complete();
                                 }
                             });
-                        } catch (final ParserConfigurationException | SAXException | IOException details) {
-                            future.fail(details);
                         }
-                    });
-                }
-            });
-        } else {
-            throw new NullPointerException(getI18n(PT_010, getClass().getSimpleName(), ".delete()"));
-        }
+
+                        CompositeFuture.all(futures).setHandler(result -> {
+                            if (result.succeeded()) {
+                                future.complete();
+                            } else {
+                                future.fail(result.cause());
+                            }
+                        });
+                    } catch (final ParserConfigurationException | SAXException | IOException details) {
+                        future.fail(details);
+                    }
+                });
+            }
+        });
     }
 
     @Override
@@ -192,7 +182,7 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
 
     @Override
     public String getPath() {
-        return PairtreeUtils.mapToPtPath(myID) + "/" + PairtreeUtils.encodeID(myID);
+        return "/" + PAIRTREE_ROOT + "/" + PairtreeUtils.mapToPtPath(myID) + "/" + PairtreeUtils.encodeID(myID);
     }
 
     @Override
@@ -202,84 +192,71 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
 
     @Override
     public void put(final String aPath, final Buffer aBuffer, final Handler<AsyncResult<Void>> aHandler) {
-        final Future<Void> future = Future.future();
+        Objects.requireNonNull(aHandler, getI18n(PT_010, getClass().getSimpleName(), ".put()"));
 
-        if (aHandler != null) {
-            future.setHandler(aHandler);
+        final Future<Void> future = Future.<Void>future().setHandler(aHandler);
 
-            LOGGER.debug("Putting Pairtree object resource: {}", aPath);
+        LOGGER.debug("Putting Pairtree object resource: {}", aPath);
 
-            myS3Client.put(myPairtreeBucket, getPath() + "/" + aPath, aBuffer, response -> {
-                final int statusCode = response.statusCode();
+        myS3Client.put(myPairtreeBucket, getPath() + "/" + aPath, aBuffer, response -> {
+            final int statusCode = response.statusCode();
 
-                if (statusCode == 200) {
-                    future.complete();
-                } else {
-                    future.fail(getI18n(PT_DEBUG_045, statusCode, getPath() + "/" + aPath, response.statusMessage()));
-                }
-            });
-        } else {
-            throw new NullPointerException(getI18n(PT_010, getClass().getSimpleName(), ".put()"));
-        }
+            if (statusCode == 200) {
+                future.complete();
+            } else {
+                future.fail(getI18n(PT_DEBUG_045, statusCode, getPath() + "/" + aPath, response.statusMessage()));
+            }
+        });
     }
 
     @Override
     public void get(final String aPath, final Handler<AsyncResult<Buffer>> aHandler) {
-        final Future<Buffer> future = Future.future();
+        Objects.requireNonNull(aHandler, getI18n(PT_010, getClass().getSimpleName(), ".get()"));
 
-        if (aHandler != null) {
-            future.setHandler(aHandler);
+        final Future<Buffer> future = Future.<Buffer>future().setHandler(aHandler);
 
-            LOGGER.debug("Getting Pairtree object resource: {}", aPath);
+        LOGGER.debug("Getting Pairtree object resource: {}", aPath);
 
-            myS3Client.get(myPairtreeBucket, getPath() + "/" + aPath, response -> {
-                final int statusCode = response.statusCode();
+        myS3Client.get(myPairtreeBucket, getPath() + "/" + aPath, response -> {
+            final int statusCode = response.statusCode();
 
-                if (statusCode == 200) {
-                    response.bodyHandler(bodyHandlerResult -> {
-                        future.complete(Buffer.buffer(bodyHandlerResult.getBytes()));
-                    });
-                } else {
-                    future.fail(getI18n(PT_DEBUG_045, statusCode, getPath() + "/" + aPath, response.statusMessage()));
-                }
-            });
-        } else {
-            throw new NullPointerException(getI18n(PT_010, getClass().getSimpleName(), ".get()"));
-        }
-
+            if (statusCode == 200) {
+                response.bodyHandler(bodyHandlerResult -> {
+                    future.complete(Buffer.buffer(bodyHandlerResult.getBytes()));
+                });
+            } else {
+                future.fail(getI18n(PT_DEBUG_045, statusCode, getPath() + "/" + aPath, response.statusMessage()));
+            }
+        });
     }
 
     @Override
     public void find(final String aPath, final Handler<AsyncResult<Boolean>> aHandler) {
-        final Future<Boolean> future = Future.future();
+        Objects.requireNonNull(aHandler, getI18n(PT_010, getClass().getSimpleName(), ".find()"));
 
-        if (aHandler != null) {
-            future.setHandler(aHandler);
+        final Future<Boolean> future = Future.<Boolean>future().setHandler(aHandler);
 
-            LOGGER.debug("Finding Pairtree object resource: {}", aPath);
+        LOGGER.debug("Finding Pairtree object resource: {}", aPath);
 
-            myS3Client.head(myPairtreeBucket, getPath() + "/" + aPath, response -> {
-                final int statusCode = response.statusCode();
+        myS3Client.head(myPairtreeBucket, getPath() + "/" + aPath, response -> {
+            final int statusCode = response.statusCode();
 
-                if (statusCode != 200) {
-                    future.fail(getI18n(PT_DEBUG_045, statusCode, getPath() + "/" + aPath, response.statusMessage()));
-                } else {
-                    final String contentLength = response.getHeader("Content-Length");
+            if (statusCode != 200) {
+                future.fail(getI18n(PT_DEBUG_045, statusCode, getPath() + "/" + aPath, response.statusMessage()));
+            } else {
+                final String contentLength = response.getHeader("Content-Length");
 
-                    try {
-                        if (Integer.parseInt(contentLength) > 0) {
-                            future.complete(true);
-                        } else {
-                            future.complete(false);
-                        }
-                    } catch (final NumberFormatException details) {
-                        future.fail("Content-Length was not an integer: " + contentLength);
+                try {
+                    if (Integer.parseInt(contentLength) > 0) {
+                        future.complete(true);
+                    } else {
+                        future.complete(false);
                     }
+                } catch (final NumberFormatException details) {
+                    future.fail("Content-Length was not an integer: " + contentLength);
                 }
-            });
-        } else {
-            throw new NullPointerException(getI18n(PT_010, getClass().getSimpleName(), ".find()"));
-        }
+            }
+        });
     }
 
 }
