@@ -182,12 +182,18 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
 
     @Override
     public String getPath() {
-        return PAIRTREE_ROOT + "/" + PairtreeUtils.mapToPtPath(myID) + "/" + PairtreeUtils.encodeID(myID);
+        // Pairtree encodes colons to pluses so we need to pre-encode them as a workaround for an S3 bug
+        // Cf. https://forums.aws.amazon.com/thread.jspa?threadID=55746
+        final String awsID = myID.replace(':', '~');
+        return PAIRTREE_ROOT + "/" + PairtreeUtils.mapToPtPath(awsID) + "/" + PairtreeUtils.encodeID(awsID);
     }
 
     @Override
     public String getPath(final String aResourcePath) {
-        return aResourcePath.startsWith("/") ? getPath() + aResourcePath : getPath() + "/" + aResourcePath;
+        // We need to encode any pluses in our resource path as a workaround for an S3 bug
+        // Cf. https://forums.aws.amazon.com/thread.jspa?threadID=55746
+        final String awsPath = aResourcePath.replace('+', '~');
+        return awsPath.startsWith("/") ? getPath() + awsPath : getPath() + "/" + awsPath;
     }
 
     @Override
@@ -198,7 +204,7 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
 
         LOGGER.debug("Putting Pairtree object resource: {}", aPath);
 
-        myS3Client.put(myPairtreeBucket, getPath() + "/" + aPath, aBuffer, response -> {
+        myS3Client.put(myPairtreeBucket, getPath(aPath), aBuffer, response -> {
             final int statusCode = response.statusCode();
 
             if (statusCode == 200) {
@@ -217,7 +223,7 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
 
         LOGGER.debug("Getting Pairtree object resource: {}", aPath);
 
-        myS3Client.get(myPairtreeBucket, getPath() + "/" + aPath, response -> {
+        myS3Client.get(myPairtreeBucket, getPath(aPath), response -> {
             final int statusCode = response.statusCode();
 
             if (statusCode == 200) {
@@ -238,7 +244,7 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
 
         LOGGER.debug("Finding Pairtree object resource: {}", aPath);
 
-        myS3Client.head(myPairtreeBucket, getPath() + "/" + aPath, response -> {
+        myS3Client.head(myPairtreeBucket, getPath(aPath), response -> {
             final int statusCode = response.statusCode();
 
             if (statusCode != 200) {

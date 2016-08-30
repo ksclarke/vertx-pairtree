@@ -72,5 +72,7 @@
   <entry key="PT-DEBUG-047">Failed to delete S3 resource during test tear down: {}</entry>
   <entry key="PT-DEBUG-048">Didn't find expected S3 resource: {}</entry>
   <entry key="PT-DEBUG-049">Please supply your own AWS access and secret key to run integration tests</entry>
+  <entry key="PT-DEBUG-050">Pairtree object with plus not found as expected</entry>
+  <entry key="PT-DEBUG-051">Failed to PUT Pairtree object with a plus in its name</entry>
 
 </properties>

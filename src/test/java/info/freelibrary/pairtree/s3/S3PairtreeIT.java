@@ -2,6 +2,7 @@
 package info.freelibrary.pairtree.s3;
 
 import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
+import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_001;
 import static info.freelibrary.pairtree.PairtreeFactory.PairtreeImpl.S3Bucket;
 import static info.freelibrary.pairtree.PairtreeRoot.PAIRTREE_PREFIX;
 import static info.freelibrary.pairtree.PairtreeRoot.PAIRTREE_VERSION;
@@ -35,8 +36,8 @@ public class S3PairtreeIT extends AbstractS3IT {
     public void setUp(final TestContext aContext) {
         super.setUp(aContext);
 
-        // Initialize our S3-based Pairtree
-        LOGGER.debug("Initializing S3-backed Pairtree");
+        LOGGER.debug(PT_DEBUG_001, "s3:///" + myTestBucket);
+
         myPairtree = PairtreeFactory.getFactory(myVertx, S3Bucket).getPairtree(myTestBucket, myAccessKey,
                 mySecretKey);
     }
