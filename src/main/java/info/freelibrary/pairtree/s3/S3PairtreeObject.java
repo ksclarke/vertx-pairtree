@@ -182,7 +182,7 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
 
     @Override
     public String getPath() {
-        return "/" + PAIRTREE_ROOT + "/" + PairtreeUtils.mapToPtPath(myID) + "/" + PairtreeUtils.encodeID(myID);
+        return PAIRTREE_ROOT + "/" + PairtreeUtils.mapToPtPath(myID) + "/" + PairtreeUtils.encodeID(myID);
     }
 
     @Override

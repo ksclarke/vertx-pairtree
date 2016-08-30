@@ -49,7 +49,7 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
 
         // Create a test ID for each test run
         myUID = randomUUID().toString();
-        myS3Path = "/" + PAIRTREE_ROOT + "/" + PairtreeUtils.mapToPtPath(myUID) + "/" + myUID;
+        myS3Path = PAIRTREE_ROOT + "/" + PairtreeUtils.mapToPtPath(myUID) + "/" + myUID;
     }
 
     @Test
