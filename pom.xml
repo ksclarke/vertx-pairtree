@@ -46,22 +46,16 @@
     <vertx.pairtree.secret_key></vertx.pairtree.secret_key>
 
     <!-- Dependency versions -->
-    <maven.compiler.plugin.version>3.5.1</maven.compiler.plugin.version>
     <vertx.hot.plugin.version>2.1.0</vertx.hot.plugin.version>
-    <freelib.utils.version>0.7.0</freelib.utils.version>
     <aws.sdk.version>1.11.22</aws.sdk.version>
     <vertx.version>3.3.2</vertx.version>
-
-    <!-- Project settings -->
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
 
   <dependencies>
+    <!-- Project dependencies -->
     <dependency>
       <groupId>info.freelibrary</groupId>
       <artifactId>freelib-utils</artifactId>
-      <version>${freelib.utils.version}</version>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
@@ -99,7 +93,6 @@
       <plugin>
         <groupId>info.freelibrary</groupId>
         <artifactId>freelib-utils</artifactId>
-        <version>${freelib.utils.version}</version>
         <executions>
           <execution>
             <phase>process-resources</phase>
@@ -116,15 +109,6 @@
         </executions>
       </plugin>
       <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>${maven.compiler.plugin.version}</version>
-        <configuration>
-          <source>${maven.compiler.source}</source>
-          <target>${maven.compiler.target}</target>
-          <generatedSourcesDirectory>${project.basedir}/src/main/generated</generatedSourcesDirectory>
-        </configuration>
-      </plugin>
-      <plugin>
         <groupId>io.dazraf</groupId>
         <artifactId>vertx-hot-maven-plugin</artifactId>
         <version>${vertx.hot.plugin.version}</version>
@@ -137,10 +121,6 @@
       </plugin>
       <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>sonar-maven-plugin</artifactId>
       </plugin>
       <plugin>
         <artifactId>maven-checkstyle-plugin</artifactId>
@@ -167,7 +147,7 @@
           <systemPropertyVariables>
             <vertx.logger-delegate-factory-class-name>io.vertx.core.logging.SLF4JLogDelegateFactory</vertx.logger-delegate-factory-class-name>
           </systemPropertyVariables>
-          <argLine>-XX:MaxMetaspaceSize=512m ${jacoco.agent.unit.arg}</argLine>
+          <argLine>-XX:MaxMetaspaceSize=512m ${jacoco.agent.arg}</argLine>
         </configuration>
       </plugin>
       <plugin>
@@ -196,7 +176,7 @@
                 <vertx.pairtree.access_key>${vertx.pairtree.access_key}</vertx.pairtree.access_key>
                 <vertx.pairtree.secret_key>${vertx.pairtree.secret_key}</vertx.pairtree.secret_key>
               </systemPropertyVariables>
-              <argLine>-XX:MaxMetaspaceSize=128m ${jacoco.agent.it.arg}</argLine>
+              <argLine>-XX:MaxMetaspaceSize=128m ${jacoco.agent.arg}</argLine>
               <includes>
                 <include>**/*IT.java</include>
                 <include>**/*IntegrationTest.java</include>
@@ -220,7 +200,7 @@
   <parent>
     <artifactId>freelib-parent</artifactId>
     <groupId>info.freelibrary</groupId>
-    <version>0.1.6</version>
+    <version>0.1.8</version>
   </parent>
 
 </project>
