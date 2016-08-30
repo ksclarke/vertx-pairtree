@@ -16,7 +16,7 @@ import info.freelibrary.pairtree.s3.S3Pairtree;
 
 import io.vertx.core.Vertx;
 
-public class PairtreeFactory {
+final public class PairtreeFactory {
 
     public static enum PairtreeImpl {
         FileSystem, S3Bucket
@@ -24,8 +24,10 @@ public class PairtreeFactory {
 
     public static final PairtreeImpl DEFAULT_TYPE = PairtreeImpl.FileSystem;
 
-    private static List<Map.Entry<PairtreeImpl, PairtreeFactory>> myFactories =
+    private static final List<Map.Entry<PairtreeImpl, PairtreeFactory>> myFactories =
             new ArrayList<>(PairtreeImpl.values().length);
+
+    private static final int MINIMUM_AWS_CONFIG_COUNT = 2;
 
     private final Vertx myVertx;
 
@@ -108,7 +110,7 @@ public class PairtreeFactory {
                 final String accessKey;
                 final String secretKey;
 
-                if (aConfigVarargs.length > 2) {
+                if (aConfigVarargs.length > MINIMUM_AWS_CONFIG_COUNT) {
                     accessKey = aConfigVarargs[1];
                     secretKey = aConfigVarargs[2];
                 } else {

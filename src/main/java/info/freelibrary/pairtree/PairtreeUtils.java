@@ -54,6 +54,7 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Utilities for working with Pairtrees.
@@ -114,12 +115,11 @@ public class PairtreeUtils {
      * @return The Pairtree path for the supplied ID
      */
     public static String mapToPtPath(final String aID) {
-        if (aID == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(aID);
 
         final String encodedID = encodeID(aID);
-        final List<String> shorties = new ArrayList<String>();
+        final List<String> shorties = new ArrayList<>();
+
         int start = 0;
 
         while (start < encodedID.length()) {
@@ -156,15 +156,12 @@ public class PairtreeUtils {
      * @return The Pairtree path for the supplied ID
      */
     public static String mapToPtPath(final String aBasePath, final String aID, final String aEncapsulatingDirName) {
-        if (aID == null) {
-            throw new PairtreeRuntimeException(PT_004);
-        }
+        Objects.requireNonNull(aID);
 
         if (aEncapsulatingDirName == null) {
             return concat(aBasePath, mapToPtPath(aID));
         }
 
-        // If aBasePath is null, the concatenate method just ignores it
         return concat(aBasePath, mapToPtPath(aID), encodeID(aEncapsulatingDirName));
     }
 
@@ -289,17 +286,17 @@ public class PairtreeUtils {
         final StringBuffer pathBuf = new StringBuffer();
         Character lastChar = null;
 
-        for (int i = 0; i < aPathsVarargs.length; i++) {
-            if (aPathsVarargs[i] != null) {
+        for (final String aPathsVararg : aPathsVarargs) {
+            if (aPathsVararg != null) {
                 final int length;
 
                 if (lastChar != null && !mySeparator.equals(lastChar)) {
                     pathBuf.append(mySeparator);
                 }
 
-                pathBuf.append(aPathsVarargs[i]);
-                length = aPathsVarargs[i].length();
-                lastChar = aPathsVarargs[i].charAt(length - 1);
+                pathBuf.append(aPathsVararg);
+                length = aPathsVararg.length();
+                lastChar = aPathsVararg.charAt(length - 1);
             }
         }
 
@@ -382,8 +379,7 @@ public class PairtreeUtils {
 
         final StringBuffer idBuf = new StringBuffer();
 
-        for (int c = 0; c < bytes.length; c++) {
-            final byte b = bytes[c];
+        for (final byte b : bytes) {
             final int i = b & 0xff;
 
             if (i < 0x21 || i > 0x7e || i == 0x22 || i == 0x2a || i == 0x2b || i == 0x2c || i == 0x3c || i == 0x3d ||
