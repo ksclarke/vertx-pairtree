@@ -109,16 +109,29 @@ final public class PairtreeFactory {
                 final String bucket = aConfigVarargs.length > 0 ? aConfigVarargs[0] : DEFAULT_PAIRTREE_NAME;
                 final String accessKey;
                 final String secretKey;
+                final String endpoint;
 
                 if (aConfigVarargs.length > MINIMUM_AWS_CONFIG_COUNT) {
                     accessKey = aConfigVarargs[1];
                     secretKey = aConfigVarargs[2];
+
+                    if (aConfigVarargs.length > MINIMUM_AWS_CONFIG_COUNT + 1) {
+                        endpoint = aConfigVarargs[3];
+                    } else {
+                        endpoint = null;
+                    }
                 } else {
                     accessKey = System.getProperty("AWS_ACCESS_KEY");
                     secretKey = System.getProperty("AWS_SECRET_KEY");
+                    endpoint = System.getProperty("S3_ENDPOINT");
                 }
 
-                return new S3Pairtree(myVertx, bucket, accessKey, secretKey);
+                // FIXME: support Pairtree prefix
+                if (endpoint == null) {
+                    return new S3Pairtree(myVertx, bucket, accessKey, secretKey);
+                } else {
+                    return new S3Pairtree(myVertx, bucket, accessKey, secretKey, endpoint);
+                }
             default: // FileSystem backed
                 final String fsPath = aConfigVarargs.length > 0 ? aConfigVarargs[0] : DEFAULT_PAIRTREE_NAME;
                 return new FsPairtree(myVertx, fsPath);

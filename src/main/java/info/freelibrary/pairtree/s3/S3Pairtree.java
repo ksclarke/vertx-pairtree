@@ -58,7 +58,7 @@ public class S3Pairtree extends AbstractPairtree {
      * @param aSecretKey An S3 secret key
      */
     public S3Pairtree(final Vertx aVertx, final String aBucket, final String aAccessKey, final String aSecretKey) {
-        this(aVertx, aBucket, aAccessKey, aSecretKey, null);
+        this(null, aVertx, aBucket, aAccessKey, aSecretKey, null);
     }
 
     /**
@@ -68,15 +68,49 @@ public class S3Pairtree extends AbstractPairtree {
      * @param aBucket An S3 bucket in which to put the Pairtree
      * @param aAccessKey An S3 access key
      * @param aSecretKey An S3 secret key
-     * @param aPairtreePrefix A Pairtree prefix
+     * @param aEndpoint An S3 endpoint
      */
     public S3Pairtree(final Vertx aVertx, final String aBucket, final String aAccessKey, final String aSecretKey,
-            final String aPairtreePrefix) {
+        final String aEndpoint) {
+        this(null, aVertx, aBucket, aAccessKey, aSecretKey, aEndpoint);
+    }
+
+    /**
+     * Creates S3Pairtree using the supplied S3 bucket, access key and secret key.
+     *
+     * @param aPairtreePrefix A Pairtree prefix
+     * @param aVertx A Vert.x instance with which to instantiate the <code>S3Client</code>
+     * @param aBucket An S3 bucket in which to put the Pairtree
+     * @param aAccessKey An S3 access key
+     * @param aSecretKey An S3 secret key
+     */
+    public S3Pairtree(final String aPairtreePrefix, final Vertx aVertx, final String aBucket, final String aAccessKey,
+        final String aSecretKey) {
+        this(aPairtreePrefix, aVertx, aBucket, aAccessKey, aSecretKey, null);
+    }
+
+    /**
+     * Creates S3Pairtree using the supplied S3 bucket, access key and secret key.
+     *
+     * @param aPairtreePrefix A Pairtree prefix
+     * @param aVertx A Vert.x instance with which to instantiate the <code>S3Client</code>
+     * @param aBucket An S3 bucket in which to put the Pairtree
+     * @param aAccessKey An S3 access key
+     * @param aSecretKey An S3 secret key
+     * @param aEndpoint An S3 endpoint
+     */
+    public S3Pairtree(final String aPairtreePrefix, final Vertx aVertx, final String aBucket, final String aAccessKey,
+        final String aSecretKey, final String aEndpoint) {
         Objects.requireNonNull(StringUtils.trimToNull(aBucket), getI18n(PT_015));
         Objects.requireNonNull(StringUtils.trimToNull(aAccessKey), getI18n(PT_016));
         Objects.requireNonNull(StringUtils.trimToNull(aSecretKey), getI18n(PT_017));
 
-        myS3Client = new S3Client(aVertx, aAccessKey, aSecretKey);
+        if (aEndpoint == null) {
+            myS3Client = new S3Client(aVertx, aAccessKey, aSecretKey);
+        } else {
+            myS3Client = new S3Client(aVertx, aAccessKey, aSecretKey, aEndpoint);
+        }
+
         myBucket = aBucket;
 
         if (StringUtils.trimToNull(aPairtreePrefix) != null) {
