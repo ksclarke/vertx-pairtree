@@ -11,8 +11,6 @@ env:
 
 script: mvn -U -Ps3_it install -Dvertx.pairtree.bucket=${VERTX_PAIRTREE_BUCKET} -Dvertx.pairtree.access_key=${VERTX_PAIRTREE_ACCESS_KEY} -Dvertx.pairtree.secret_key=${VERTX_PAIRTREE_SECRET_KEY}
 
-after_success: mvn -U -Ps3_it coveralls:report -Dvertx.pairtree.bucket=${VERTX_PAIRTREE_BUCKET} -Dvertx.pairtree.access_key=${VERTX_PAIRTREE_ACCESS_KEY} -Dvertx.pairtree.secret_key=${VERTX_PAIRTREE_SECRET_KEY}
-
 cache:
   directories:
   - $HOME/.m2
