@@ -1,9 +1,9 @@
 
 package info.freelibrary.pairtree.s3;
 
-import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
 import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_045;
 import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_046;
+import static info.freelibrary.pairtree.PairtreeConstants.BUNDLE_NAME;
 import static java.util.UUID.randomUUID;
 
 import java.io.IOException;
@@ -24,11 +24,13 @@ import org.xml.sax.XMLReader;
 
 import com.amazonaws.AmazonClientException;
 
+import info.freelibrary.pairtree.MessageCodes;
 import info.freelibrary.util.Logger;
 import info.freelibrary.util.LoggerFactory;
 import info.freelibrary.util.StringUtils;
 
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.file.OpenOptions;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
@@ -72,13 +74,13 @@ public class S3ClientIT extends AbstractS3IT {
         final String s3Key = "green-" + myTestID + ".gif";
 
         if (createResource(s3Key, aContext)) {
-            myClient.head(myTestBucket, s3Key, headResponse -> {
-                final int statusCode = headResponse.statusCode();
+            myClient.head(myTestBucket, s3Key, response -> {
+                final int statusCode = response.statusCode();
 
                 if (statusCode != 200) {
-                    aContext.fail(getI18n(PT_DEBUG_045, statusCode, s3Key, headResponse.statusMessage()));
+                    aContext.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, s3Key, response.statusMessage()));
                 } else {
-                    final String contentLength = headResponse.getHeader("Content-Length");
+                    final String contentLength = response.getHeader("Content-Length");
 
                     aContext.assertNotNull(contentLength);
                     aContext.assertTrue(Integer.parseInt(contentLength) > 0);
@@ -98,11 +100,11 @@ public class S3ClientIT extends AbstractS3IT {
             "path/from/two-" + myTestID };
 
         if (createResources(keys, aContext)) {
-            myClient.list(myTestBucket, listResponse -> {
-                final int statusCode = listResponse.statusCode();
+            myClient.list(myTestBucket, response -> {
+                final int statusCode = response.statusCode();
 
                 if (statusCode == 200) {
-                    listResponse.bodyHandler(buffer -> {
+                    response.bodyHandler(buffer -> {
                         final SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
 
                         saxParserFactory.setNamespaceAware(true);
@@ -130,7 +132,7 @@ public class S3ClientIT extends AbstractS3IT {
                     });
                 } else {
                     final String keyValues = StringUtils.toString(keys, '|');
-                    final String message = listResponse.statusMessage();
+                    final String message = response.statusMessage();
 
                     aContext.fail(getI18n(PT_DEBUG_045, statusCode, keyValues, message));
                     async.complete();
@@ -148,11 +150,11 @@ public class S3ClientIT extends AbstractS3IT {
             "path/from/two-" + myTestID };
 
         if (createResources(keys, aContext)) {
-            myClient.list(myTestBucket, "path/from", listResponse -> {
-                final int statusCode = listResponse.statusCode();
+            myClient.list(myTestBucket, "path/from", response -> {
+                final int statusCode = response.statusCode();
 
                 if (statusCode == 200) {
-                    listResponse.bodyHandler(buffer -> {
+                    response.bodyHandler(buffer -> {
                         final SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
 
                         saxParserFactory.setNamespaceAware(true);
@@ -179,9 +181,9 @@ public class S3ClientIT extends AbstractS3IT {
                     });
                 } else {
                     final String keyValues = StringUtils.toString(keys, '|');
-                    final String message = listResponse.statusMessage();
+                    final String message = response.statusMessage();
 
-                    aContext.fail(getI18n(PT_DEBUG_045, statusCode, keyValues, message));
+                    aContext.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, keyValues, message));
                     async.complete();
                 }
             });
@@ -200,14 +202,14 @@ public class S3ClientIT extends AbstractS3IT {
         final String s3Key = "green-" + myTestID + ".gif";
 
         if (createResource(s3Key, aContext)) {
-            myClient.get(myTestBucket, s3Key, getResponse -> {
-                final int statusCode = getResponse.statusCode();
+            myClient.get(myTestBucket, s3Key, response -> {
+                final int statusCode = response.statusCode();
 
                 if (statusCode != 200) {
-                    aContext.fail(getI18n(PT_DEBUG_045, statusCode, s3Key, getResponse.statusMessage()));
+                    aContext.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, s3Key, response.statusMessage()));
                     async.complete();
                 } else {
-                    getResponse.bodyHandler(buffer -> {
+                    response.bodyHandler(buffer -> {
                         if (buffer.length() != myResource.length) {
                             aContext.fail("Length: " + buffer.length());
                         }
@@ -231,11 +233,11 @@ public class S3ClientIT extends AbstractS3IT {
         final String s3Key = "green-" + myTestID + ".gif";
 
         if (createResource(s3Key, aContext)) {
-            myClient.put(myTestBucket, s3Key, Buffer.buffer(myResource), putResponse -> {
-                final int statusCode = putResponse.statusCode();
+            myClient.put(myTestBucket, s3Key, Buffer.buffer(myResource), response -> {
+                final int statusCode = response.statusCode();
 
                 if (statusCode != 200) {
-                    aContext.fail(getI18n(PT_DEBUG_045, statusCode, s3Key, putResponse.statusMessage()));
+                    aContext.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, s3Key, response.statusMessage()));
                 }
 
                 async.complete();
@@ -243,6 +245,63 @@ public class S3ClientIT extends AbstractS3IT {
         } else {
             async.complete();
         }
+    }
+
+    @Test
+    public void testPutAsyncFile(final TestContext aContext) {
+        final Async async = aContext.async();
+        final String s3Key = "green-" + myTestID + ".gif";
+
+        myVertx.fileSystem().open(TEST_FILE.getAbsolutePath(), new OpenOptions(), openResult -> {
+            if (openResult.succeeded()) {
+                if (createResource(s3Key, aContext)) {
+                    myClient.put(myTestBucket, s3Key, openResult.result(), response -> {
+                        final int statusCode = response.statusCode();
+
+                        if (statusCode != 200) {
+                            aContext.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, s3Key, response
+                                    .statusMessage()));
+                        }
+
+                        async.complete();
+                    });
+                } else {
+                    async.complete();
+                }
+            } else {
+                aContext.fail(openResult.cause());
+                async.complete();
+            }
+        });
+    }
+
+    @Test
+    public void testPutAsyncFileLength(final TestContext aContext) {
+        final Async async = aContext.async();
+        final String s3Key = "green-" + myTestID + ".gif";
+        final int length = (int) TEST_FILE.length();
+
+        myVertx.fileSystem().open(TEST_FILE.getAbsolutePath(), new OpenOptions(), openResult -> {
+            if (openResult.succeeded()) {
+                if (createResource(s3Key, aContext)) {
+                    myClient.put(myTestBucket, s3Key, openResult.result(), length, response -> {
+                        final int statusCode = response.statusCode();
+
+                        if (statusCode != 200) {
+                            aContext.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, s3Key, response
+                                    .statusMessage()));
+                        }
+
+                        async.complete();
+                    });
+                } else {
+                    async.complete();
+                }
+            } else {
+                aContext.fail(openResult.cause());
+                async.complete();
+            }
+        });
     }
 
     /**
@@ -255,11 +314,11 @@ public class S3ClientIT extends AbstractS3IT {
         final String s3Key = "green-" + myTestID + ".gif";
 
         if (createResource(s3Key, aContext)) {
-            myClient.delete(myTestBucket, s3Key, deleteResponse -> {
-                final int statusCode = deleteResponse.statusCode();
+            myClient.delete(myTestBucket, s3Key, response -> {
+                final int statusCode = response.statusCode();
 
                 if (statusCode != 204) {
-                    aContext.fail(getI18n(PT_DEBUG_045, statusCode, s3Key, deleteResponse.statusMessage()));
+                    aContext.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, s3Key, response.statusMessage()));
                 }
 
                 async.complete();
@@ -279,11 +338,11 @@ public class S3ClientIT extends AbstractS3IT {
         final String s3Key = "green-" + myTestID + ".gif";
 
         if (createResource(s3Key, aContext)) {
-            final S3ClientRequest request = myClient.createPutRequest(myTestBucket, s3Key, putResponse -> {
-                final int statusCode = putResponse.statusCode();
+            final S3ClientRequest request = myClient.createPutRequest(myTestBucket, s3Key, response -> {
+                final int statusCode = response.statusCode();
 
                 if (statusCode != 200) {
-                    aContext.fail(getI18n(PT_DEBUG_045, statusCode, s3Key, putResponse.statusMessage()));
+                    aContext.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, s3Key, response.statusMessage()));
                 }
 
                 async.complete();
@@ -305,14 +364,14 @@ public class S3ClientIT extends AbstractS3IT {
         final String s3Key = "green-" + myTestID + ".gif";
 
         if (createResource(s3Key, aContext)) {
-            final S3ClientRequest request = myClient.createGetRequest(myTestBucket, s3Key, getResponse -> {
-                final int statusCode = getResponse.statusCode();
+            final S3ClientRequest request = myClient.createGetRequest(myTestBucket, s3Key, response -> {
+                final int statusCode = response.statusCode();
 
                 if (statusCode != 200) {
-                    aContext.fail(getI18n(PT_DEBUG_045, statusCode, s3Key, getResponse.statusMessage()));
+                    aContext.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, s3Key, response.statusMessage()));
                     async.complete();
                 } else {
-                    getResponse.bodyHandler(buffer -> {
+                    response.bodyHandler(buffer -> {
                         final byte[] bytes = buffer.getBytes();
 
                         if (bytes.length != myResource.length) {
@@ -340,11 +399,11 @@ public class S3ClientIT extends AbstractS3IT {
         final String s3Key = "green-" + myTestID + ".gif";
 
         if (createResource(s3Key, aContext)) {
-            final S3ClientRequest request = myClient.createDeleteRequest(myTestBucket, s3Key, deleteResponse -> {
-                final int statusCode = deleteResponse.statusCode();
+            final S3ClientRequest request = myClient.createDeleteRequest(myTestBucket, s3Key, response -> {
+                final int statusCode = response.statusCode();
 
                 if (statusCode != 204) {
-                    aContext.fail(getI18n(PT_DEBUG_045, statusCode, s3Key, deleteResponse.statusMessage()));
+                    aContext.fail(getI18n(PT_DEBUG_045, statusCode, s3Key, response.statusMessage()));
                 }
 
                 async.complete();

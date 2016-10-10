@@ -8,6 +8,7 @@ import info.freelibrary.util.StringUtils;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.file.AsyncFile;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpClientRequest;
@@ -47,14 +48,14 @@ public class S3Client {
      * @param aSecretKey An S3 secret key
      */
     public S3Client(final Vertx aVertx, final String aAccessKey, final String aSecretKey) {
-        this(aVertx, aAccessKey, aSecretKey, null, DEFAULT_ENDPOINT, -1, -1);
+        this(aVertx, aAccessKey, aSecretKey, null, DEFAULT_ENDPOINT, -1, -1, -1);
     }
 
     /**
      * Creates a new S3 client using the supplied access key, secret key, and endpoint.
      */
     public S3Client(final Vertx aVertx, final String aAccessKey, final String aSecretKey, final String aEndpoint) {
-        this(aVertx, aAccessKey, aSecretKey, null, aEndpoint, -1, -1);
+        this(aVertx, aAccessKey, aSecretKey, null, aEndpoint, -1, -1, -1);
     }
 
     /**
@@ -67,9 +68,10 @@ public class S3Client {
      * @param aEndpoint An S3 endpoint
      * @param aIdleTimeout An idle timeout in seconds
      * @param aConnectTimeout A connect timeout in milliseconds
+     * @param aMaxWaitQueueSize A maximum number of connections the pending queue will hold
      */
     public S3Client(final Vertx aVertx, final String aAccessKey, final String aSecretKey, final String aSessionToken,
-            final String aEndpoint, final int aIdleTimeout, final int aConnectTimeout) {
+            final String aEndpoint, final int aIdleTimeout, final int aConnectTimeout, final int aMaxWaitQueueSize) {
         final HttpClientOptions opts = new HttpClientOptions();
 
         myAccessKey = aAccessKey;
@@ -86,6 +88,10 @@ public class S3Client {
 
         if (aConnectTimeout != -1) {
             opts.setConnectTimeout(aConnectTimeout);
+        }
+
+        if (aMaxWaitQueueSize != -1) {
+            opts.setMaxWaitQueueSize(aMaxWaitQueueSize);
         }
 
         myHTTPClient = aVertx.createHttpClient(opts);
@@ -161,14 +167,34 @@ public class S3Client {
      *
      * @param aBucket An S3 bucket
      * @param aKey An S3 key
+     * @param aFile A file to upload
+     * @param aHandler A response handler for the upload
+     */
+    public void put(final String aBucket, final String aKey, final AsyncFile aFile,
+            final Handler<HttpClientResponse> aHandler) {
+        final S3ClientRequest request = createPutRequest(aBucket, aKey, aHandler);
+        final Buffer buffer = Buffer.buffer();
+
+        aFile.endHandler(event -> {
+            request.putHeader(HttpHeaders.CONTENT_LENGTH, String.valueOf(buffer.length()));
+            request.end(buffer);
+        });
+
+        aFile.handler(data -> {
+            buffer.appendBuffer(data);
+        });
+    }
+
+    /**
+     * Uploads the file contents to S3.
+     *
+     * @param aBucket An S3 bucket
+     * @param aKey An S3 key
      * @param aUpload An HttpServerFileUpload
+     * @param aHandler An upload response handler
      */
     public void put(final String aBucket, final String aKey, final HttpServerFileUpload aUpload,
             final Handler<HttpClientResponse> aHandler) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("S3 request bucket: {}, key: {}", aBucket, aKey);
-        }
-
         final S3ClientRequest request = createPutRequest(aBucket, aKey, aHandler);
         final Buffer buffer = Buffer.buffer();
 
@@ -187,14 +213,33 @@ public class S3Client {
      *
      * @param aBucket An S3 bucket
      * @param aKey An S3 key
+     * @param aFile A file to upload
+     * @param aHandler An upload response handler
+     */
+    public void put(final String aBucket, final String aKey, final AsyncFile aFile, final long aFileSize,
+            final Handler<HttpClientResponse> aHandler) {
+        final S3ClientRequest request = createPutRequest(aBucket, aKey, aHandler);
+        final Buffer buffer = Buffer.buffer();
+
+        request.putHeader(HttpHeaders.CONTENT_LENGTH, String.valueOf(aFileSize));
+
+        aFile.endHandler(event -> {
+            request.end(buffer);
+        });
+
+        Pump.pump(aFile, request).start();
+    }
+
+    /**
+     * Uploads the file contents to S3.
+     *
+     * @param aBucket An S3 bucket
+     * @param aKey An S3 key
      * @param aUpload An HttpServerFileUpload
+     * @param aHandler An upload response handler
      */
     public void put(final String aBucket, final String aKey, final HttpServerFileUpload aUpload, final long aFileSize,
             final Handler<HttpClientResponse> aHandler) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("S3 request bucket: {}, key: {}", aBucket, aKey);
-        }
-
         final S3ClientRequest request = createPutRequest(aBucket, aKey, aHandler);
         final Buffer buffer = Buffer.buffer();
 
