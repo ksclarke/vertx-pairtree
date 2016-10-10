@@ -1,13 +1,7 @@
 
 package info.freelibrary.pairtree.s3;
 
-import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
-import static info.freelibrary.pairtree.MessageCodes.PT_010;
-import static info.freelibrary.pairtree.MessageCodes.PT_011;
-import static info.freelibrary.pairtree.MessageCodes.PT_012;
-import static info.freelibrary.pairtree.MessageCodes.PT_015;
-import static info.freelibrary.pairtree.MessageCodes.PT_016;
-import static info.freelibrary.pairtree.MessageCodes.PT_017;
+import static info.freelibrary.pairtree.PairtreeConstants.BUNDLE_NAME;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -25,6 +19,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 import info.freelibrary.pairtree.AbstractPairtree;
+import info.freelibrary.pairtree.MessageCodes;
 import info.freelibrary.pairtree.PairtreeObject;
 import info.freelibrary.util.Logger;
 import info.freelibrary.util.LoggerFactory;
@@ -49,6 +44,8 @@ public class S3Pairtree extends AbstractPairtree {
 
     private final S3Client myS3Client;
 
+    private String myPrefix;
+
     /**
      * Creates S3Pairtree using the supplied S3 bucket, access key and secret key.
      *
@@ -71,7 +68,7 @@ public class S3Pairtree extends AbstractPairtree {
      * @param aEndpoint An S3 endpoint
      */
     public S3Pairtree(final Vertx aVertx, final String aBucket, final String aAccessKey, final String aSecretKey,
-        final String aEndpoint) {
+            final String aEndpoint) {
         this(null, aVertx, aBucket, aAccessKey, aSecretKey, aEndpoint);
     }
 
@@ -85,7 +82,7 @@ public class S3Pairtree extends AbstractPairtree {
      * @param aSecretKey An S3 secret key
      */
     public S3Pairtree(final String aPairtreePrefix, final Vertx aVertx, final String aBucket, final String aAccessKey,
-        final String aSecretKey) {
+            final String aSecretKey) {
         this(aPairtreePrefix, aVertx, aBucket, aAccessKey, aSecretKey, null);
     }
 
@@ -100,10 +97,10 @@ public class S3Pairtree extends AbstractPairtree {
      * @param aEndpoint An S3 endpoint
      */
     public S3Pairtree(final String aPairtreePrefix, final Vertx aVertx, final String aBucket, final String aAccessKey,
-        final String aSecretKey, final String aEndpoint) {
-        Objects.requireNonNull(StringUtils.trimToNull(aBucket), getI18n(PT_015));
-        Objects.requireNonNull(StringUtils.trimToNull(aAccessKey), getI18n(PT_016));
-        Objects.requireNonNull(StringUtils.trimToNull(aSecretKey), getI18n(PT_017));
+            final String aSecretKey, final String aEndpoint) {
+        Objects.requireNonNull(StringUtils.trimToNull(aBucket), getI18n(MessageCodes.PT_015));
+        Objects.requireNonNull(StringUtils.trimToNull(aAccessKey), getI18n(MessageCodes.PT_016));
+        Objects.requireNonNull(StringUtils.trimToNull(aSecretKey), getI18n(MessageCodes.PT_017));
 
         if (aEndpoint == null) {
             myS3Client = new S3Client(aVertx, aAccessKey, aSecretKey);
@@ -140,37 +137,51 @@ public class S3Pairtree extends AbstractPairtree {
 
     @Override
     public void exists(final Handler<AsyncResult<Boolean>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(PT_010, getClass().getSimpleName(), ".exists()"));
+        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".exists()"));
 
         final Future<Boolean> future = Future.<Boolean>future().setHandler(aHandler);
 
         myS3Client.get(myBucket, getVersionFilePath(), getVersionResponse -> {
-            if (getVersionResponse.statusCode() != 200) {
+            final int versionStatusCode = getVersionResponse.statusCode();
+
+            if (versionStatusCode != 200 && versionStatusCode != 404) {
                 future.fail("Response code: " + getVersionResponse.statusCode() + " [" + getVersionResponse
                         .statusMessage() + "]");
-            } else if (hasPrefix()) {
-                myS3Client.get(myBucket, getPrefixFilePath(), getPrefixResponse -> {
-                    if (getPrefixResponse.statusCode() != 200) {
-                        future.fail("Response code: " + getPrefixResponse.statusCode() + " [" + getPrefixResponse
-                                .statusMessage() + "]");
-                    } else {
-                        future.complete(true);
-                    }
-                });
-            } else {
-                future.complete(true);
+            } else if (versionStatusCode == 200) {
+                if (hasPrefix()) {
+                    myS3Client.get(myBucket, getPrefixFilePath(), getPrefixResponse -> {
+                        final int prefixStatusCode = getPrefixResponse.statusCode();
+
+                        if (prefixStatusCode != 200 && prefixStatusCode != 404) {
+                            future.fail("Response code: " + getPrefixResponse.statusCode() + " [" + getPrefixResponse
+                                    .statusMessage() + "]");
+                        } else if (prefixStatusCode == 200) {
+                            future.complete(true);
+                        } else if (prefixStatusCode == 404) {
+                            future.complete(false);
+                        }
+                    });
+                } else {
+                    future.complete(true);
+                }
+            } else if (versionStatusCode == 404) {
+                future.complete(false);
             }
         });
     }
 
     @Override
     public void create(final Handler<AsyncResult<Void>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(PT_010, getClass().getSimpleName(), ".create()"));
+        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".create()"));
 
-        final String specNote = getI18n(PT_011, PT_VERSION_NUM) + PATH_SEP + getI18n(PT_012);
         final Future<Void> future = Future.<Void>future().setHandler(aHandler);
+        final StringBuilder specNote = new StringBuilder();
 
-        myS3Client.put(myBucket, getVersionFilePath(), Buffer.buffer(specNote), putVersionResponse -> {
+        specNote.append(getI18n(MessageCodes.PT_011, PT_VERSION_NUM));
+        specNote.append(System.lineSeparator());
+        specNote.append(getI18n(MessageCodes.PT_012));
+
+        myS3Client.put(myBucket, getVersionFilePath(), Buffer.buffer(specNote.toString()), putVersionResponse -> {
             if (putVersionResponse.statusCode() != 200) {
                 future.fail("Response code: " + putVersionResponse.statusCode() + " [" + putVersionResponse
                         .statusMessage() + "]");
@@ -192,7 +203,7 @@ public class S3Pairtree extends AbstractPairtree {
     @SuppressWarnings("rawtypes")
     @Override
     public void delete(final Handler<AsyncResult<Void>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(PT_010, getClass().getSimpleName(), ".delete()"));
+        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".delete()"));
 
         final Future<Void> future = Future.<Void>future().setHandler(aHandler);
 

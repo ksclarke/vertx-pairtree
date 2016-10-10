@@ -1,10 +1,8 @@
 
 package info.freelibrary.pairtree.s3;
 
-import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
 import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_001;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_050;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_051;
+import static info.freelibrary.pairtree.PairtreeConstants.BUNDLE_NAME;
 import static info.freelibrary.pairtree.PairtreeFactory.PairtreeImpl.S3Bucket;
 import static info.freelibrary.pairtree.PairtreeRoot.PAIRTREE_ROOT;
 import static java.util.UUID.randomUUID;
@@ -15,6 +13,7 @@ import org.junit.runner.RunWith;
 
 import com.amazonaws.AmazonClientException;
 
+import info.freelibrary.pairtree.MessageCodes;
 import info.freelibrary.pairtree.PairtreeFactory;
 import info.freelibrary.pairtree.PairtreeRoot;
 import info.freelibrary.pairtree.PairtreeUtils;
@@ -95,7 +94,7 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
                 aContext.fail(result.cause());
             } else if (!myS3Client.doesObjectExist(myTestBucket, PAIRTREE_ROOT + "/" + PairtreeUtils.mapToPtPath(
                 "ark:/99999/88888888").replace('+', '~') + "/ark~=99999=88888888/README.txt")) {
-                aContext.fail(PT_DEBUG_050);
+                aContext.fail(MessageCodes.PT_DEBUG_050);
             }
 
             async.complete();
@@ -167,7 +166,7 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
             if (!result.succeeded()) {
                 aContext.fail(result.cause());
             } else if (!myS3Client.doesObjectExist(myTestBucket, myS3Path + "/ark~=99999=99999999.gif")) {
-                aContext.fail(PT_DEBUG_051);
+                aContext.fail(MessageCodes.PT_DEBUG_051);
             }
 
             async.complete();

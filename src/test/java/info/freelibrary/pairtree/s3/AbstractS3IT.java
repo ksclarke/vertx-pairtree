@@ -1,9 +1,6 @@
 
 package info.freelibrary.pairtree.s3;
 
-import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_049;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -21,8 +18,8 @@ import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 
 import info.freelibrary.pairtree.AbstractPairtreeTest;
+import info.freelibrary.pairtree.MessageCodes;
 import info.freelibrary.util.IOUtils;
-import info.freelibrary.util.LoggerFactory;
 
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
@@ -50,10 +47,6 @@ public abstract class AbstractS3IT extends AbstractPairtreeTest {
             myTestBucket = System.getProperty("vertx.pairtree.bucket", "vertx-pairtree-tests");
             myAccessKey = System.getProperty("vertx.pairtree.access_key", "YOUR_ACCESS_KEY");
             mySecretKey = System.getProperty("vertx.pairtree.secret_key", "YOUR_SECRET_KEY");
-
-            if (mySecretKey.equals("YOUR_SECRET_KEY") || myAccessKey.equals("YOUR_ACCESS_KEY")) {
-                aContext.fail(LoggerFactory.getLogger(AbstractS3IT.class, BUNDLE_NAME).getMessage(PT_DEBUG_049));
-            }
         } catch (final IOException details) {
             aContext.fail(details.getMessage());
         }
@@ -63,6 +56,10 @@ public abstract class AbstractS3IT extends AbstractPairtreeTest {
     @Before
     public void setUp(final TestContext aContext) {
         super.setUp(aContext);
+
+        if (mySecretKey.equals("YOUR_SECRET_KEY") || myAccessKey.equals("YOUR_ACCESS_KEY")) {
+            aContext.fail(getI18n(MessageCodes.PT_DEBUG_049));
+        }
 
         // Initialize the S3 client we use for test set up and tear down
         myS3Client = new AmazonS3Client(new BasicAWSCredentials(myAccessKey, mySecretKey));

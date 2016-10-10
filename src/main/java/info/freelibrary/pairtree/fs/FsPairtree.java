@@ -1,26 +1,6 @@
 
 package info.freelibrary.pairtree.fs;
 
-import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
-import static info.freelibrary.pairtree.MessageCodes.PT_010;
-import static info.freelibrary.pairtree.MessageCodes.PT_011;
-import static info.freelibrary.pairtree.MessageCodes.PT_012;
-import static info.freelibrary.pairtree.MessageCodes.PT_013;
-import static info.freelibrary.pairtree.MessageCodes.PT_014;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_001;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_002;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_003;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_004;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_005;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_006;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_007;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_008;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_009;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_033;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_034;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_035;
-import static java.io.File.separatorChar;
-
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -28,6 +8,8 @@ import java.util.List;
 import java.util.Objects;
 
 import info.freelibrary.pairtree.AbstractPairtree;
+import info.freelibrary.pairtree.MessageCodes;
+import info.freelibrary.pairtree.PairtreeConstants;
 import info.freelibrary.pairtree.PairtreeException;
 import info.freelibrary.pairtree.PairtreeObject;
 import info.freelibrary.util.Logger;
@@ -56,10 +38,7 @@ public class FsPairtree extends AbstractPairtree {
      * @param aDirPath The directory in which to put the Pairtree
      */
     public FsPairtree(final Vertx aVertx, final String aDirPath) {
-        myPath = aDirPath + java.io.File.separatorChar + PAIRTREE_ROOT;
-        myFileSystem = aVertx.fileSystem();
-
-        LOGGER.debug(PT_DEBUG_001, aDirPath);
+        this(aVertx, aDirPath, null);
     }
 
     /**
@@ -70,11 +49,18 @@ public class FsPairtree extends AbstractPairtree {
      * @param aPairtreePrefix The Pairtree's prefix
      */
     public FsPairtree(final Vertx aVertx, final String aDirPath, final String aPairtreePrefix) {
-        myPath = aDirPath + java.io.File.separatorChar + PAIRTREE_ROOT;
-        myFileSystem = aVertx.fileSystem();
-        myPrefix = aPairtreePrefix;
+        Objects.requireNonNull(aVertx);
+        Objects.requireNonNull(aDirPath);
 
-        LOGGER.debug(PT_DEBUG_002, aDirPath, aPairtreePrefix);
+        myPath = Paths.get(aDirPath, PAIRTREE_ROOT).toString();
+        myFileSystem = aVertx.fileSystem();
+
+        if (aPairtreePrefix == null) {
+            LOGGER.debug(MessageCodes.PT_DEBUG_001, aDirPath);
+        } else {
+            myPrefix = aPairtreePrefix;
+            LOGGER.debug(MessageCodes.PT_DEBUG_002, aDirPath, aPairtreePrefix);
+        }
     }
 
     @Override
@@ -99,7 +85,7 @@ public class FsPairtree extends AbstractPairtree {
 
     @Override
     public void exists(final Handler<AsyncResult<Boolean>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(PT_010, getClass().getSimpleName(), ".exists()"));
+        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".exists()"));
 
         final Future<Boolean> future = Future.<Boolean>future().setHandler(aHandler);
 
@@ -118,11 +104,11 @@ public class FsPairtree extends AbstractPairtree {
 
     @Override
     public void create(final Handler<AsyncResult<Void>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(PT_010, getClass().getSimpleName(), ".create()"));
+        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".create()"));
 
         final Future<Void> future = Future.<Void>future().setHandler(aHandler);
 
-        LOGGER.debug(PT_DEBUG_004, myPath);
+        LOGGER.debug(MessageCodes.PT_DEBUG_004, myPath);
 
         myFileSystem.mkdirs(myPath, result -> {
             if (result.succeeded()) {
@@ -135,11 +121,11 @@ public class FsPairtree extends AbstractPairtree {
 
     @Override
     public void delete(final Handler<AsyncResult<Void>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(PT_010, getClass().getSimpleName(), ".delete()"));
+        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".delete()"));
 
         final Future<Void> future = Future.<Void>future().setHandler(aHandler);
 
-        LOGGER.debug(PT_DEBUG_003, myPath);
+        LOGGER.debug(MessageCodes.PT_DEBUG_003, myPath);
 
         myFileSystem.deleteRecursive(myPath, true, result -> {
             if (result.succeeded()) {
@@ -174,7 +160,7 @@ public class FsPairtree extends AbstractPairtree {
 
     @Override
     protected Logger getLogger() {
-        return LoggerFactory.getLogger(FsPairtree.class, BUNDLE_NAME);
+        return LoggerFactory.getLogger(FsPairtree.class, PairtreeConstants.BUNDLE_NAME);
     }
 
     private void checkVersion(final Future<Boolean> aFuture) {
@@ -182,13 +168,13 @@ public class FsPairtree extends AbstractPairtree {
 
         myFileSystem.exists(versionFilePath, result -> {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(PT_DEBUG_007, versionFilePath);
+                LOGGER.debug(MessageCodes.PT_DEBUG_007, versionFilePath);
             }
 
             if (result.succeeded()) {
                 if (result.result()) {
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug(PT_DEBUG_008, versionFilePath);
+                        LOGGER.debug(MessageCodes.PT_DEBUG_008, versionFilePath);
                     }
 
                     checkPrefix(aFuture);
@@ -208,19 +194,19 @@ public class FsPairtree extends AbstractPairtree {
             if (result.succeeded()) {
                 if (hasPrefix()) {
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug(PT_DEBUG_035, prefixFilePath);
+                        LOGGER.debug(MessageCodes.PT_DEBUG_035, prefixFilePath);
                     }
 
                     if (result.result()) {
                         aFuture.complete(result.result());
                     } else {
-                        aFuture.fail(new PairtreeException(PT_013, prefixFilePath));
+                        aFuture.fail(new PairtreeException(MessageCodes.PT_013, prefixFilePath));
                     }
                 } else {
-                    LOGGER.debug(PT_DEBUG_009, prefixFilePath);
+                    LOGGER.debug(MessageCodes.PT_DEBUG_009, prefixFilePath);
 
                     if (result.result()) {
-                        aFuture.fail(new PairtreeException(PT_014, prefixFilePath));
+                        aFuture.fail(new PairtreeException(MessageCodes.PT_014, prefixFilePath));
                     } else {
                         aFuture.complete(!result.result());
                     }
@@ -233,7 +219,7 @@ public class FsPairtree extends AbstractPairtree {
 
     private void deleteVersion(final Future<Void> aFuture) {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(PT_DEBUG_006, myPath);
+            LOGGER.debug(MessageCodes.PT_DEBUG_006, myPath);
         }
 
         myFileSystem.delete(getVersionFilePath(), result -> {
@@ -251,7 +237,7 @@ public class FsPairtree extends AbstractPairtree {
 
     private void deletePrefix(final Future<Void> aFuture) {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(PT_DEBUG_034, myPath);
+            LOGGER.debug(MessageCodes.PT_DEBUG_034, myPath);
         }
 
         myFileSystem.delete(getPrefixFilePath(), result -> {
@@ -264,13 +250,17 @@ public class FsPairtree extends AbstractPairtree {
     }
 
     private void setVersion(final Future<Void> aFuture) {
-        final String specNote = getI18n(PT_011, PT_VERSION_NUM) + separatorChar + getI18n(PT_012);
+        final StringBuilder specNote = new StringBuilder();
+
+        specNote.append(getI18n(MessageCodes.PT_011, PT_VERSION_NUM));
+        specNote.append(System.lineSeparator());
+        specNote.append(getI18n(MessageCodes.PT_012));
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(PT_DEBUG_005, myPath);
+            LOGGER.debug(MessageCodes.PT_DEBUG_005, myPath);
         }
 
-        myFileSystem.writeFile(getVersionFilePath(), Buffer.buffer(specNote), result -> {
+        myFileSystem.writeFile(getVersionFilePath(), Buffer.buffer(specNote.toString()), result -> {
             if (result.succeeded()) {
                 if (myPrefix != null && myPrefix.length() > 0) {
                     setPrefix(aFuture);
@@ -285,7 +275,7 @@ public class FsPairtree extends AbstractPairtree {
 
     private void setPrefix(final Future<Void> aFuture) {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(PT_DEBUG_033, myPath);
+            LOGGER.debug(MessageCodes.PT_DEBUG_033, myPath);
         }
 
         myFileSystem.writeFile(getPrefixFilePath(), Buffer.buffer(myPrefix), result -> {

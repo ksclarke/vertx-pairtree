@@ -1,8 +1,6 @@
 
 package info.freelibrary.pairtree;
 
-import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
-
 import info.freelibrary.util.I18nObject;
 import info.freelibrary.util.Logger;
 
@@ -13,7 +11,7 @@ public abstract class AbstractPairtree extends I18nObject implements PairtreeRoo
     protected String myPrefix;
 
     protected AbstractPairtree() {
-        super(BUNDLE_NAME);
+        super(PairtreeConstants.BUNDLE_NAME);
     }
 
     @Override

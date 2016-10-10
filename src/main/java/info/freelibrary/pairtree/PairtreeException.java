@@ -1,8 +1,6 @@
 
 package info.freelibrary.pairtree;
 
-import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
-
 import info.freelibrary.util.I18nException;
 
 /**
@@ -23,7 +21,7 @@ public class PairtreeException extends I18nException {
      * @param aMessage
      */
     public PairtreeException(final String aMessage) {
-        super(BUNDLE_NAME, aMessage);
+        super(PairtreeConstants.BUNDLE_NAME, aMessage);
     }
 
     /**
@@ -34,7 +32,7 @@ public class PairtreeException extends I18nException {
      * @param aDetailsVarargs Additional details to insert into the message
      */
     public PairtreeException(final String aMessage, final Object... aDetailsVarargs) {
-        super(BUNDLE_NAME, aMessage, aDetailsVarargs);
+        super(PairtreeConstants.BUNDLE_NAME, aMessage, aDetailsVarargs);
     }
 
     /**
@@ -44,7 +42,7 @@ public class PairtreeException extends I18nException {
      * @param aCause An upstream exception
      */
     public PairtreeException(final String aMessage, final Exception aCause) {
-        super(BUNDLE_NAME, aMessage, aCause);
+        super(PairtreeConstants.BUNDLE_NAME, aMessage, aCause);
     }
 
     /**
@@ -56,6 +54,6 @@ public class PairtreeException extends I18nException {
      * @param aDetailsVarargs Additional details to insert into the message
      */
     public PairtreeException(final String aMessage, final Exception aCause, final String... aDetailsVarargs) {
-        super(BUNDLE_NAME, aMessage, aDetailsVarargs, aCause);
+        super(PairtreeConstants.BUNDLE_NAME, aMessage, aDetailsVarargs, aCause);
     }
 }

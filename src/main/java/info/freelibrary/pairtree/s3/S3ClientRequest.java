@@ -270,12 +270,13 @@ public class S3ClientRequest implements HttpClientRequest {
                     canonicalizedAmzHeaders + canonicalizedResource;
 
             String signature;
+
             try {
                 signature = b64SignHmacSha1(mySecretKey, toSign);
-            } catch (InvalidKeyException | NoSuchAlgorithmException e) {
+            } catch (InvalidKeyException | NoSuchAlgorithmException details) {
                 signature = "ERRORSIGNATURE";
                 // This will totally fail, but downstream users can handle it
-                LOGGER.error("Failed to sign S3 request due to " + e);
+                LOGGER.error("Failed to sign S3 request due to " + details);
             }
 
             final String authorization = "AWS" + " " + myAccessKey + ":" + signature;

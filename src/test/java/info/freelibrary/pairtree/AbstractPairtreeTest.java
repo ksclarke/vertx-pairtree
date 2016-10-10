@@ -1,8 +1,7 @@
 
 package info.freelibrary.pairtree;
 
-import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
-import static info.freelibrary.pairtree.MessageCodes.PT_010;
+import static info.freelibrary.pairtree.PairtreeConstants.BUNDLE_NAME;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -64,7 +63,8 @@ public abstract class AbstractPairtreeTest extends I18nObject {
      */
     protected void createTestPairtreeObject(final PairtreeImpl aPairtreeImpl,
             final Handler<AsyncResult<PairtreeObject>> aHandler, final String... aConfigVarargs) {
-        Objects.requireNonNull(aHandler, getI18n(PT_010, getClass().getSimpleName(), ".createTestPairtreeObject()"));
+        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(),
+                ".createTestPairtreeObject()"));
 
         final String[] config = Arrays.copyOf(aConfigVarargs, aConfigVarargs.length - 1);
         final PairtreeRoot root = PairtreeFactory.getFactory(myVertx, aPairtreeImpl).getPairtree(config);

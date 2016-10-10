@@ -1,8 +1,7 @@
 
 package info.freelibrary.pairtree.s3;
 
-import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_001;
+import static info.freelibrary.pairtree.PairtreeConstants.BUNDLE_NAME;
 import static info.freelibrary.pairtree.PairtreeFactory.PairtreeImpl.S3Bucket;
 import static info.freelibrary.pairtree.PairtreeRoot.PAIRTREE_PREFIX;
 import static info.freelibrary.pairtree.PairtreeRoot.PAIRTREE_VERSION;
@@ -12,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import info.freelibrary.pairtree.MessageCodes;
 import info.freelibrary.pairtree.PairtreeFactory;
 import info.freelibrary.pairtree.PairtreeRoot;
 import info.freelibrary.util.Logger;
@@ -36,10 +36,9 @@ public class S3PairtreeIT extends AbstractS3IT {
     public void setUp(final TestContext aContext) {
         super.setUp(aContext);
 
-        LOGGER.debug(PT_DEBUG_001, "s3:///" + myTestBucket);
+        LOGGER.debug(MessageCodes.PT_DEBUG_001, "s3:///" + myTestBucket);
 
-        myPairtree = PairtreeFactory.getFactory(myVertx, S3Bucket).getPairtree(myTestBucket, myAccessKey,
-                mySecretKey);
+        myPairtree = PairtreeFactory.getFactory(myVertx, S3Bucket).getPairtree(myTestBucket, myAccessKey, mySecretKey);
     }
 
     @Test
