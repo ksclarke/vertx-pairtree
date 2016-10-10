@@ -1,19 +1,12 @@
 
 package info.freelibrary.pairtree.fs;
 
-import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
-import static info.freelibrary.pairtree.MessageCodes.PT_010;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_021;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_022;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_023;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_025;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_026;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_027;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 
+import info.freelibrary.pairtree.MessageCodes;
+import info.freelibrary.pairtree.PairtreeConstants;
 import info.freelibrary.pairtree.PairtreeObject;
 import info.freelibrary.pairtree.PairtreeUtils;
 import info.freelibrary.util.I18nObject;
@@ -28,7 +21,7 @@ import io.vertx.core.file.FileSystem;
 
 public class FsPairtreeObject extends I18nObject implements PairtreeObject {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FsPairtreeObject.class, BUNDLE_NAME);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FsPairtreeObject.class, PairtreeConstants.BUNDLE_NAME);
 
     private final FileSystem myFileSystem;
 
@@ -46,7 +39,11 @@ public class FsPairtreeObject extends I18nObject implements PairtreeObject {
      * @param aID The object's ID
      */
     public FsPairtreeObject(final FileSystem aFileSystem, final FsPairtree aPairtree, final String aID) {
-        super(BUNDLE_NAME);
+        super(PairtreeConstants.BUNDLE_NAME);
+
+        Objects.requireNonNull(aFileSystem);
+        Objects.requireNonNull(aPairtree);
+        Objects.requireNonNull(aID);
 
         myPairtreePath = aPairtree.toString();
         myPrefix = aPairtree.getPrefix();
@@ -61,11 +58,11 @@ public class FsPairtreeObject extends I18nObject implements PairtreeObject {
 
     @Override
     public void exists(final Handler<AsyncResult<Boolean>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(PT_010, getClass().getSimpleName(), ".exists()"));
+        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".exists()"));
 
         final Future<Boolean> future = Future.<Boolean>future().setHandler(aHandler);
 
-        LOGGER.debug(PT_DEBUG_021, this);
+        LOGGER.debug(MessageCodes.PT_DEBUG_021, this);
 
         myFileSystem.exists(getPath(), result -> {
             if (result.succeeded()) {
@@ -78,11 +75,11 @@ public class FsPairtreeObject extends I18nObject implements PairtreeObject {
 
     @Override
     public void create(final Handler<AsyncResult<Void>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(PT_010, getClass().getSimpleName(), ".create()"));
+        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".create()"));
 
         final Future<Void> future = Future.<Void>future().setHandler(aHandler);
 
-        LOGGER.debug(PT_DEBUG_023, this);
+        LOGGER.debug(MessageCodes.PT_DEBUG_023, this);
 
         myFileSystem.mkdirs(getPath(), result -> {
             if (result.succeeded()) {
@@ -95,11 +92,11 @@ public class FsPairtreeObject extends I18nObject implements PairtreeObject {
 
     @Override
     public void delete(final Handler<AsyncResult<Void>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(PT_010, getClass().getSimpleName(), ".delete()"));
+        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".delete()"));
 
         final Future<Void> future = Future.<Void>future().setHandler(aHandler);
 
-        LOGGER.debug(PT_DEBUG_022, this);
+        LOGGER.debug(MessageCodes.PT_DEBUG_022, this);
 
         myFileSystem.deleteRecursive(getPath(), true, result -> {
             if (result.succeeded()) {
@@ -132,12 +129,12 @@ public class FsPairtreeObject extends I18nObject implements PairtreeObject {
 
     @Override
     public void put(final String aPath, final Buffer aBuffer, final Handler<AsyncResult<Void>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(PT_010, getClass().getSimpleName(), ".put()"));
+        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".put()"));
 
         final Path resourcePath = Paths.get(getPath(), aPath);
         final Future<Void> future = Future.<Void>future().setHandler(aHandler);
 
-        LOGGER.debug(PT_DEBUG_026, resourcePath.toString());
+        LOGGER.debug(MessageCodes.PT_DEBUG_026, resourcePath.toString());
 
         // First, create the parent directory path if it doesn't already exist
         myFileSystem.mkdirs(resourcePath.getParent().toString(), mkdirsResult -> {
@@ -158,12 +155,12 @@ public class FsPairtreeObject extends I18nObject implements PairtreeObject {
 
     @Override
     public void get(final String aPath, final Handler<AsyncResult<Buffer>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(PT_010, getClass().getSimpleName(), ".get()"));
+        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".get()"));
 
         final String resourcePath = Paths.get(getPath(), aPath).toString();
         final Future<Buffer> future = Future.<Buffer>future().setHandler(aHandler);
 
-        LOGGER.debug(PT_DEBUG_027, resourcePath.toString());
+        LOGGER.debug(MessageCodes.PT_DEBUG_027, resourcePath.toString());
 
         myFileSystem.readFile(resourcePath, result -> {
             if (result.succeeded()) {
@@ -176,12 +173,12 @@ public class FsPairtreeObject extends I18nObject implements PairtreeObject {
 
     @Override
     public void find(final String aPath, final Handler<AsyncResult<Boolean>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(PT_010, getClass().getSimpleName(), ".find()"));
+        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".find()"));
 
         final String resourcePath = Paths.get(getPath(), aPath).toString();
         final Future<Boolean> future = Future.<Boolean>future().setHandler(aHandler);
 
-        LOGGER.debug(PT_DEBUG_025, resourcePath.toString());
+        LOGGER.debug(MessageCodes.PT_DEBUG_025, resourcePath.toString());
 
         myFileSystem.exists(resourcePath, result -> {
             if (result.succeeded()) {
