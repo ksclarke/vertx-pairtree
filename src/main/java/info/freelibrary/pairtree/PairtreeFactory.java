@@ -1,7 +1,6 @@
 
 package info.freelibrary.pairtree;
 
-import static info.freelibrary.pairtree.MessageCodes.PT_009;
 import static info.freelibrary.pairtree.PairtreeFactory.PairtreeImpl.FileSystem;
 import static info.freelibrary.pairtree.PairtreeFactory.PairtreeImpl.S3Bucket;
 import static info.freelibrary.pairtree.PairtreeRoot.DEFAULT_PAIRTREE_NAME;
@@ -16,16 +15,23 @@ import info.freelibrary.pairtree.s3.S3Pairtree;
 
 import io.vertx.core.Vertx;
 
+/**
+ * A factory which can be used to create pairtree objects.
+ *
+ * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
+ */
 final public class PairtreeFactory {
 
+    /* The types of pairtree backends supported by this library. */
     public static enum PairtreeImpl {
         FileSystem, S3Bucket
     };
 
+    /* The default type of Pairtree implementation. */
     public static final PairtreeImpl DEFAULT_TYPE = PairtreeImpl.FileSystem;
 
-    private static final List<Map.Entry<PairtreeImpl, PairtreeFactory>> myFactories =
-            new ArrayList<>(PairtreeImpl.values().length);
+    private static final List<Map.Entry<PairtreeImpl, PairtreeFactory>> myFactories = new ArrayList<>(PairtreeImpl
+            .values().length);
 
     private static final int MINIMUM_AWS_CONFIG_COUNT = 2;
 
@@ -52,13 +58,17 @@ final public class PairtreeFactory {
      * @return A Pairtree root
      */
     public final PairtreeRoot getPairtree(final String... aConfigVarargs) {
+        final PairtreeRoot pairtree;
+
         if (myImplType.equals(FileSystem)) {
-            return getPairtree(FileSystem, aConfigVarargs[0]);
+            pairtree = getPairtree(FileSystem, aConfigVarargs[0]);
         } else if (myImplType.equals(S3Bucket)) {
-            return getPairtree(S3Bucket, aConfigVarargs);
+            pairtree = getPairtree(S3Bucket, aConfigVarargs);
         } else {
-            throw new PairtreeRuntimeException(PT_009, myImplType);
+            throw new PairtreeRuntimeException(MessageCodes.PT_009, myImplType);
         }
+
+        return pairtree;
     }
 
     /**
@@ -103,38 +113,40 @@ final public class PairtreeFactory {
      *        access key, and AWS secret key (the last two are only needed if the implementation is an S3 Pairtree)
      * @return A Pairtree root
      */
-    private final PairtreeRoot getPairtree(final PairtreeImpl aImpl, final String... aConfigVarargs) {
-        switch (aImpl) {
-            case S3Bucket:
-                final String bucket = aConfigVarargs.length > 0 ? aConfigVarargs[0] : DEFAULT_PAIRTREE_NAME;
-                final String accessKey;
-                final String secretKey;
-                final String endpoint;
+    private final PairtreeRoot getPairtree(final PairtreeImpl aImpl, final String... aConfig) {
+        final PairtreeRoot pairtree;
 
-                if (aConfigVarargs.length > MINIMUM_AWS_CONFIG_COUNT) {
-                    accessKey = aConfigVarargs[1];
-                    secretKey = aConfigVarargs[2];
+        if (aImpl.equals(S3Bucket)) {
+            final String bucket = aConfig.length > 0 ? aConfig[0] : DEFAULT_PAIRTREE_NAME;
+            final String accessKey;
+            final String secretKey;
+            final String endpoint;
 
-                    if (aConfigVarargs.length > MINIMUM_AWS_CONFIG_COUNT + 1) {
-                        endpoint = aConfigVarargs[3];
-                    } else {
-                        endpoint = null;
-                    }
+            if (aConfig.length > MINIMUM_AWS_CONFIG_COUNT) {
+                accessKey = aConfig[1];
+                secretKey = aConfig[2];
+
+                if (aConfig.length > MINIMUM_AWS_CONFIG_COUNT + 1) {
+                    endpoint = aConfig[3];
                 } else {
-                    accessKey = System.getProperty("AWS_ACCESS_KEY");
-                    secretKey = System.getProperty("AWS_SECRET_KEY");
-                    endpoint = System.getProperty("S3_ENDPOINT");
+                    endpoint = null;
                 }
+            } else {
+                accessKey = System.getProperty("AWS_ACCESS_KEY");
+                secretKey = System.getProperty("AWS_SECRET_KEY");
+                endpoint = System.getProperty("S3_ENDPOINT");
+            }
 
-                // FIXME: support Pairtree prefix
-                if (endpoint == null) {
-                    return new S3Pairtree(myVertx, bucket, accessKey, secretKey);
-                } else {
-                    return new S3Pairtree(myVertx, bucket, accessKey, secretKey, endpoint);
-                }
-            default: // FileSystem backed
-                final String fsPath = aConfigVarargs.length > 0 ? aConfigVarargs[0] : DEFAULT_PAIRTREE_NAME;
-                return new FsPairtree(myVertx, fsPath);
+            // FIXME: support Pairtree prefix
+            if (endpoint == null) {
+                pairtree = new S3Pairtree(myVertx, bucket, accessKey, secretKey);
+            } else {
+                pairtree = new S3Pairtree(myVertx, bucket, accessKey, secretKey, endpoint);
+            }
+        } else { // Default file-system implementation
+            pairtree = new FsPairtree(myVertx, aConfig.length > 0 ? aConfig[0] : DEFAULT_PAIRTREE_NAME);
         }
+
+        return pairtree;
     }
 }

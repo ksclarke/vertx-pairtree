@@ -19,6 +19,11 @@ import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.file.FileSystem;
 
+/**
+ * A file-system backed implementation of a Pairtree object.
+ *
+ * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
+ */
 public class FsPairtreeObject extends I18nObject implements PairtreeObject {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FsPairtreeObject.class, PairtreeConstants.BUNDLE_NAME);

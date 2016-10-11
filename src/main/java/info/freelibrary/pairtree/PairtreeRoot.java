@@ -6,19 +6,24 @@ import java.util.List;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
+/**
+ * A public interface for Pairtree root implementations.
+ *
+ * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
+ */
 public interface PairtreeRoot {
 
-    public static final String DEFAULT_PAIRTREE_NAME = "pairtree";
+    public final String DEFAULT_PAIRTREE_NAME = "pairtree";
 
-    public static final String PT_VERSION_NUM = "0.1";
+    public final String PT_VERSION_NUM = "0.1";
 
-    public static final String PAIRTREE_PREFIX = "pairtree_prefix";
+    public final String PAIRTREE_PREFIX = "pairtree_prefix";
 
-    public static final String PAIRTREE_ROOT = "pairtree_root";
+    public final String PAIRTREE_ROOT = "pairtree_root";
 
-    public static final String PAIRTREE_VERSION = "pairtree_version";
+    public final String PAIRTREE_VERSION = "pairtree_version";
 
-    public static final String DEFAULT_CHARSET = "UTF-8";
+    public final String DEFAULT_CHARSET = "UTF-8";
 
     /**
      * Gets the Pairtree prefix.

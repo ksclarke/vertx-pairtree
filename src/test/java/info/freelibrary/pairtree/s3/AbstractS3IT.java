@@ -24,6 +24,11 @@ import info.freelibrary.util.IOUtils;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 
+/**
+ * Support for S3 test interactions.
+ *
+ * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
+ */
 @RunWith(VertxUnitRunner.class)
 public abstract class AbstractS3IT extends AbstractPairtreeTest {
 
@@ -39,6 +44,11 @@ public abstract class AbstractS3IT extends AbstractPairtreeTest {
 
     protected AmazonS3Client myS3Client;
 
+    /**
+     * Static test setup.
+     *
+     * @param aContext A test context
+     */
     @BeforeClass
     public static void setUpBeforeClass(final TestContext aContext) {
         try {

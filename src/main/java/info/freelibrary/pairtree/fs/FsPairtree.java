@@ -23,6 +23,11 @@ import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.file.FileSystem;
 
+/**
+ * A file-system backed Pairtree implementation.
+ *
+ * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
+ */
 public class FsPairtree extends AbstractPairtree {
 
     /* The underlying file system */

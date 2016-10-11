@@ -21,12 +21,22 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.file.FileSystem;
 import io.vertx.ext.unit.TestContext;
 
+/**
+ * Tests for the <code>AbstractFsPairtree</code>.
+ *
+ * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
+ */
 public abstract class AbstractFsPairtreeTest extends AbstractPairtreeTest {
 
     protected PairtreeRoot myPairtree;
 
     protected FileSystem myFileSystem;
 
+    /**
+     * Setup for the tests.
+     *
+     * @param aContext A test context
+     */
     @Override
     @Before
     public void setUp(final TestContext aContext) {
@@ -38,6 +48,11 @@ public abstract class AbstractFsPairtreeTest extends AbstractPairtreeTest {
         myPairtree = PairtreeFactory.getFactory(myVertx).getPairtree(path);
     }
 
+    /**
+     * Tear down for the tests.
+     *
+     * @param aContext A test context
+     */
     @Override
     @After
     public void tearDown(final TestContext aContext) {

@@ -11,11 +11,11 @@ import org.xml.sax.helpers.DefaultHandler;
 /**
  * A SAX handler for S3's ObjectList response.
  *
- * @author Kevin S. Clarke (<a href="mailto:ksclarke@ksclarke.io">ksclarke@ksclarke.io</a>)
+ * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
 public class ObjectListHandler extends DefaultHandler {
 
-    final List<String> myKeys = new ArrayList<String>();
+    final List<String> myKeys = new ArrayList<>();
 
     final StringBuilder myKeyText = new StringBuilder();
 

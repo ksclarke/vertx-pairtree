@@ -8,6 +8,11 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.http.HttpServerOptions;
 
+/**
+ * A verticle for pairtrees.
+ *
+ * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
+ */
 public class PairtreeVerticle extends AbstractVerticle {
 
     /* Using SLF4J until https://github.com/dazraf/vertx-hot/issues/1 is fixed */

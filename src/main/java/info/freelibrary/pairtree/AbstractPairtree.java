@@ -4,12 +4,20 @@ package info.freelibrary.pairtree;
 import info.freelibrary.util.I18nObject;
 import info.freelibrary.util.Logger;
 
+/**
+ * A base pairtree class which can be extended by specific implementations.
+ *
+ * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
+ */
 public abstract class AbstractPairtree extends I18nObject implements PairtreeRoot {
 
     protected final Logger LOGGER = getLogger();
 
     protected String myPrefix;
 
+    /**
+     * Creates an abstract pairtree object.
+     */
     protected AbstractPairtree() {
         super(PairtreeConstants.BUNDLE_NAME);
     }

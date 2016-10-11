@@ -21,6 +21,11 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 
+/**
+ * Tests for the S3 Pairtree implementation.
+ *
+ * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
+ */
 @RunWith(VertxUnitRunner.class)
 public class S3PairtreeIT extends AbstractS3IT {
 
@@ -43,15 +48,12 @@ public class S3PairtreeIT extends AbstractS3IT {
 
     @Test
     public final void testGetObject(final TestContext aContext) {
-        LOGGER.debug("Running testGetObject()");
         aContext.assertEquals(myPairtree.getObject("asdf").getID(), "asdf");
     }
 
     @Test
     public final void testExists(final TestContext aContext) {
         final Async async = aContext.async();
-
-        LOGGER.debug("Running testExists()");
 
         myPairtree.create(createResult -> {
             if (!createResult.succeeded()) {
@@ -61,12 +63,12 @@ public class S3PairtreeIT extends AbstractS3IT {
                 final boolean prefixFile = myS3Client.doesObjectExist(myTestBucket, myPairtree.getPrefixFilePath());
                 final boolean versionFile = myS3Client.doesObjectExist(myTestBucket, myPairtree.getVersionFilePath());
 
-                aContext.assertTrue(versionFile, "Didn't find expected version file");
+                aContext.assertTrue(versionFile, MessageCodes.PT_DEBUG_055);
 
                 if (myPairtree.hasPrefix()) {
-                    aContext.assertTrue(prefixFile, "Didn't find expected prefix file");
+                    aContext.assertTrue(prefixFile, MessageCodes.PT_DEBUG_054);
                 } else {
-                    aContext.assertFalse(prefixFile, "Found unexpected prefix file");
+                    aContext.assertFalse(prefixFile, MessageCodes.PT_DEBUG_052);
                 }
 
                 myPairtree.exists(existsResults -> {
@@ -85,8 +87,6 @@ public class S3PairtreeIT extends AbstractS3IT {
     @Test
     public final void testCreate(final TestContext aContext) {
         final Async async = aContext.async();
-
-        LOGGER.debug("Running testCreate()");
 
         myPairtree.create(result -> {
             if (!result.succeeded()) {
@@ -107,8 +107,6 @@ public class S3PairtreeIT extends AbstractS3IT {
     public final void testDelete(final TestContext aContext) {
         final Async async = aContext.async();
 
-        LOGGER.debug("Running testDelete()");
-
         myPairtree.create(createResult -> {
             if (!createResult.succeeded()) {
                 aContext.fail(createResult.cause());
@@ -117,12 +115,12 @@ public class S3PairtreeIT extends AbstractS3IT {
                 final boolean prefixFile = myS3Client.doesObjectExist(myTestBucket, myPairtree.getPrefixFilePath());
                 final boolean versionFile = myS3Client.doesObjectExist(myTestBucket, myPairtree.getVersionFilePath());
 
-                aContext.assertTrue(versionFile, "Didn't find expected version file");
+                aContext.assertTrue(versionFile, MessageCodes.PT_DEBUG_055);
 
                 if (myPairtree.hasPrefix()) {
-                    aContext.assertTrue(prefixFile, "Didn't find expected prefix file");
+                    aContext.assertTrue(prefixFile, MessageCodes.PT_DEBUG_054);
                 } else {
-                    aContext.assertFalse(prefixFile, "Found unexpected prefix file");
+                    aContext.assertFalse(prefixFile, MessageCodes.PT_DEBUG_052);
                 }
 
                 // Now delete the Pairtree we just created
@@ -133,13 +131,13 @@ public class S3PairtreeIT extends AbstractS3IT {
                         final String versionFilePath = myPairtree.getVersionFilePath();
                         final boolean vfpExists = myS3Client.doesObjectExist(myTestBucket, versionFilePath);
 
-                        aContext.assertFalse(vfpExists, "Found unexpected version file");
+                        aContext.assertFalse(vfpExists, MessageCodes.PT_DEBUG_053);
 
                         if (myPairtree.hasPrefix()) {
                             final String prefixFilePath = myPairtree.getPrefixFilePath();
                             final boolean pfpExists = myS3Client.doesObjectExist(myTestBucket, prefixFilePath);
 
-                            aContext.assertFalse(pfpExists, "Found unexpected prefix file");
+                            aContext.assertFalse(pfpExists, MessageCodes.PT_DEBUG_052);
                         }
                     }
 
@@ -151,25 +149,21 @@ public class S3PairtreeIT extends AbstractS3IT {
 
     @Test
     public final void testToString(final TestContext aContext) {
-        LOGGER.debug("Running testToString()");
         aContext.assertEquals("s3:///" + myTestBucket + "/pairtree_root", myPairtree.toString());
     }
 
     @Test
     public final void testGetPath(final TestContext aContext) {
-        LOGGER.debug("Running testGetPath()");
         aContext.assertEquals(myTestBucket, myPairtree.getPath());
     }
 
     @Test
     public final void testGetPrefixFilePath(final TestContext aContext) {
-        LOGGER.debug("Running testGetPrefixFilePath()");
         aContext.assertEquals(PAIRTREE_PREFIX, myPairtree.getPrefixFilePath());
     }
 
     @Test
     public final void testGetVersionFilePath(final TestContext aContext) {
-        LOGGER.debug("Running testGetVersionFilePath()");
         aContext.assertEquals(PAIRTREE_VERSION + PT_VERSION_NUM.replace('.', '_'), myPairtree.getVersionFilePath());
     }
 

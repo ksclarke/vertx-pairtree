@@ -25,6 +25,11 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 
+/**
+ * Tests for the <code>S3PairtreeObject</code>.
+ *
+ * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
+ */
 @RunWith(VertxUnitRunner.class)
 public class S3PairtreeObjectIT extends AbstractS3IT {
 

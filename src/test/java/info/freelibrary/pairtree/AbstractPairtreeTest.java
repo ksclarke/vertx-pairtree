@@ -21,6 +21,11 @@ import io.vertx.core.Vertx;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 
+/**
+ * An abstract Pairtree test object.
+ *
+ * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
+ */
 @RunWith(VertxUnitRunner.class)
 public abstract class AbstractPairtreeTest extends I18nObject {
 
@@ -30,16 +35,29 @@ public abstract class AbstractPairtreeTest extends I18nObject {
 
     protected Vertx myVertx;
 
+    /**
+     * Creates an abstract Pairtree test.
+     */
     public AbstractPairtreeTest() {
         super(BUNDLE_NAME);
     }
 
+    /**
+     * Setup for the tests.
+     *
+     * @param aContext A test context
+     */
     @Before
     public void setUp(final TestContext aContext) {
         LOGGER.debug("Initializing Vert.x");
         myVertx = Vertx.vertx();
     }
 
+    /**
+     * Tear down for the tests.
+     *
+     * @param aContext
+     */
     @After
     public void tearDown(final TestContext aContext) {
         // FIXME: This causes problems... Why?

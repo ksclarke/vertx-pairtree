@@ -1,8 +1,6 @@
 
 package info.freelibrary.pairtree.s3;
 
-import info.freelibrary.util.Logger;
-import info.freelibrary.util.LoggerFactory;
 import info.freelibrary.util.StringUtils;
 
 import io.vertx.core.Handler;
@@ -17,11 +15,14 @@ import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpServerFileUpload;
 import io.vertx.core.streams.Pump;
 
+/**
+ * An S3 client implementation used by the S3Pairtree object.
+ *
+ * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
+ */
 public class S3Client {
 
     public static final String DEFAULT_ENDPOINT = "s3.amazonaws.com"; // test bad endpoint: s3-us-east-1.amazonaws.com
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(S3Client.class);
 
     private final String myAccessKey;
 

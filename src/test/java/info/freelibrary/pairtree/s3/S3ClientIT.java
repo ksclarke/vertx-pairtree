@@ -38,7 +38,7 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 /**
  * Integration tests for {@link S3Client}.
  *
- * @author Kevin S. Clarke (<a href="mailto:ksclarke@ksclarke.io">ksclarke@ksclarke.io</a>)
+ * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
 @RunWith(VertxUnitRunner.class)
 public class S3ClientIT extends AbstractS3IT {
@@ -215,10 +215,6 @@ public class S3ClientIT extends AbstractS3IT {
         }
     }
 
-    /**
-     * Test for
-     * {@link info.freelibrary.pairtree.s3.S3Client#put(java.lang.String, java.lang.String, io.vertx.core.buffer.Buffer, io.vertx.core.Handler)}
-     */
     @Test
     public void testPut(final TestContext aContext) {
         final Async async = aContext.async();

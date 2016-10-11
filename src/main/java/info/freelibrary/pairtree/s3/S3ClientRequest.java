@@ -23,6 +23,11 @@ import io.vertx.core.http.HttpConnection;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpVersion;
 
+/**
+ * An S3 client request implementation of <code>HttpClientRequest</code>.
+ *
+ * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
+ */
 public class S3ClientRequest implements HttpClientRequest {
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");

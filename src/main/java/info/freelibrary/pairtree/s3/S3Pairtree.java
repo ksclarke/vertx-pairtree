@@ -32,6 +32,11 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 
+/**
+ * A S3 backed Pairtree implementation.
+ *
+ * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
+ */
 public class S3Pairtree extends AbstractPairtree {
 
     public static final String AWS_ACCESS_KEY = "AWS_ACCESS_KEY";
@@ -145,7 +150,7 @@ public class S3Pairtree extends AbstractPairtree {
             final int versionStatusCode = getVersionResponse.statusCode();
 
             if (versionStatusCode != 200 && versionStatusCode != 404) {
-                future.fail("Response code: " + getVersionResponse.statusCode() + " [" + getVersionResponse
+                future.fail(getI18n(MessageCodes.PT_018) + getVersionResponse.statusCode() + " [" + getVersionResponse
                         .statusMessage() + "]");
             } else if (versionStatusCode == 200) {
                 if (hasPrefix()) {
@@ -153,8 +158,8 @@ public class S3Pairtree extends AbstractPairtree {
                         final int prefixStatusCode = getPrefixResponse.statusCode();
 
                         if (prefixStatusCode != 200 && prefixStatusCode != 404) {
-                            future.fail("Response code: " + getPrefixResponse.statusCode() + " [" + getPrefixResponse
-                                    .statusMessage() + "]");
+                            future.fail(getI18n(MessageCodes.PT_018) + getPrefixResponse.statusCode() + " [" +
+                                    getPrefixResponse.statusMessage() + "]");
                         } else if (prefixStatusCode == 200) {
                             future.complete(true);
                         } else if (prefixStatusCode == 404) {
@@ -183,13 +188,13 @@ public class S3Pairtree extends AbstractPairtree {
 
         myS3Client.put(myBucket, getVersionFilePath(), Buffer.buffer(specNote.toString()), putVersionResponse -> {
             if (putVersionResponse.statusCode() != 200) {
-                future.fail("Response code: " + putVersionResponse.statusCode() + " [" + putVersionResponse
+                future.fail(getI18n(MessageCodes.PT_018) + putVersionResponse.statusCode() + " [" + putVersionResponse
                         .statusMessage() + "]");
             } else if (hasPrefix()) {
                 myS3Client.put(myBucket, getPrefixFilePath(), Buffer.buffer(myPrefix), putPrefixResponse -> {
                     if (putPrefixResponse.statusCode() != 200) {
-                        future.fail("Response code: " + putPrefixResponse.statusCode() + " [" + putPrefixResponse
-                                .statusMessage() + "]");
+                        future.fail(getI18n(MessageCodes.PT_018) + putPrefixResponse.statusCode() + " [" +
+                                putPrefixResponse.statusMessage() + "]");
                     } else {
                         future.complete();
                     }
@@ -232,7 +237,7 @@ public class S3Pairtree extends AbstractPairtree {
 
                             myS3Client.delete(myBucket, key, deleteResponse -> {
                                 if (deleteResponse.statusCode() != 204) {
-                                    deleteFuture.fail("Response status code: " + deleteResponse.statusCode());
+                                    deleteFuture.fail(getI18n(MessageCodes.PT_018) + deleteResponse.statusCode());
                                 } else {
                                     deleteFuture.complete();
                                 }
@@ -251,7 +256,7 @@ public class S3Pairtree extends AbstractPairtree {
                     }
                 });
             } else {
-                future.fail("Response status code: " + listResponse.statusCode());
+                future.fail(getI18n(MessageCodes.PT_018) + listResponse.statusCode());
             }
         });
     }

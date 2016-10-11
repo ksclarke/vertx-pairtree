@@ -14,12 +14,20 @@ import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import junit.framework.TestCase;
 
+/**
+ * Test of the <code>PairtreeFactory</code>.
+ *
+ * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
+ */
 public class PairtreeFactoryTest extends TestCase {
 
     private static final String TMPDIR = System.getProperty("java.io.tmpdir") + separatorChar;
 
     private Vertx myVertx;
 
+    /**
+     * Setup for the tests.
+     */
     @Override
     public void setUp() throws Exception {
         myVertx = Vertx.vertx(new VertxOptions());

@@ -21,6 +21,7 @@
   <entry key="PT-015">S3 Pairtree bucket not supplied</entry>
   <entry key="PT-016">S3 Pairtree access key not supplied</entry>
   <entry key="PT-017">S3 Pairtree secret key not supplied</entry>
+  <entry key="PT-018">Response code: </entry>
   
   <!-- Debugging messages -->
   <entry key="PT-DEBUG-001">Initializing Pairtree in '{}'</entry>
@@ -74,5 +75,9 @@
   <entry key="PT-DEBUG-049">Please supply your own AWS access and secret key to run integration tests</entry>
   <entry key="PT-DEBUG-050">Pairtree object with plus not found as expected</entry>
   <entry key="PT-DEBUG-051">Failed to PUT Pairtree object with a plus in its name</entry>
+  <entry key="PT-DEBUG-052">Found unexpected prefix file</entry>
+  <entry key="PT-DEBUG-053">Found unexpected version file</entry>
+  <entry key="PT-DEBUG-054">Didn't find expected prefix file</entry>
+  <entry key="PT-DEBUG-055">Didn't find expected version file</entry>
 
 </properties>

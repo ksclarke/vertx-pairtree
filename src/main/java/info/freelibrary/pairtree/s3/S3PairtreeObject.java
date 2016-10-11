@@ -1,6 +1,3 @@
-/**
- *
- */
 
 package info.freelibrary.pairtree.s3;
 

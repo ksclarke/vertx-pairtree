@@ -27,6 +27,11 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 
+/**
+ * Tests for the <code>FsPairtreeObject</code>.
+ *
+ * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
+ */
 @RunWith(VertxUnitRunner.class)
 public class FsPairtreeObjectTest extends AbstractFsPairtreeTest {
 
