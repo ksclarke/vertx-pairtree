@@ -73,7 +73,7 @@ public class S3ClientIT extends AbstractS3IT {
         final Async async = aContext.async();
         final String s3Key = "green-" + myTestID + ".gif";
 
-        if (createResource(s3Key, aContext)) {
+        if (createResource(s3Key, aContext, async)) {
             myClient.head(myTestBucket, s3Key, response -> {
                 final int statusCode = response.statusCode();
 
@@ -88,8 +88,6 @@ public class S3ClientIT extends AbstractS3IT {
 
                 async.complete();
             });
-        } else {
-            async.complete();
         }
     }
 
@@ -99,7 +97,7 @@ public class S3ClientIT extends AbstractS3IT {
         final String[] keys = { "path/to/one-" + myTestID, "path/to/two-" + myTestID, "path/from/one-" + myTestID,
             "path/from/two-" + myTestID };
 
-        if (createResources(keys, aContext)) {
+        if (createResources(keys, aContext, async)) {
             myClient.list(myTestBucket, response -> {
                 final int statusCode = response.statusCode();
 
@@ -138,8 +136,6 @@ public class S3ClientIT extends AbstractS3IT {
                     async.complete();
                 }
             });
-        } else {
-            async.complete();
         }
     }
 
@@ -149,7 +145,7 @@ public class S3ClientIT extends AbstractS3IT {
         final String[] keys = { "path/to/one-" + myTestID, "path/to/two-" + myTestID, "path/from/one-" + myTestID,
             "path/from/two-" + myTestID };
 
-        if (createResources(keys, aContext)) {
+        if (createResources(keys, aContext, async)) {
             myClient.list(myTestBucket, "path/from", response -> {
                 final int statusCode = response.statusCode();
 
@@ -187,8 +183,6 @@ public class S3ClientIT extends AbstractS3IT {
                     async.complete();
                 }
             });
-        } else {
-            async.complete();
         }
     }
 
@@ -201,7 +195,7 @@ public class S3ClientIT extends AbstractS3IT {
         final Async async = aContext.async();
         final String s3Key = "green-" + myTestID + ".gif";
 
-        if (createResource(s3Key, aContext)) {
+        if (createResource(s3Key, aContext, async)) {
             myClient.get(myTestBucket, s3Key, response -> {
                 final int statusCode = response.statusCode();
 
@@ -218,8 +212,6 @@ public class S3ClientIT extends AbstractS3IT {
                     });
                 }
             });
-        } else {
-            async.complete();
         }
     }
 
@@ -299,7 +291,7 @@ public class S3ClientIT extends AbstractS3IT {
         final Async async = aContext.async();
         final String s3Key = "green-" + myTestID + ".gif";
 
-        if (createResource(s3Key, aContext)) {
+        if (createResource(s3Key, aContext, async)) {
             myClient.delete(myTestBucket, s3Key, response -> {
                 final int statusCode = response.statusCode();
 
@@ -309,8 +301,6 @@ public class S3ClientIT extends AbstractS3IT {
 
                 async.complete();
             });
-        } else {
-            async.complete();
         }
     }
 
@@ -345,7 +335,7 @@ public class S3ClientIT extends AbstractS3IT {
         final Async async = aContext.async();
         final String s3Key = "green-" + myTestID + ".gif";
 
-        if (createResource(s3Key, aContext)) {
+        if (createResource(s3Key, aContext, async)) {
             final S3ClientRequest request = myClient.createGetRequest(myTestBucket, s3Key, response -> {
                 final int statusCode = response.statusCode();
 
@@ -366,8 +356,6 @@ public class S3ClientIT extends AbstractS3IT {
             });
 
             request.end();
-        } else {
-            async.complete();
         }
     }
 
@@ -380,7 +368,7 @@ public class S3ClientIT extends AbstractS3IT {
         final Async async = aContext.async();
         final String s3Key = "green-" + myTestID + ".gif";
 
-        if (createResource(s3Key, aContext)) {
+        if (createResource(s3Key, aContext, async)) {
             final S3ClientRequest request = myClient.createDeleteRequest(myTestBucket, s3Key, response -> {
                 final int statusCode = response.statusCode();
 
@@ -392,8 +380,6 @@ public class S3ClientIT extends AbstractS3IT {
             });
 
             request.end();
-        } else {
-            async.complete();
         }
     }
 
@@ -402,17 +388,20 @@ public class S3ClientIT extends AbstractS3IT {
         return LoggerFactory.getLogger(S3ClientIT.class, BUNDLE_NAME);
     }
 
-    private boolean createResource(final String aResource, final TestContext aContext) {
-        return createResources(new String[] { aResource }, aContext);
+    private boolean createResource(final String aResource, final TestContext aContext, final Async aAsync) {
+        return createResources(new String[] { aResource }, aContext, aAsync);
     }
 
-    private boolean createResources(final String[] aResourceArray, final TestContext aContext) {
+    private boolean createResources(final String[] aResourceArray, final TestContext aContext, final Async aAsync) {
         for (final String resource : aResourceArray) {
             try {
                 myS3Client.putObject(myTestBucket, resource, TEST_FILE);
             } catch (final AmazonClientException details) {
-                aContext.fail(getI18n(PT_DEBUG_046, resource));
                 LOGGER.error(details.getMessage(), details);
+
+                aContext.fail(getI18n(PT_DEBUG_046, resource));
+                aAsync.complete();
+
                 return false;
             }
         }
