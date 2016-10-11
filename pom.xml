@@ -176,7 +176,7 @@
                 <vertx.pairtree.access_key>${vertx.pairtree.access_key}</vertx.pairtree.access_key>
                 <vertx.pairtree.secret_key>${vertx.pairtree.secret_key}</vertx.pairtree.secret_key>
               </systemPropertyVariables>
-              <argLine>-XX:MaxMetaspaceSize=128m ${jacoco.agent.arg}</argLine>
+              <argLine>${jacoco.agent.arg}</argLine>
               <includes>
                 <include>**/*IT.java</include>
                 <include>**/*IntegrationTest.java</include>
