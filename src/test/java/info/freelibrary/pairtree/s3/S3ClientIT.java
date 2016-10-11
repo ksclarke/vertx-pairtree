@@ -232,19 +232,15 @@ public class S3ClientIT extends AbstractS3IT {
         final Async async = aContext.async();
         final String s3Key = "green-" + myTestID + ".gif";
 
-        if (createResource(s3Key, aContext)) {
-            myClient.put(myTestBucket, s3Key, Buffer.buffer(myResource), response -> {
-                final int statusCode = response.statusCode();
+        myClient.put(myTestBucket, s3Key, Buffer.buffer(myResource), response -> {
+            final int statusCode = response.statusCode();
 
-                if (statusCode != 200) {
-                    aContext.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, s3Key, response.statusMessage()));
-                }
+            if (statusCode != 200) {
+                aContext.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, s3Key, response.statusMessage()));
+            }
 
-                async.complete();
-            });
-        } else {
             async.complete();
-        }
+        });
     }
 
     @Test
@@ -254,20 +250,15 @@ public class S3ClientIT extends AbstractS3IT {
 
         myVertx.fileSystem().open(TEST_FILE.getAbsolutePath(), new OpenOptions(), openResult -> {
             if (openResult.succeeded()) {
-                if (createResource(s3Key, aContext)) {
-                    myClient.put(myTestBucket, s3Key, openResult.result(), response -> {
-                        final int statusCode = response.statusCode();
+                myClient.put(myTestBucket, s3Key, openResult.result(), response -> {
+                    final int statusCode = response.statusCode();
 
-                        if (statusCode != 200) {
-                            aContext.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, s3Key, response
-                                    .statusMessage()));
-                        }
+                    if (statusCode != 200) {
+                        aContext.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, s3Key, response.statusMessage()));
+                    }
 
-                        async.complete();
-                    });
-                } else {
                     async.complete();
-                }
+                });
             } else {
                 aContext.fail(openResult.cause());
                 async.complete();
@@ -283,20 +274,15 @@ public class S3ClientIT extends AbstractS3IT {
 
         myVertx.fileSystem().open(TEST_FILE.getAbsolutePath(), new OpenOptions(), openResult -> {
             if (openResult.succeeded()) {
-                if (createResource(s3Key, aContext)) {
-                    myClient.put(myTestBucket, s3Key, openResult.result(), length, response -> {
-                        final int statusCode = response.statusCode();
+                myClient.put(myTestBucket, s3Key, openResult.result(), length, response -> {
+                    final int statusCode = response.statusCode();
 
-                        if (statusCode != 200) {
-                            aContext.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, s3Key, response
-                                    .statusMessage()));
-                        }
+                    if (statusCode != 200) {
+                        aContext.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, s3Key, response.statusMessage()));
+                    }
 
-                        async.complete();
-                    });
-                } else {
                     async.complete();
-                }
+                });
             } else {
                 aContext.fail(openResult.cause());
                 async.complete();
@@ -337,21 +323,17 @@ public class S3ClientIT extends AbstractS3IT {
         final Async async = aContext.async();
         final String s3Key = "green-" + myTestID + ".gif";
 
-        if (createResource(s3Key, aContext)) {
-            final S3ClientRequest request = myClient.createPutRequest(myTestBucket, s3Key, response -> {
-                final int statusCode = response.statusCode();
+        final S3ClientRequest request = myClient.createPutRequest(myTestBucket, s3Key, response -> {
+            final int statusCode = response.statusCode();
 
-                if (statusCode != 200) {
-                    aContext.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, s3Key, response.statusMessage()));
-                }
+            if (statusCode != 200) {
+                aContext.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, s3Key, response.statusMessage()));
+            }
 
-                async.complete();
-            });
-
-            request.end(Buffer.buffer(myResource));
-        } else {
             async.complete();
-        }
+        });
+
+        request.end(Buffer.buffer(myResource));
     }
 
     /**
