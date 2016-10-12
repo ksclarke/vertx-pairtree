@@ -150,16 +150,20 @@ public class S3Pairtree extends AbstractPairtree {
             final int versionStatusCode = getVersionResponse.statusCode();
 
             if (versionStatusCode != 200 && versionStatusCode != 404) {
-                future.fail(getI18n(MessageCodes.PT_018) + getVersionResponse.statusCode() + " [" + getVersionResponse
-                        .statusMessage() + "]");
+                final int statusCode = getVersionResponse.statusCode();
+                final String statusMessage = getVersionResponse.statusMessage();
+
+                future.fail(getI18n(MessageCodes.PT_018, statusCode, statusMessage));
             } else if (versionStatusCode == 200) {
                 if (hasPrefix()) {
                     myS3Client.get(myBucket, getPrefixFilePath(), getPrefixResponse -> {
                         final int prefixStatusCode = getPrefixResponse.statusCode();
 
                         if (prefixStatusCode != 200 && prefixStatusCode != 404) {
-                            future.fail(getI18n(MessageCodes.PT_018) + getPrefixResponse.statusCode() + " [" +
-                                    getPrefixResponse.statusMessage() + "]");
+                            final int statusCode = getPrefixResponse.statusCode();
+                            final String statusMessage = getPrefixResponse.statusMessage();
+
+                            future.fail(getI18n(MessageCodes.PT_018, statusCode, statusMessage));
                         } else if (prefixStatusCode == 200) {
                             future.complete(true);
                         } else if (prefixStatusCode == 404) {
@@ -188,13 +192,17 @@ public class S3Pairtree extends AbstractPairtree {
 
         myS3Client.put(myBucket, getVersionFilePath(), Buffer.buffer(specNote.toString()), putVersionResponse -> {
             if (putVersionResponse.statusCode() != 200) {
-                future.fail(getI18n(MessageCodes.PT_018) + putVersionResponse.statusCode() + " [" + putVersionResponse
-                        .statusMessage() + "]");
+                final int statusCode = putVersionResponse.statusCode();
+                final String statusMessage = putVersionResponse.statusMessage();
+
+                future.fail(getI18n(MessageCodes.PT_018, statusCode, statusMessage));
             } else if (hasPrefix()) {
                 myS3Client.put(myBucket, getPrefixFilePath(), Buffer.buffer(myPrefix), putPrefixResponse -> {
                     if (putPrefixResponse.statusCode() != 200) {
-                        future.fail(getI18n(MessageCodes.PT_018) + putPrefixResponse.statusCode() + " [" +
-                                putPrefixResponse.statusMessage() + "]");
+                        final int statusCode = putPrefixResponse.statusCode();
+                        final String statusMessage = putPrefixResponse.statusMessage();
+
+                        future.fail(getI18n(MessageCodes.PT_018, statusCode, statusMessage));
                     } else {
                         future.complete();
                     }
@@ -237,7 +245,10 @@ public class S3Pairtree extends AbstractPairtree {
 
                             myS3Client.delete(myBucket, key, deleteResponse -> {
                                 if (deleteResponse.statusCode() != 204) {
-                                    deleteFuture.fail(getI18n(MessageCodes.PT_018) + deleteResponse.statusCode());
+                                    final int statusCode = deleteResponse.statusCode();
+                                    final String statusMessage = deleteResponse.statusMessage();
+
+                                    deleteFuture.fail(getI18n(MessageCodes.PT_018, statusCode, statusMessage));
                                 } else {
                                     deleteFuture.complete();
                                 }
@@ -256,7 +267,10 @@ public class S3Pairtree extends AbstractPairtree {
                     }
                 });
             } else {
-                future.fail(getI18n(MessageCodes.PT_018) + listResponse.statusCode());
+                final int statusCode = listResponse.statusCode();
+                final String statusMessage = listResponse.statusMessage();
+
+                future.fail(getI18n(MessageCodes.PT_018, statusCode, statusMessage));
             }
         });
     }

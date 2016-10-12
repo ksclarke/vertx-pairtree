@@ -56,7 +56,7 @@ public abstract class AbstractPairtreeTest extends I18nObject {
     /**
      * Tear down for the tests.
      *
-     * @param aContext
+     * @param aContext A test context
      */
     @After
     public void tearDown(final TestContext aContext) {
@@ -73,25 +73,24 @@ public abstract class AbstractPairtreeTest extends I18nObject {
     protected abstract Logger getLogger();
 
     /**
-     * Does the work of creating a test Pairtree object in a test Pairtree so that tests against that object can be
-     * run.
+     * Does the work of creating a test Pairtree object in a test Pairtree so that tests against that object can be run.
      *
      * @param aID An ID of the <code>PairtreeObject</code> to be created
      * @param aHandler A handler to handle the creation of the test <code>PairtreeObject</code>
      */
     protected void createTestPairtreeObject(final PairtreeImpl aPairtreeImpl,
-            final Handler<AsyncResult<PairtreeObject>> aHandler, final String... aConfigVarargs) {
+            final Handler<AsyncResult<PairtreeObject>> aHandler, final String... aConfig) {
         Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(),
                 ".createTestPairtreeObject()"));
 
-        final String[] config = Arrays.copyOf(aConfigVarargs, aConfigVarargs.length - 1);
+        final String[] config = Arrays.copyOf(aConfig, aConfig.length - 1);
         final PairtreeRoot root = PairtreeFactory.getFactory(myVertx, aPairtreeImpl).getPairtree(config);
         final Future<PairtreeObject> future = Future.<PairtreeObject>future().setHandler(aHandler);
 
         root.create(createPtResult -> {
             if (createPtResult.succeeded()) {
                 // Last thing passed in via our configuration arguments is the test object's ID
-                final PairtreeObject ptObject = root.getObject(aConfigVarargs[aConfigVarargs.length - 1]);
+                final PairtreeObject ptObject = root.getObject(aConfig[aConfig.length - 1]);
 
                 ptObject.create(createPtObjResult -> {
                     if (createPtObjResult.succeeded()) {

@@ -13,17 +13,23 @@ import io.vertx.core.Handler;
  */
 public interface PairtreeRoot {
 
-    public final String DEFAULT_PAIRTREE_NAME = "pairtree";
+    /* Default Pairtree name */
+    String DEFAULT_PAIRTREE = "pairtree";
 
-    public final String PT_VERSION_NUM = "0.1";
+    /* Version of the Pairtree specification */
+    String PT_VERSION_NUM = "0.1";
 
-    public final String PAIRTREE_PREFIX = "pairtree_prefix";
+    /* Default Pairtree prefix file name */
+    String PAIRTREE_PREFIX = "pairtree_prefix";
 
-    public final String PAIRTREE_ROOT = "pairtree_root";
+    /* Default Pairtree root directory name */
+    String PAIRTREE_ROOT = "pairtree_root";
 
-    public final String PAIRTREE_VERSION = "pairtree_version";
+    /* Default Pairtree version file name */
+    String PAIRTREE_VERSION = "pairtree_version";
 
-    public final String DEFAULT_CHARSET = "UTF-8";
+    /* Default character set for the Pairtree */
+    String DEFAULT_CHARSET = "UTF-8";
 
     /**
      * Gets the Pairtree prefix.
