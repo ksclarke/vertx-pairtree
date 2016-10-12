@@ -13,7 +13,6 @@ import io.vertx.core.http.HttpClientRequest;
 import io.vertx.core.http.HttpClientResponse;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpServerFileUpload;
-import io.vertx.core.streams.Pump;
 
 /**
  * An S3 client implementation used by the S3Pairtree object.
@@ -207,50 +206,6 @@ public class S3Client {
         aUpload.handler(data -> {
             buffer.appendBuffer(data);
         });
-    }
-
-    /**
-     * Uploads the file contents to S3.
-     *
-     * @param aBucket An S3 bucket
-     * @param aKey An S3 key
-     * @param aFile A file to upload
-     * @param aHandler An upload response handler
-     */
-    public void put(final String aBucket, final String aKey, final AsyncFile aFile, final long aFileSize,
-            final Handler<HttpClientResponse> aHandler) {
-        final S3ClientRequest request = createPutRequest(aBucket, aKey, aHandler);
-        final Buffer buffer = Buffer.buffer();
-
-        request.putHeader(HttpHeaders.CONTENT_LENGTH, String.valueOf(aFileSize));
-
-        aFile.endHandler(event -> {
-            request.end(buffer);
-        });
-
-        Pump.pump(aFile, request).start();
-    }
-
-    /**
-     * Uploads the file contents to S3.
-     *
-     * @param aBucket An S3 bucket
-     * @param aKey An S3 key
-     * @param aUpload An HttpServerFileUpload
-     * @param aHandler An upload response handler
-     */
-    public void put(final String aBucket, final String aKey, final HttpServerFileUpload aUpload, final long aFileSize,
-            final Handler<HttpClientResponse> aHandler) {
-        final S3ClientRequest request = createPutRequest(aBucket, aKey, aHandler);
-        final Buffer buffer = Buffer.buffer();
-
-        request.putHeader(HttpHeaders.CONTENT_LENGTH, String.valueOf(aFileSize));
-
-        aUpload.endHandler(event -> {
-            request.end(buffer);
-        });
-
-        Pump.pump(aUpload, request).start();
     }
 
     /**

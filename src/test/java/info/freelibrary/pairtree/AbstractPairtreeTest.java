@@ -75,8 +75,9 @@ public abstract class AbstractPairtreeTest extends I18nObject {
     /**
      * Does the work of creating a test Pairtree object in a test Pairtree so that tests against that object can be run.
      *
-     * @param aID An ID of the <code>PairtreeObject</code> to be created
-     * @param aHandler A handler to handle the creation of the test <code>PairtreeObject</code>
+     * @param aPairtreeImpl A Pairtree implementation
+     * @param aHandler to handle the result of the creation event
+     * @param aConfig A configuration passed as a varargs
      */
     protected void createTestPairtreeObject(final PairtreeImpl aPairtreeImpl,
             final Handler<AsyncResult<PairtreeObject>> aHandler, final String... aConfig) {
