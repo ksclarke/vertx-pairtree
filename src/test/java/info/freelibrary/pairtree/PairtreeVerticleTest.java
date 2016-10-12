@@ -19,6 +19,7 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 @RunWith(VertxUnitRunner.class)
 public class PairtreeVerticleTest {
 
+    /** The connection to the Vertx framework */
     private Vertx vertx;
 
     /**
@@ -42,6 +43,11 @@ public class PairtreeVerticleTest {
         vertx.close(aContext.asyncAssertSuccess());
     }
 
+    /**
+     * Tests the <code>PairtreeVerticle</code> class.
+     *
+     * @param aContext A test context
+     */
     @Test
     public void testMyApplication(final TestContext aContext) {
         final Async async = aContext.async();

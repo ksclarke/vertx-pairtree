@@ -22,6 +22,7 @@
   <entry key="PT-016">S3 Pairtree access key not supplied</entry>
   <entry key="PT-017">S3 Pairtree secret key not supplied</entry>
   <entry key="PT-018">Response code: {} [{}]</entry>
+  <entry key="PT-019">Content-Length was not an integer: {}</entry>
   
   <!-- Debugging messages -->
   <entry key="PT-DEBUG-001">Initializing Pairtree in '{}'</entry>

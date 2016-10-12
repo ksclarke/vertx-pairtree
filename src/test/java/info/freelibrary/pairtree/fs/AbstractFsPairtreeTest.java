@@ -28,8 +28,10 @@ import io.vertx.ext.unit.TestContext;
  */
 public abstract class AbstractFsPairtreeTest extends AbstractPairtreeTest {
 
+    /** The Pairtree being tested */
     protected PairtreeRoot myPairtree;
 
+    /** A connection to the file system */
     protected FileSystem myFileSystem;
 
     /**

@@ -19,7 +19,7 @@ public class InvalidPathException extends PairtreeException {
     /**
      * Creates an invalid Pairtree path exception.
      *
-     * @param aMessage
+     * @param aMessage An exception message
      */
     public InvalidPathException(final String aMessage) {
         super(aMessage);

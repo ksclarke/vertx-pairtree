@@ -32,16 +32,22 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 @RunWith(VertxUnitRunner.class)
 public abstract class AbstractS3IT extends AbstractPairtreeTest {
 
+    /** The test file used in the tests */
     protected static final File TEST_FILE = new File("src/test/resources/green.gif");
 
+    /** AWS access key */
     protected static String myAccessKey;
 
+    /** AWS secret key */
     protected static String mySecretKey;
 
+    /** S3 bucket used in the tests */
     protected static String myTestBucket;
 
+    /** Byte array for resource contents */
     protected static byte[] myResource;
 
+    /** The S3 client used to setup some of the tests */
     protected AmazonS3Client myS3Client;
 
     /**

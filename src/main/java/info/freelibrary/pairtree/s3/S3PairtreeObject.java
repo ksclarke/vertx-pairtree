@@ -1,7 +1,8 @@
 
 package info.freelibrary.pairtree.s3;
 
-import static info.freelibrary.pairtree.PairtreeConstants.BUNDLE_NAME;
+import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
+import static info.freelibrary.pairtree.Constants.PATH_SEP;
 import static info.freelibrary.pairtree.PairtreeRoot.PAIRTREE_ROOT;
 
 import java.io.IOException;
@@ -18,6 +19,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
+import info.freelibrary.pairtree.HTTP;
 import info.freelibrary.pairtree.MessageCodes;
 import info.freelibrary.pairtree.PairtreeObject;
 import info.freelibrary.pairtree.PairtreeUtils;
@@ -34,18 +36,26 @@ import io.vertx.core.buffer.Buffer;
 /**
  * An S3-backed Pairtree object implementation.
  *
- * @author Kevin S. Clarke (<a href="mailto:ksclarke@ksclarke.io">ksclarke@ksclarke.io</a>)
+ * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
 public class S3PairtreeObject extends I18nObject implements PairtreeObject {
 
+    /** The logger used when interacting with the S3 Pairtree object */
     private static final Logger LOGGER = LoggerFactory.getLogger(S3PairtreeObject.class, BUNDLE_NAME);
 
+    /** Creates a README file for an S3 Pairtree */
+    private static final String README_FILE = "/README.txt";
+
+    /** The client used to interact with the S3 Pairtree */
     private final S3Client myS3Client;
 
+    /** The bucket in which the Pairtree resides */
     private final String myPairtreeBucket;
 
+    /** The Pairtree's prefix (optional) */
     private final String myPrefix;
 
+    /** The Pairtree's ID */
     private final String myID;
 
     /**
@@ -70,14 +80,11 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
 
         final Future<Boolean> future = Future.<Boolean>future().setHandler(aHandler);
 
-        myS3Client.head(myPairtreeBucket, getPath() + "/README.txt", response -> {
+        myS3Client.head(myPairtreeBucket, getPath() + README_FILE, response -> {
             final int statusCode = response.statusCode();
 
-            if (statusCode != 200 && statusCode != 404) {
-                final String statusMessage = response.statusMessage();
-                future.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, getPath() + "/README.txt", statusMessage));
-            } else if (statusCode == 200) {
-                final String contentLength = response.getHeader("Content-Length");
+            if (statusCode == HTTP.OK) {
+                final String contentLength = response.getHeader(HTTP.CONTENT_LENGTH);
 
                 try {
                     if (Integer.parseInt(contentLength) > 0) {
@@ -86,10 +93,13 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
                         future.complete(false);
                     }
                 } catch (final NumberFormatException details) {
-                    future.fail("Content-Length was not an integer: " + contentLength);
+                    future.fail(getI18n(MessageCodes.PT_019, contentLength));
                 }
-            } else if (statusCode == 404) {
+            } else if (statusCode == HTTP.NOT_FOUND) {
                 future.complete(false);
+            } else {
+                final String statusMessage = response.statusMessage();
+                future.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, getPath() + README_FILE, statusMessage));
             }
         });
     }
@@ -100,14 +110,14 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
 
         final Future<Void> future = Future.<Void>future().setHandler(aHandler);
 
-        myS3Client.put(myPairtreeBucket, getPath() + "/README.txt", Buffer.buffer(myID), response -> {
+        myS3Client.put(myPairtreeBucket, getPath() + README_FILE, Buffer.buffer(myID), response -> {
             final int statusCode = response.statusCode();
 
-            if (statusCode != 200) {
-                final String statusMessage = response.statusMessage();
-                future.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, getPath() + "/README.txt", statusMessage));
-            } else {
+            if (statusCode == HTTP.OK) {
                 future.complete();
+            } else {
+                final String statusMessage = response.statusMessage();
+                future.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, getPath() + README_FILE, statusMessage));
             }
         });
     }
@@ -122,10 +132,7 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
         myS3Client.list(myPairtreeBucket, getPath(), listResponse -> {
             final int listStatusCode = listResponse.statusCode();
 
-            if (listStatusCode != 200) {
-                final String status = listResponse.statusMessage();
-                future.fail(getI18n(MessageCodes.PT_DEBUG_045, listStatusCode, getPath(), status));
-            } else {
+            if (listStatusCode == HTTP.OK) {
                 listResponse.bodyHandler(bodyHandler -> {
                     final SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
 
@@ -150,11 +157,11 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
                             myS3Client.delete(myPairtreeBucket, key, deleteResponse -> {
                                 final int deleteStatusCode = deleteResponse.statusCode();
 
-                                if (deleteStatusCode != 204) {
+                                if (deleteStatusCode == HTTP.NO_CONTENT) {
+                                    keyFuture.complete();
+                                } else {
                                     final String status = deleteResponse.statusMessage();
                                     keyFuture.fail(getI18n(MessageCodes.PT_DEBUG_045, deleteStatusCode, key, status));
-                                } else {
-                                    keyFuture.complete();
                                 }
                             });
                         }
@@ -170,13 +177,16 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
                         future.fail(details);
                     }
                 });
+            } else {
+                final String status = listResponse.statusMessage();
+                future.fail(getI18n(MessageCodes.PT_DEBUG_045, listStatusCode, getPath(), status));
             }
         });
     }
 
     @Override
     public String getID() {
-        return myPrefix == null ? myID : myPrefix + "/" + myID;
+        return myPrefix == null ? myID : myPrefix + PATH_SEP + myID;
     }
 
     @Override
@@ -184,7 +194,7 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
         // Pairtree encodes colons to pluses so we need to pre-encode them as a workaround for an S3 bug
         // Cf. https://forums.aws.amazon.com/thread.jspa?threadID=55746
         final String awsID = myID.replace(':', '~');
-        return PAIRTREE_ROOT + "/" + PairtreeUtils.mapToPtPath(awsID) + "/" + PairtreeUtils.encodeID(awsID);
+        return PAIRTREE_ROOT + PATH_SEP + PairtreeUtils.mapToPtPath(awsID) + PATH_SEP + PairtreeUtils.encodeID(awsID);
     }
 
     @Override
@@ -192,7 +202,7 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
         // We need to encode any pluses in our resource path as a workaround for an S3 bug
         // Cf. https://forums.aws.amazon.com/thread.jspa?threadID=55746
         final String awsPath = aResourcePath.replace('+', '~');
-        return awsPath.startsWith("/") ? getPath() + awsPath : getPath() + "/" + awsPath;
+        return awsPath.startsWith("/") ? getPath() + awsPath : getPath() + PATH_SEP + awsPath;
     }
 
     @Override
@@ -206,17 +216,17 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
         myS3Client.put(myPairtreeBucket, getPath(aPath), aBuffer, response -> {
             final int statusCode = response.statusCode();
 
-            if (statusCode == 200) {
+            if (statusCode == HTTP.OK) {
                 future.complete();
             } else {
-                if (statusCode == 403) {
+                if (statusCode == HTTP.FORBIDDEN) {
                     response.bodyHandler(handler -> {
-                        System.out.println(new String(handler.getBytes()));
+                        LOGGER.debug(new String(handler.getBytes()));
                     });
                 }
 
                 final String status = response.statusMessage();
-                future.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, getPath() + "/" + aPath, status));
+                future.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, getPath() + PATH_SEP + aPath, status));
             }
         });
     }
@@ -232,13 +242,13 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
         myS3Client.get(myPairtreeBucket, getPath(aPath), response -> {
             final int statusCode = response.statusCode();
 
-            if (statusCode == 200) {
+            if (statusCode == HTTP.OK) {
                 response.bodyHandler(bodyHandlerResult -> {
                     future.complete(Buffer.buffer(bodyHandlerResult.getBytes()));
                 });
             } else {
                 final String status = response.statusMessage();
-                future.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, getPath() + "/" + aPath, status));
+                future.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, getPath() + PATH_SEP + aPath, status));
             }
         });
     }
@@ -254,11 +264,8 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
         myS3Client.head(myPairtreeBucket, getPath(aPath), response -> {
             final int statusCode = response.statusCode();
 
-            if (statusCode != 200 && statusCode != 404) {
-                final String status = response.statusMessage();
-                future.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, getPath() + "/" + aPath, status));
-            } else if (statusCode == 200) {
-                final String contentLength = response.getHeader("Content-Length");
+            if (statusCode == HTTP.OK) {
+                final String contentLength = response.getHeader(HTTP.CONTENT_LENGTH);
 
                 try {
                     if (Integer.parseInt(contentLength) > 0) {
@@ -267,10 +274,13 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
                         future.complete(false);
                     }
                 } catch (final NumberFormatException details) {
-                    future.fail("Content-Length was not an integer: " + contentLength);
+                    future.fail(getI18n(MessageCodes.PT_019, contentLength));
                 }
-            } else if (statusCode == 404) {
+            } else if (statusCode == HTTP.NOT_FOUND) {
                 future.complete(false);
+            } else {
+                final String status = response.statusMessage();
+                future.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, getPath() + PATH_SEP + aPath, status));
             }
         });
     }

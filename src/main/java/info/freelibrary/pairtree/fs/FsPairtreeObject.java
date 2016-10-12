@@ -5,8 +5,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 
+import info.freelibrary.pairtree.Constants;
 import info.freelibrary.pairtree.MessageCodes;
-import info.freelibrary.pairtree.PairtreeConstants;
 import info.freelibrary.pairtree.PairtreeObject;
 import info.freelibrary.pairtree.PairtreeUtils;
 import info.freelibrary.util.I18nObject;
@@ -26,14 +26,19 @@ import io.vertx.core.file.FileSystem;
  */
 public class FsPairtreeObject extends I18nObject implements PairtreeObject {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FsPairtreeObject.class, PairtreeConstants.BUNDLE_NAME);
+    /** The logger used with the file-system based Pairtree object */
+    private static final Logger LOGGER = LoggerFactory.getLogger(FsPairtreeObject.class, Constants.BUNDLE_NAME);
 
+    /** A connection to the Pairtree's file system */
     private final FileSystem myFileSystem;
 
+    /** The path to the file-system based Pairtree */
     private final String myPairtreePath;
 
+    /** The Pairtree's prefix (optional) */
     private final String myPrefix;
 
+    /** The ID of this Pairtree */
     private final String myID;
 
     /**
@@ -44,7 +49,7 @@ public class FsPairtreeObject extends I18nObject implements PairtreeObject {
      * @param aID The object's ID
      */
     public FsPairtreeObject(final FileSystem aFileSystem, final FsPairtree aPairtree, final String aID) {
-        super(PairtreeConstants.BUNDLE_NAME);
+        super(Constants.BUNDLE_NAME);
 
         Objects.requireNonNull(aFileSystem);
         Objects.requireNonNull(aPairtree);
@@ -54,10 +59,10 @@ public class FsPairtreeObject extends I18nObject implements PairtreeObject {
         myPrefix = aPairtree.getPrefix();
         myFileSystem = aFileSystem;
 
-        if (myPrefix != null) {
-            myID = PairtreeUtils.removePrefix(myPrefix, aID);
-        } else {
+        if (myPrefix == null) {
             myID = aID;
+        } else {
+            myID = PairtreeUtils.removePrefix(myPrefix, aID);
         }
     }
 
@@ -139,7 +144,7 @@ public class FsPairtreeObject extends I18nObject implements PairtreeObject {
         final Path resourcePath = Paths.get(getPath(), aPath);
         final Future<Void> future = Future.<Void>future().setHandler(aHandler);
 
-        LOGGER.debug(MessageCodes.PT_DEBUG_026, resourcePath.toString());
+        LOGGER.debug(MessageCodes.PT_DEBUG_026, resourcePath);
 
         // First, create the parent directory path if it doesn't already exist
         myFileSystem.mkdirs(resourcePath.getParent().toString(), mkdirsResult -> {
@@ -165,7 +170,7 @@ public class FsPairtreeObject extends I18nObject implements PairtreeObject {
         final String resourcePath = Paths.get(getPath(), aPath).toString();
         final Future<Buffer> future = Future.<Buffer>future().setHandler(aHandler);
 
-        LOGGER.debug(MessageCodes.PT_DEBUG_027, resourcePath.toString());
+        LOGGER.debug(MessageCodes.PT_DEBUG_027, resourcePath);
 
         myFileSystem.readFile(resourcePath, result -> {
             if (result.succeeded()) {
@@ -183,7 +188,7 @@ public class FsPairtreeObject extends I18nObject implements PairtreeObject {
         final String resourcePath = Paths.get(getPath(), aPath).toString();
         final Future<Boolean> future = Future.<Boolean>future().setHandler(aHandler);
 
-        LOGGER.debug(MessageCodes.PT_DEBUG_025, resourcePath.toString());
+        LOGGER.debug(MessageCodes.PT_DEBUG_025, resourcePath);
 
         myFileSystem.exists(resourcePath, result -> {
             if (result.succeeded()) {

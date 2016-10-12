@@ -15,15 +15,21 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class ObjectListHandler extends DefaultHandler {
 
+    /** The element name for an S3 key */
+    private static final String KEY = "Key";
+
+    /** List of S3 keys */
     final List<String> myKeys = new ArrayList<>();
 
+    /** Builder for an S3's key value */
     final StringBuilder myKeyText = new StringBuilder();
 
+    /** The last element encountered while parsing S3 output */
     String myLastElement;
 
     @Override
     public void characters(final char[] aCharArray, final int aStart, final int aLength) throws SAXException {
-        if (myLastElement.equals("Key")) {
+        if (myLastElement.equals(KEY)) {
             myKeyText.append(aCharArray, aStart, aLength);
         }
     }
@@ -31,7 +37,7 @@ public class ObjectListHandler extends DefaultHandler {
     @Override
     public void startElement(final String aURI, final String aLocalName, final String aQName,
             final Attributes aAttributes) throws SAXException {
-        if (aLocalName.equals("Key")) {
+        if (aLocalName.equals(KEY)) {
             myKeyText.delete(0, myKeyText.length());
         }
 
@@ -40,7 +46,7 @@ public class ObjectListHandler extends DefaultHandler {
 
     @Override
     public void endElement(final String aURI, final String aLocalName, final String aQName) {
-        if (aLocalName.equals("Key")) {
+        if (aLocalName.equals(KEY)) {
             myKeys.add(myKeyText.toString());
         }
     }

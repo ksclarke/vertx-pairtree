@@ -1,7 +1,8 @@
 
 package info.freelibrary.pairtree.s3;
 
-import static info.freelibrary.pairtree.PairtreeConstants.BUNDLE_NAME;
+import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
+import static info.freelibrary.pairtree.Constants.PATH_SEP;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -19,6 +20,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 import info.freelibrary.pairtree.AbstractPairtree;
+import info.freelibrary.pairtree.HTTP;
 import info.freelibrary.pairtree.MessageCodes;
 import info.freelibrary.pairtree.PairtreeObject;
 import info.freelibrary.util.Logger;
@@ -39,16 +41,22 @@ import io.vertx.core.buffer.Buffer;
  */
 public class S3Pairtree extends AbstractPairtree {
 
+    /** AWS access key */
     public static final String AWS_ACCESS_KEY = "AWS_ACCESS_KEY";
 
+    /** AWS secret key */
     public static final String AWS_SECRET_KEY = "AWS_SECRET_KEY";
 
-    private static final String PATH_SEP = "/";
+    /** An S3 Pairtree logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(S3Pairtree.class, BUNDLE_NAME);
 
+    /** The Pairtree's S3 bucket */
     private final String myBucket;
 
+    /** The S3 client to use for the Pairtree's operations */
     private final S3Client myS3Client;
 
+    /** The Pairtree's prefix (optional) */
     private String myPrefix;
 
     /**
@@ -118,6 +126,14 @@ public class S3Pairtree extends AbstractPairtree {
         if (StringUtils.trimToNull(aPairtreePrefix) != null) {
             myPrefix = aPairtreePrefix;
         }
+
+        if (LOGGER.isDebugEnabled()) {
+            if (myPrefix == null) {
+                LOGGER.debug(MessageCodes.PT_DEBUG_001, myBucket);
+            } else {
+                LOGGER.debug(MessageCodes.PT_DEBUG_002, myBucket, myPrefix);
+            }
+        }
     }
 
     @Override
@@ -149,32 +165,32 @@ public class S3Pairtree extends AbstractPairtree {
         myS3Client.get(myBucket, getVersionFilePath(), getVersionResponse -> {
             final int versionStatusCode = getVersionResponse.statusCode();
 
-            if (versionStatusCode != 200 && versionStatusCode != 404) {
-                final int statusCode = getVersionResponse.statusCode();
-                final String statusMessage = getVersionResponse.statusMessage();
-
-                future.fail(getI18n(MessageCodes.PT_018, statusCode, statusMessage));
-            } else if (versionStatusCode == 200) {
+            if (versionStatusCode == HTTP.OK) {
                 if (hasPrefix()) {
                     myS3Client.get(myBucket, getPrefixFilePath(), getPrefixResponse -> {
                         final int prefixStatusCode = getPrefixResponse.statusCode();
 
-                        if (prefixStatusCode != 200 && prefixStatusCode != 404) {
+                        if (prefixStatusCode == HTTP.OK) {
+                            future.complete(true);
+                        } else if (prefixStatusCode == HTTP.NOT_FOUND) {
+                            future.complete(false);
+                        } else {
                             final int statusCode = getPrefixResponse.statusCode();
                             final String statusMessage = getPrefixResponse.statusMessage();
 
                             future.fail(getI18n(MessageCodes.PT_018, statusCode, statusMessage));
-                        } else if (prefixStatusCode == 200) {
-                            future.complete(true);
-                        } else if (prefixStatusCode == 404) {
-                            future.complete(false);
                         }
                     });
                 } else {
                     future.complete(true);
                 }
-            } else if (versionStatusCode == 404) {
+            } else if (versionStatusCode == HTTP.NOT_FOUND) {
                 future.complete(false);
+            } else {
+                final int statusCode = getVersionResponse.statusCode();
+                final String statusMessage = getVersionResponse.statusMessage();
+
+                future.fail(getI18n(MessageCodes.PT_018, statusCode, statusMessage));
             }
         });
     }
@@ -191,24 +207,26 @@ public class S3Pairtree extends AbstractPairtree {
         specNote.append(getI18n(MessageCodes.PT_012));
 
         myS3Client.put(myBucket, getVersionFilePath(), Buffer.buffer(specNote.toString()), putVersionResponse -> {
-            if (putVersionResponse.statusCode() != 200) {
+            if (putVersionResponse.statusCode() == HTTP.OK) {
+                if (hasPrefix()) {
+                    myS3Client.put(myBucket, getPrefixFilePath(), Buffer.buffer(myPrefix), putPrefixResponse -> {
+                        if (putPrefixResponse.statusCode() == HTTP.OK) {
+                            future.complete();
+                        } else {
+                            final int statusCode = putPrefixResponse.statusCode();
+                            final String statusMessage = putPrefixResponse.statusMessage();
+
+                            future.fail(getI18n(MessageCodes.PT_018, statusCode, statusMessage));
+                        }
+                    });
+                } else {
+                    future.complete();
+                }
+            } else {
                 final int statusCode = putVersionResponse.statusCode();
                 final String statusMessage = putVersionResponse.statusMessage();
 
                 future.fail(getI18n(MessageCodes.PT_018, statusCode, statusMessage));
-            } else if (hasPrefix()) {
-                myS3Client.put(myBucket, getPrefixFilePath(), Buffer.buffer(myPrefix), putPrefixResponse -> {
-                    if (putPrefixResponse.statusCode() != 200) {
-                        final int statusCode = putPrefixResponse.statusCode();
-                        final String statusMessage = putPrefixResponse.statusMessage();
-
-                        future.fail(getI18n(MessageCodes.PT_018, statusCode, statusMessage));
-                    } else {
-                        future.complete();
-                    }
-                });
-            } else {
-                future.complete();
             }
         });
     }
@@ -221,7 +239,7 @@ public class S3Pairtree extends AbstractPairtree {
         final Future<Void> future = Future.<Void>future().setHandler(aHandler);
 
         myS3Client.list(myBucket, listResponse -> {
-            if (listResponse.statusCode() == 200) {
+            if (listResponse.statusCode() == HTTP.OK) {
                 listResponse.bodyHandler(bodyHandler -> {
                     final SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
 
@@ -244,13 +262,13 @@ public class S3Pairtree extends AbstractPairtree {
                             futures.add(deleteFuture);
 
                             myS3Client.delete(myBucket, key, deleteResponse -> {
-                                if (deleteResponse.statusCode() != 204) {
+                                if (deleteResponse.statusCode() == HTTP.NO_CONTENT) {
+                                    deleteFuture.complete();
+                                } else {
                                     final int statusCode = deleteResponse.statusCode();
                                     final String statusMessage = deleteResponse.statusMessage();
 
                                     deleteFuture.fail(getI18n(MessageCodes.PT_018, statusCode, statusMessage));
-                                } else {
-                                    deleteFuture.complete();
                                 }
                             });
                         }
@@ -293,11 +311,6 @@ public class S3Pairtree extends AbstractPairtree {
     @Override
     public String getVersionFilePath() {
         return getVersionFileName();
-    }
-
-    @Override
-    public Logger getLogger() {
-        return LoggerFactory.getLogger(S3Pairtree.class, BUNDLE_NAME);
     }
 
 }

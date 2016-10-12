@@ -1,9 +1,9 @@
 
 package info.freelibrary.pairtree.s3;
 
+import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
 import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_045;
 import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_046;
-import static info.freelibrary.pairtree.PairtreeConstants.BUNDLE_NAME;
 import static java.util.UUID.randomUUID;
 
 import java.io.IOException;
@@ -24,6 +24,7 @@ import org.xml.sax.XMLReader;
 
 import com.amazonaws.AmazonClientException;
 
+import info.freelibrary.pairtree.HTTP;
 import info.freelibrary.pairtree.MessageCodes;
 import info.freelibrary.util.Logger;
 import info.freelibrary.util.LoggerFactory;
@@ -43,8 +44,10 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 @RunWith(VertxUnitRunner.class)
 public class S3ClientIT extends AbstractS3IT {
 
+    /** The S3 client being used in the tests */
     private S3Client myClient;
 
+    /** A test ID */
     private String myTestID;
 
     @Override
@@ -80,7 +83,7 @@ public class S3ClientIT extends AbstractS3IT {
                 if (statusCode != 200) {
                     aContext.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, s3Key, response.statusMessage()));
                 } else {
-                    final String contentLength = response.getHeader("Content-Length");
+                    final String contentLength = response.getHeader(HTTP.CONTENT_LENGTH);
 
                     aContext.assertNotNull(contentLength);
                     aContext.assertTrue(Integer.parseInt(contentLength) > 0);
@@ -239,30 +242,6 @@ public class S3ClientIT extends AbstractS3IT {
         myVertx.fileSystem().open(TEST_FILE.getAbsolutePath(), new OpenOptions(), openResult -> {
             if (openResult.succeeded()) {
                 myClient.put(myTestBucket, s3Key, openResult.result(), response -> {
-                    final int statusCode = response.statusCode();
-
-                    if (statusCode != 200) {
-                        aContext.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, s3Key, response.statusMessage()));
-                    }
-
-                    async.complete();
-                });
-            } else {
-                aContext.fail(openResult.cause());
-                async.complete();
-            }
-        });
-    }
-
-    @Test
-    public void testPutAsyncFileLength(final TestContext aContext) {
-        final Async async = aContext.async();
-        final String s3Key = "green-" + myTestID + ".gif";
-        final int length = (int) TEST_FILE.length();
-
-        myVertx.fileSystem().open(TEST_FILE.getAbsolutePath(), new OpenOptions(), openResult -> {
-            if (openResult.succeeded()) {
-                myClient.put(myTestBucket, s3Key, openResult.result(), length, response -> {
                     final int statusCode = response.statusCode();
 
                     if (statusCode != 200) {

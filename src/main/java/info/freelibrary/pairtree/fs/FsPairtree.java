@@ -1,6 +1,8 @@
 
 package info.freelibrary.pairtree.fs;
 
+import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
+
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -9,7 +11,6 @@ import java.util.Objects;
 
 import info.freelibrary.pairtree.AbstractPairtree;
 import info.freelibrary.pairtree.MessageCodes;
-import info.freelibrary.pairtree.PairtreeConstants;
 import info.freelibrary.pairtree.PairtreeException;
 import info.freelibrary.pairtree.PairtreeObject;
 import info.freelibrary.util.Logger;
@@ -30,10 +31,13 @@ import io.vertx.core.file.FileSystem;
  */
 public class FsPairtree extends AbstractPairtree {
 
-    /* The underlying file system */
+    /** A logger for the file-system based Pairtree implementation */
+    private static final Logger LOGGER = LoggerFactory.getLogger(FsPairtree.class, BUNDLE_NAME);
+
+    /** The underlying file system */
     private final FileSystem myFileSystem;
 
-    /* File system location of Pairtree root */
+    /** File system location of Pairtree root */
     private final String myPath;
 
     /**
@@ -163,11 +167,11 @@ public class FsPairtree extends AbstractPairtree {
         return myPath;
     }
 
-    @Override
-    protected Logger getLogger() {
-        return LoggerFactory.getLogger(FsPairtree.class, PairtreeConstants.BUNDLE_NAME);
-    }
-
+    /**
+     * Checks that Pairtree version file exists.
+     *
+     * @param aFuture The result of an action that may, or may not, have occurred yet.
+     */
     private void checkVersion(final Future<Boolean> aFuture) {
         final String versionFilePath = getVersionFilePath();
 
@@ -192,6 +196,11 @@ public class FsPairtree extends AbstractPairtree {
         });
     }
 
+    /**
+     * Checks whether a Pairtree prefix file exists.
+     *
+     * @param aFuture The result of an action that may, or may not, have occurred yet.
+     */
     private void checkPrefix(final Future<Boolean> aFuture) {
         final String prefixFilePath = getPrefixFilePath();
 
@@ -222,6 +231,11 @@ public class FsPairtree extends AbstractPairtree {
         });
     }
 
+    /**
+     * Deletes a Pairtree version file.
+     *
+     * @param aFuture The result of an action that may, or may not, have occurred yet.
+     */
     private void deleteVersion(final Future<Void> aFuture) {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(MessageCodes.PT_DEBUG_006, myPath);
@@ -240,6 +254,11 @@ public class FsPairtree extends AbstractPairtree {
         });
     }
 
+    /**
+     * Deletes a Pairtree prefix file.
+     *
+     * @param aFuture The result of an action that may, or may not, have occurred yet.
+     */
     private void deletePrefix(final Future<Void> aFuture) {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(MessageCodes.PT_DEBUG_034, myPath);
@@ -254,6 +273,11 @@ public class FsPairtree extends AbstractPairtree {
         });
     }
 
+    /**
+     * Creates a Pairtree version file.
+     *
+     * @param aFuture The result of an action that may, or may not, have occurred yet.
+     */
     private void setVersion(final Future<Void> aFuture) {
         final StringBuilder specNote = new StringBuilder();
 
@@ -278,6 +302,11 @@ public class FsPairtree extends AbstractPairtree {
         });
     }
 
+    /**
+     * Creates a Pairtree prefix file.
+     *
+     * @param aFuture The result of an action that may, or may not, have occurred yet.
+     */
     private void setPrefix(final Future<Void> aFuture) {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(MessageCodes.PT_DEBUG_033, myPath);

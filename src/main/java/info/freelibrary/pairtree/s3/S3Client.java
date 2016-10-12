@@ -1,7 +1,7 @@
 
 package info.freelibrary.pairtree.s3;
 
-import info.freelibrary.util.StringUtils;
+import static info.freelibrary.pairtree.Constants.PATH_SEP;
 
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
@@ -13,7 +13,6 @@ import io.vertx.core.http.HttpClientRequest;
 import io.vertx.core.http.HttpClientResponse;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpServerFileUpload;
-import io.vertx.core.streams.Pump;
 
 /**
  * An S3 client implementation used by the S3Pairtree object.
@@ -22,14 +21,20 @@ import io.vertx.core.streams.Pump;
  */
 public class S3Client {
 
-    public static final String DEFAULT_ENDPOINT = "s3.amazonaws.com"; // test bad endpoint: s3-us-east-1.amazonaws.com
+    // TODO: test for a bad endpoint, for example: s3-us-east-1.amazonaws.com
+    /** Default S3 endpoint */
+    public static final String DEFAULT_ENDPOINT = "s3.amazonaws.com";
 
+    /** AWS access key */
     private final String myAccessKey;
 
+    /** AWS secret key */
     private final String mySecretKey;
 
+    /** S3 session token */
     private final String mySessionToken;
 
+    /** HTTP client used to interact with S3 */
     private final HttpClient myHTTPClient;
 
     /**
@@ -49,14 +54,20 @@ public class S3Client {
      * @param aSecretKey An S3 secret key
      */
     public S3Client(final Vertx aVertx, final String aAccessKey, final String aSecretKey) {
-        this(aVertx, aAccessKey, aSecretKey, null, DEFAULT_ENDPOINT, -1, -1, -1);
+        this(aVertx, aAccessKey, aSecretKey, null, new HttpClientOptions().setDefaultHost(DEFAULT_ENDPOINT));
     }
 
     /**
      * Creates a new S3 client using the supplied access key, secret key, and endpoint.
+     *
+     * @param aVertx A Vert.x instance from which to create the <code>HttpClient</code>
+     * @param aAccessKey An S3 access key
+     * @param aSecretKey An S3 secret key
+     * @param aEndpoint An S3 endpoint
      */
     public S3Client(final Vertx aVertx, final String aAccessKey, final String aSecretKey, final String aEndpoint) {
-        this(aVertx, aAccessKey, aSecretKey, null, aEndpoint, -1, -1, -1);
+        this(aVertx, aAccessKey, aSecretKey, null, new HttpClientOptions().setDefaultHost(aEndpoint));
+
     }
 
     /**
@@ -66,36 +77,16 @@ public class S3Client {
      * @param aAccessKey An S3 access key
      * @param aSecretKey An S3 secret key
      * @param aSessionToken An S3 session token
-     * @param aEndpoint An S3 endpoint
-     * @param aIdleTimeout An idle timeout in seconds
-     * @param aConnectTimeout A connect timeout in milliseconds
-     * @param aMaxWaitQueueSize A maximum number of connections the pending queue will hold
+     * @param aConfig A configuration of HTTP options to use when connecting
      */
     public S3Client(final Vertx aVertx, final String aAccessKey, final String aSecretKey, final String aSessionToken,
-            final String aEndpoint, final int aIdleTimeout, final int aConnectTimeout, final int aMaxWaitQueueSize) {
-        final HttpClientOptions opts = new HttpClientOptions();
+            final HttpClientOptions aConfig) {
 
         myAccessKey = aAccessKey;
         mySecretKey = aSecretKey;
         mySessionToken = aSessionToken;
 
-        if (StringUtils.trimToNull(aEndpoint) != null) {
-            opts.setDefaultHost(aEndpoint);
-        }
-
-        if (aIdleTimeout != -1) {
-            opts.setIdleTimeout(aIdleTimeout);
-        }
-
-        if (aConnectTimeout != -1) {
-            opts.setConnectTimeout(aConnectTimeout);
-        }
-
-        if (aMaxWaitQueueSize != -1) {
-            opts.setMaxWaitQueueSize(aMaxWaitQueueSize);
-        }
-
-        myHTTPClient = aVertx.createHttpClient(opts);
+        myHTTPClient = aVertx.createHttpClient(aConfig);
     }
 
     /**
@@ -210,50 +201,6 @@ public class S3Client {
     }
 
     /**
-     * Uploads the file contents to S3.
-     *
-     * @param aBucket An S3 bucket
-     * @param aKey An S3 key
-     * @param aFile A file to upload
-     * @param aHandler An upload response handler
-     */
-    public void put(final String aBucket, final String aKey, final AsyncFile aFile, final long aFileSize,
-            final Handler<HttpClientResponse> aHandler) {
-        final S3ClientRequest request = createPutRequest(aBucket, aKey, aHandler);
-        final Buffer buffer = Buffer.buffer();
-
-        request.putHeader(HttpHeaders.CONTENT_LENGTH, String.valueOf(aFileSize));
-
-        aFile.endHandler(event -> {
-            request.end(buffer);
-        });
-
-        Pump.pump(aFile, request).start();
-    }
-
-    /**
-     * Uploads the file contents to S3.
-     *
-     * @param aBucket An S3 bucket
-     * @param aKey An S3 key
-     * @param aUpload An HttpServerFileUpload
-     * @param aHandler An upload response handler
-     */
-    public void put(final String aBucket, final String aKey, final HttpServerFileUpload aUpload, final long aFileSize,
-            final Handler<HttpClientResponse> aHandler) {
-        final S3ClientRequest request = createPutRequest(aBucket, aKey, aHandler);
-        final Buffer buffer = Buffer.buffer();
-
-        request.putHeader(HttpHeaders.CONTENT_LENGTH, String.valueOf(aFileSize));
-
-        aUpload.endHandler(event -> {
-            request.end(buffer);
-        });
-
-        Pump.pump(aUpload, request).start();
-    }
-
-    /**
      * Deletes an S3 resource.
      * <p>
      * <code>DELETE (bucket, key) -> handler(Response)</code>
@@ -280,7 +227,7 @@ public class S3Client {
      */
     public S3ClientRequest createPutRequest(final String aBucket, final String aKey,
             final Handler<HttpClientResponse> aHandler) {
-        final HttpClientRequest httpRequest = myHTTPClient.put("/" + aBucket + "/" + aKey, aHandler);
+        final HttpClientRequest httpRequest = myHTTPClient.put(PATH_SEP + aBucket + PATH_SEP + aKey, aHandler);
         return new S3ClientRequest("PUT", aBucket, aKey, httpRequest, myAccessKey, mySecretKey, mySessionToken);
     }
 
@@ -297,7 +244,7 @@ public class S3Client {
      */
     public S3ClientRequest createHeadRequest(final String aBucket, final String aKey,
             final Handler<HttpClientResponse> aHandler) {
-        final HttpClientRequest httpRequest = myHTTPClient.head("/" + aBucket + "/" + aKey, aHandler);
+        final HttpClientRequest httpRequest = myHTTPClient.head(PATH_SEP + aBucket + PATH_SEP + aKey, aHandler);
         return new S3ClientRequest("HEAD", aBucket, aKey, httpRequest, myAccessKey, mySecretKey, mySessionToken);
     }
 
@@ -314,7 +261,7 @@ public class S3Client {
      */
     public S3ClientRequest createGetRequest(final String aBucket, final String aKey,
             final Handler<HttpClientResponse> aHandler) {
-        final HttpClientRequest httpRequest = myHTTPClient.get("/" + aBucket + "/" + aKey, aHandler);
+        final HttpClientRequest httpRequest = myHTTPClient.get(PATH_SEP + aBucket + PATH_SEP + aKey, aHandler);
         return new S3ClientRequest("GET", aBucket, aKey, httpRequest, myAccessKey, mySecretKey, mySessionToken);
     }
 
@@ -331,7 +278,7 @@ public class S3Client {
      */
     public S3ClientRequest createDeleteRequest(final String aBucket, final String aKey,
             final Handler<HttpClientResponse> aHandler) {
-        final HttpClientRequest httpRequest = myHTTPClient.delete("/" + aBucket + "/" + aKey, aHandler);
+        final HttpClientRequest httpRequest = myHTTPClient.delete(PATH_SEP + aBucket + PATH_SEP + aKey, aHandler);
         return new S3ClientRequest("DELETE", aBucket, aKey, httpRequest, myAccessKey, mySecretKey, mySessionToken);
     }
 
