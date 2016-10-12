@@ -254,30 +254,6 @@ public class S3ClientIT extends AbstractS3IT {
         });
     }
 
-    @Test
-    public void testPutAsyncFileLength(final TestContext aContext) {
-        final Async async = aContext.async();
-        final String s3Key = "green-" + myTestID + ".gif";
-        final int length = (int) TEST_FILE.length();
-
-        myVertx.fileSystem().open(TEST_FILE.getAbsolutePath(), new OpenOptions(), openResult -> {
-            if (openResult.succeeded()) {
-                myClient.put(myTestBucket, s3Key, openResult.result(), length, response -> {
-                    final int statusCode = response.statusCode();
-
-                    if (statusCode != 200) {
-                        aContext.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, s3Key, response.statusMessage()));
-                    }
-
-                    async.complete();
-                });
-            } else {
-                aContext.fail(openResult.cause());
-                async.complete();
-            }
-        });
-    }
-
     /**
      * Test for
      * {@link info.freelibrary.pairtree.s3.S3Client#delete(java.lang.String, java.lang.String, io.vertx.core.Handler)}
