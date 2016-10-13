@@ -77,10 +77,7 @@ public class S3Client {
      * @param aAccessKey An S3 access key
      * @param aSecretKey An S3 secret key
      * @param aSessionToken An S3 session token
-     * @param aEndpoint An S3 endpoint
-     * @param aIdleTimeout An idle timeout in seconds
-     * @param aConnectTimeout A connect timeout in milliseconds
-     * @param aMaxWaitQueueSize A maximum number of connections the pending queue will hold
+     * @param aConfig A configuration of HTTP options to use when connecting
      */
     public S3Client(final Vertx aVertx, final String aAccessKey, final String aSecretKey, final String aSessionToken,
             final HttpClientOptions aConfig) {
