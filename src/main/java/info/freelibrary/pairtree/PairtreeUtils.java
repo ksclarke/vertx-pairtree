@@ -41,13 +41,7 @@ THE SOFTWARE.
 
 package info.freelibrary.pairtree;
 
-import static info.freelibrary.pairtree.Constants.COLON;
-import static info.freelibrary.pairtree.Constants.COMMA;
-import static info.freelibrary.pairtree.Constants.EQUALS_SIGN;
-import static info.freelibrary.pairtree.Constants.HEX_INDICATOR;
-import static info.freelibrary.pairtree.Constants.PERIOD;
-import static info.freelibrary.pairtree.Constants.PLUS_SIGN;
-import static info.freelibrary.pairtree.Constants.SLASH;
+import static info.freelibrary.pairtree.Constants.PATH_SEP;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -61,6 +55,27 @@ import java.util.Objects;
  * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
 public class PairtreeUtils {
+
+    /** A colon */
+    private static final char COLON = ':';
+
+    /** A hex indicator */
+    private static final char HEX_INDICATOR = '^';
+
+    /** A semicolon */
+    private static final char SEMICOLON = ';';
+
+    /** A period */
+    private static final char PERIOD = '.';
+
+    /** A comma */
+    private static final char COMMA = ',';
+
+    /** A plus sign which replaces a colon when encoding */
+    private static final char PLUS_SIGN = '+';
+
+    /** An equals sign which replaces a slash when encoding */
+    private static final char EQUALS_SIGN = '=';
 
     /** The Pairtree's separating character */
     private static Character mySeparator = File.separatorChar;
@@ -401,7 +416,7 @@ public class PairtreeUtils {
             final char character = idBuffer.charAt(index);
 
             // Encode characters that need to be encoded according to Pairtree specification
-            if (character == SLASH) {
+            if (character == PATH_SEP) {
                 idBuffer.setCharAt(index, EQUALS_SIGN);
             } else if (character == COLON) {
                 idBuffer.setCharAt(index, PLUS_SIGN);
@@ -427,7 +442,7 @@ public class PairtreeUtils {
 
             // Decode characters that need to be decoded according to Pairtree specification
             if (character == EQUALS_SIGN) {
-                idBuf.append(SLASH);
+                idBuf.append(PATH_SEP);
             } else if (character == PLUS_SIGN) {
                 idBuf.append(COLON);
             } else if (character == COMMA) {

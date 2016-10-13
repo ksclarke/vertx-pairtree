@@ -6,7 +6,7 @@ import static info.freelibrary.pairtree.Constants.FORBIDDEN;
 import static info.freelibrary.pairtree.Constants.NOT_FOUND;
 import static info.freelibrary.pairtree.Constants.NO_CONTENT;
 import static info.freelibrary.pairtree.Constants.OK;
-import static info.freelibrary.pairtree.Constants.SLASH;
+import static info.freelibrary.pairtree.Constants.PATH_SEP;
 import static info.freelibrary.pairtree.PairtreeRoot.PAIRTREE_ROOT;
 
 import java.io.IOException;
@@ -93,7 +93,7 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
                         future.complete(false);
                     }
                 } catch (final NumberFormatException details) {
-                    future.fail("Content-Length was not an integer: " + contentLength);
+                    future.fail(getI18n(MessageCodes.PT_019, contentLength));
                 }
             } else if (statusCode == NOT_FOUND) {
                 future.complete(false);
@@ -186,7 +186,7 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
 
     @Override
     public String getID() {
-        return myPrefix == null ? myID : myPrefix + SLASH + myID;
+        return myPrefix == null ? myID : myPrefix + PATH_SEP + myID;
     }
 
     @Override
@@ -194,7 +194,7 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
         // Pairtree encodes colons to pluses so we need to pre-encode them as a workaround for an S3 bug
         // Cf. https://forums.aws.amazon.com/thread.jspa?threadID=55746
         final String awsID = myID.replace(':', '~');
-        return PAIRTREE_ROOT + SLASH + PairtreeUtils.mapToPtPath(awsID) + SLASH + PairtreeUtils.encodeID(awsID);
+        return PAIRTREE_ROOT + PATH_SEP + PairtreeUtils.mapToPtPath(awsID) + PATH_SEP + PairtreeUtils.encodeID(awsID);
     }
 
     @Override
@@ -202,7 +202,7 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
         // We need to encode any pluses in our resource path as a workaround for an S3 bug
         // Cf. https://forums.aws.amazon.com/thread.jspa?threadID=55746
         final String awsPath = aResourcePath.replace('+', '~');
-        return awsPath.startsWith("/") ? getPath() + awsPath : getPath() + SLASH + awsPath;
+        return awsPath.startsWith("/") ? getPath() + awsPath : getPath() + PATH_SEP + awsPath;
     }
 
     @Override
@@ -226,7 +226,7 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
                 }
 
                 final String status = response.statusMessage();
-                future.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, getPath() + SLASH + aPath, status));
+                future.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, getPath() + PATH_SEP + aPath, status));
             }
         });
     }
@@ -248,7 +248,7 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
                 });
             } else {
                 final String status = response.statusMessage();
-                future.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, getPath() + SLASH + aPath, status));
+                future.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, getPath() + PATH_SEP + aPath, status));
             }
         });
     }
@@ -274,13 +274,13 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
                         future.complete(false);
                     }
                 } catch (final NumberFormatException details) {
-                    future.fail("Content-Length was not an integer: " + contentLength);
+                    future.fail(getI18n(MessageCodes.PT_019, contentLength));
                 }
             } else if (statusCode == NOT_FOUND) {
                 future.complete(false);
             } else {
                 final String status = response.statusMessage();
-                future.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, getPath() + SLASH + aPath, status));
+                future.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, getPath() + PATH_SEP + aPath, status));
             }
         });
     }

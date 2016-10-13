@@ -20,7 +20,7 @@ public class PairtreeRuntimeException extends I18nRuntimeException {
     /**
      * Creates a generic Pairtree runtime exception.
      *
-     * @param aMessage
+     * @param aMessage The detailed message about the exception
      */
     public PairtreeRuntimeException(final String aMessage) {
         super(BUNDLE_NAME, aMessage);
@@ -31,10 +31,10 @@ public class PairtreeRuntimeException extends I18nRuntimeException {
      * into the {}s in the message.
      *
      * @param aMessage An exception message
-     * @param aDetailsVarargs Additional details to insert into the message
+     * @param aMoreDetails Additional details to insert into the message
      */
-    public PairtreeRuntimeException(final String aMessage, final Object... aDetailsVarargs) {
-        super(BUNDLE_NAME, aMessage, aDetailsVarargs);
+    public PairtreeRuntimeException(final String aMessage, final Object... aMoreDetails) {
+        super(BUNDLE_NAME, aMessage, aMoreDetails);
     }
 
     /**
@@ -48,14 +48,14 @@ public class PairtreeRuntimeException extends I18nRuntimeException {
     }
 
     /**
-     * Creates a generic Pairtree runtime exception that takes an exception message, a related exception, and
-     * additional details to be input into the {}s in the message.
+     * Creates a generic Pairtree runtime exception that takes an exception message, a related exception, and additional
+     * details to be input into the {}s in the message.
      *
      * @param aMessage An exception message
      * @param aCause An upstream exception
-     * @param aDetailsVarargs Additional details to insert into the message
+     * @param aMoreDetails Additional details to insert into the message
      */
-    public PairtreeRuntimeException(final String aMessage, final Exception aCause, final String... aDetailsVarargs) {
-        super(BUNDLE_NAME, aMessage, aDetailsVarargs, aCause);
+    public PairtreeRuntimeException(final String aMessage, final Exception aCause, final String... aMoreDetails) {
+        super(BUNDLE_NAME, aMessage, aMoreDetails, aCause);
     }
 }

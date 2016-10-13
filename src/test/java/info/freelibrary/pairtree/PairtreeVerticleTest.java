@@ -43,6 +43,11 @@ public class PairtreeVerticleTest {
         vertx.close(aContext.asyncAssertSuccess());
     }
 
+    /**
+     * Tests the <code>PairtreeVerticle</code> class.
+     *
+     * @param aContext A test context
+     */
     @Test
     public void testMyApplication(final TestContext aContext) {
         final Async async = aContext.async();

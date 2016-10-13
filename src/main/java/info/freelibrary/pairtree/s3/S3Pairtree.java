@@ -5,7 +5,7 @@ import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
 import static info.freelibrary.pairtree.Constants.NOT_FOUND;
 import static info.freelibrary.pairtree.Constants.NO_CONTENT;
 import static info.freelibrary.pairtree.Constants.OK;
-import static info.freelibrary.pairtree.Constants.SLASH;
+import static info.freelibrary.pairtree.Constants.PATH_SEP;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -286,7 +286,7 @@ public class S3Pairtree extends AbstractPairtree {
 
     @Override
     public String toString() {
-        return "s3://" + SLASH + myBucket + SLASH + PAIRTREE_ROOT;
+        return "s3://" + PATH_SEP + myBucket + PATH_SEP + PAIRTREE_ROOT;
     }
 
     @Override

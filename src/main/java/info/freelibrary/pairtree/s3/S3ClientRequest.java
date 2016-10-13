@@ -1,8 +1,7 @@
 
 package info.freelibrary.pairtree.s3;
 
-import static info.freelibrary.pairtree.Constants.EOL;
-import static info.freelibrary.pairtree.Constants.SLASH;
+import static info.freelibrary.pairtree.Constants.PATH_SEP;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -33,8 +32,14 @@ import io.vertx.core.http.HttpVersion;
  */
 public class S3ClientRequest implements HttpClientRequest {
 
+    /** Hash-based message authentication code used for signing AWS requests */
+    private static final String HASH_CODE = "HmacSHA1";
+
+    /** System-independent end of line */
+    private static final String EOL = "\n";
+
     /** The date format used for timestamping S3 requests */
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
 
     /** The logger used for S3 client requests */
     private static final Logger LOGGER = LoggerFactory.getLogger(S3ClientRequest.class);
@@ -226,12 +231,6 @@ public class S3ClientRequest implements HttpClientRequest {
     }
 
     @Override
-    public HttpClientRequest sendHead() {
-        initAuthenticationHeader();
-        return myRequest.sendHead();
-    }
-
-    @Override
     public void end(final String aChunk) {
         initAuthenticationHeader();
         myRequest.end(aChunk);
@@ -257,7 +256,7 @@ public class S3ClientRequest implements HttpClientRequest {
 
     protected void initAuthenticationHeader() {
         if (isAuthenticated()) {
-            // Calculate the signature
+            // Calculate the v2 signature
             // http://docs.amazonwebservices.com/AmazonS3/latest/dev/RESTAuthentication.html
             // #ConstructingTheAuthenticationHeader
 
@@ -273,7 +272,7 @@ public class S3ClientRequest implements HttpClientRequest {
                 headers().add("X-Amz-Security-Token", mySessionToken);
             }
 
-            final StringJoiner headersBuilder = new StringJoiner(EOL, "", "\n");
+            final StringJoiner headersBuilder = new StringJoiner(EOL, "", EOL);
 
             headersBuilder.add("x-amz-date:" + xamzdate);
 
@@ -282,7 +281,7 @@ public class S3ClientRequest implements HttpClientRequest {
             }
 
             final String signedHeaders = headersBuilder.toString();
-            final String resource = SLASH + myBucket + SLASH + (myKey.startsWith("?") ? "" : myKey);
+            final String resource = PATH_SEP + myBucket + PATH_SEP + (myKey.charAt(0) == '?' ? "" : myKey);
 
             // Skipping the date, we'll use the x-amz date instead
             final StringBuilder toSign = new StringBuilder();
@@ -379,8 +378,8 @@ public class S3ClientRequest implements HttpClientRequest {
 
     private static String b64SignHmacSha1(final String aAwsSecretKey, final String aCanonicalString)
             throws NoSuchAlgorithmException, InvalidKeyException {
-        final SecretKeySpec signingKey = new SecretKeySpec(aAwsSecretKey.getBytes(), "HmacSHA1");
-        final Mac mac = Mac.getInstance("HmacSHA1");
+        final SecretKeySpec signingKey = new SecretKeySpec(aAwsSecretKey.getBytes(), HASH_CODE);
+        final Mac mac = Mac.getInstance(HASH_CODE);
 
         mac.init(signingKey);
 
@@ -388,7 +387,7 @@ public class S3ClientRequest implements HttpClientRequest {
     }
 
     private static String currentDateString() {
-        return dateFormat.format(new Date());
+        return DATE_FORMAT.format(new Date());
     }
 
     @Override
@@ -434,6 +433,12 @@ public class S3ClientRequest implements HttpClientRequest {
     @Override
     public HttpClientRequest sendHead(final Handler<HttpVersion> aHandler) {
         return myRequest.sendHead(aHandler);
+    }
+
+    @Override
+    public HttpClientRequest sendHead() {
+        initAuthenticationHeader();
+        return myRequest.sendHead();
     }
 
     @Override
