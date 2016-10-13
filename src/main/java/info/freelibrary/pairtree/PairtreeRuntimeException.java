@@ -1,7 +1,7 @@
 
 package info.freelibrary.pairtree;
 
-import static info.freelibrary.pairtree.PairtreeConstants.BUNDLE_NAME;
+import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
 
 import info.freelibrary.util.I18nRuntimeException;
 

@@ -30,26 +30,37 @@ import io.vertx.core.http.HttpVersion;
  */
 public class S3ClientRequest implements HttpClientRequest {
 
+    /** The date format used for timestamping S3 requests */
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
 
+    /** The logger used for S3 client requests */
     private static final Logger LOGGER = LoggerFactory.getLogger(S3ClientRequest.class);
 
+    /** The underlying S3 HTTP client request */
     private final HttpClientRequest myRequest;
 
+    /** The method of the S3 client request */
     private final String myMethod;
 
+    /** The S3 bucket for the request */
     private final String myBucket;
 
+    /** The S3 key for the request */
     private final String myKey;
 
+    /** The MD5 for the content */
     private String myContentMd5;
 
+    /** The content type for the request */
     private String myContentType;
 
+    /** AWS access key */
     private String myAccessKey;
 
+    /** AWS secret key */
     private String mySecretKey;
 
+    /** The S3 session token (optional) */
     private final String mySessionToken;
 
     /**
@@ -259,35 +270,31 @@ public class S3ClientRequest implements HttpClientRequest {
                 headers().add("X-Amz-Security-Token", mySessionToken);
             }
 
-            final StringJoiner canonicalizedAmzHeadersBuilder = new StringJoiner("\n", "", "\n");
+            final StringJoiner signedHeadersBuilder = new StringJoiner("\n", "", "\n");
 
-            canonicalizedAmzHeadersBuilder.add("x-amz-date:" + xamzdate);
+            signedHeadersBuilder.add("x-amz-date:" + xamzdate);
 
             if (!isSessionTokenBlank()) {
-                canonicalizedAmzHeadersBuilder.add("x-amz-security-token:" + mySessionToken);
+                signedHeadersBuilder.add("x-amz-security-token:" + mySessionToken);
             }
 
-            final String canonicalizedAmzHeaders = canonicalizedAmzHeadersBuilder.toString();
-            final String canonicalizedResource = "/" + myBucket + "/" + (myKey.startsWith("?") ? "" : myKey);
+            final String signedHeaders = signedHeadersBuilder.toString();
+            final String resource = "/" + myBucket + "/" + (myKey.startsWith("?") ? "" : myKey);
 
             // Skipping the date, we'll use the x-amz date instead
-            final String toSign = myMethod + "\n" + myContentMd5 + "\n" + myContentType + "\n\n" +
-                    canonicalizedAmzHeaders + canonicalizedResource;
+            final StringBuilder toSign = new StringBuilder();
 
-            String signature;
+            toSign.append(myMethod).append('\n').append(myContentMd5).append('\n');
+            toSign.append(myContentType).append("\n\n").append(signedHeaders).append(resource);
 
             try {
-                signature = b64SignHmacSha1(mySecretKey, toSign);
+                final String signature = b64SignHmacSha1(mySecretKey, toSign.toString());
+                final String authorization = "AWS" + " " + myAccessKey + ":" + signature;
+
+                headers().add("Authorization", authorization);
             } catch (InvalidKeyException | NoSuchAlgorithmException details) {
-                signature = "ERRORSIGNATURE";
-                // This will totally fail, but downstream users can handle it
                 LOGGER.error("Failed to sign S3 request due to " + details);
             }
-
-            final String authorization = "AWS" + " " + myAccessKey + ":" + signature;
-
-            // Put that nasty authentication string in the headers and let vert.x deal
-            headers().add("Authorization", authorization);
         }
     }
 

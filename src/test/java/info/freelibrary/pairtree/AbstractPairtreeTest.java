@@ -1,7 +1,7 @@
 
 package info.freelibrary.pairtree;
 
-import static info.freelibrary.pairtree.PairtreeConstants.BUNDLE_NAME;
+import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -29,10 +29,13 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 @RunWith(VertxUnitRunner.class)
 public abstract class AbstractPairtreeTest extends I18nObject {
 
+    /** The name of a test object */
     protected static final String TEST_OBJECT_NAME = "asdf";
 
+    /** The logger for the test */
     protected final Logger LOGGER = getLogger();
 
+    /** The connection to the Vertx framework */
     protected Vertx myVertx;
 
     /**
@@ -60,8 +63,8 @@ public abstract class AbstractPairtreeTest extends I18nObject {
      */
     @After
     public void tearDown(final TestContext aContext) {
+        LOGGER.debug("Shutting down Vert.x");
         // FIXME: This causes problems... Why?
-        // LOGGER.debug("Shutting down Vert.x");
         // myVertx.close(aContext.asyncAssertSuccess());
     }
 

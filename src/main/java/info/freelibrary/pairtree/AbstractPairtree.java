@@ -11,15 +11,17 @@ import info.freelibrary.util.Logger;
  */
 public abstract class AbstractPairtree extends I18nObject implements PairtreeRoot {
 
+    /** The logger used by the Pairtree implementation */
     protected final Logger LOGGER = getLogger();
 
+    /** The Pairtree's prefix (optional) */
     protected String myPrefix;
 
     /**
      * Creates an abstract pairtree object.
      */
     protected AbstractPairtree() {
-        super(PairtreeConstants.BUNDLE_NAME);
+        super(Constants.BUNDLE_NAME);
     }
 
     @Override

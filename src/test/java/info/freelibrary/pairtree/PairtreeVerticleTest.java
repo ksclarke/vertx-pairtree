@@ -19,6 +19,7 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 @RunWith(VertxUnitRunner.class)
 public class PairtreeVerticleTest {
 
+    /** The connection to the Vertx framework */
     private Vertx vertx;
 
     /**

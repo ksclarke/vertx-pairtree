@@ -21,8 +21,10 @@ import junit.framework.TestCase;
  */
 public class PairtreeFactoryTest extends TestCase {
 
+    /** The system's directory for temporary files */
     private static final String TMPDIR = System.getProperty("java.io.tmpdir") + separatorChar;
 
+    /** The connection to the Vertx framework */
     private Vertx myVertx;
 
     /**

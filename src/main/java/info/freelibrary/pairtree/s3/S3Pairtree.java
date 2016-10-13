@@ -1,7 +1,10 @@
 
 package info.freelibrary.pairtree.s3;
 
-import static info.freelibrary.pairtree.PairtreeConstants.BUNDLE_NAME;
+import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
+import static info.freelibrary.pairtree.Constants.NOT_FOUND;
+import static info.freelibrary.pairtree.Constants.NO_CONTENT;
+import static info.freelibrary.pairtree.Constants.OK;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -39,16 +42,22 @@ import io.vertx.core.buffer.Buffer;
  */
 public class S3Pairtree extends AbstractPairtree {
 
+    /** AWS access key */
     public static final String AWS_ACCESS_KEY = "AWS_ACCESS_KEY";
 
+    /** AWS secret key */
     public static final String AWS_SECRET_KEY = "AWS_SECRET_KEY";
 
+    /** AWS S3 path separator */
     private static final String PATH_SEP = "/";
 
+    /** The Pairtree's S3 bucket */
     private final String myBucket;
 
+    /** The S3 client to use for the Pairtree's operations */
     private final S3Client myS3Client;
 
+    /** The Pairtree's prefix (optional) */
     private String myPrefix;
 
     /**
@@ -149,31 +158,31 @@ public class S3Pairtree extends AbstractPairtree {
         myS3Client.get(myBucket, getVersionFilePath(), getVersionResponse -> {
             final int versionStatusCode = getVersionResponse.statusCode();
 
-            if (versionStatusCode != 200 && versionStatusCode != 404) {
+            if (versionStatusCode != OK && versionStatusCode != NOT_FOUND) {
                 final int statusCode = getVersionResponse.statusCode();
                 final String statusMessage = getVersionResponse.statusMessage();
 
                 future.fail(getI18n(MessageCodes.PT_018, statusCode, statusMessage));
-            } else if (versionStatusCode == 200) {
+            } else if (versionStatusCode == OK) {
                 if (hasPrefix()) {
                     myS3Client.get(myBucket, getPrefixFilePath(), getPrefixResponse -> {
                         final int prefixStatusCode = getPrefixResponse.statusCode();
 
-                        if (prefixStatusCode != 200 && prefixStatusCode != 404) {
+                        if (prefixStatusCode != OK && prefixStatusCode != NOT_FOUND) {
                             final int statusCode = getPrefixResponse.statusCode();
                             final String statusMessage = getPrefixResponse.statusMessage();
 
                             future.fail(getI18n(MessageCodes.PT_018, statusCode, statusMessage));
-                        } else if (prefixStatusCode == 200) {
+                        } else if (prefixStatusCode == OK) {
                             future.complete(true);
-                        } else if (prefixStatusCode == 404) {
+                        } else if (prefixStatusCode == NOT_FOUND) {
                             future.complete(false);
                         }
                     });
                 } else {
                     future.complete(true);
                 }
-            } else if (versionStatusCode == 404) {
+            } else if (versionStatusCode == NOT_FOUND) {
                 future.complete(false);
             }
         });
@@ -191,14 +200,14 @@ public class S3Pairtree extends AbstractPairtree {
         specNote.append(getI18n(MessageCodes.PT_012));
 
         myS3Client.put(myBucket, getVersionFilePath(), Buffer.buffer(specNote.toString()), putVersionResponse -> {
-            if (putVersionResponse.statusCode() != 200) {
+            if (putVersionResponse.statusCode() != OK) {
                 final int statusCode = putVersionResponse.statusCode();
                 final String statusMessage = putVersionResponse.statusMessage();
 
                 future.fail(getI18n(MessageCodes.PT_018, statusCode, statusMessage));
             } else if (hasPrefix()) {
                 myS3Client.put(myBucket, getPrefixFilePath(), Buffer.buffer(myPrefix), putPrefixResponse -> {
-                    if (putPrefixResponse.statusCode() != 200) {
+                    if (putPrefixResponse.statusCode() != OK) {
                         final int statusCode = putPrefixResponse.statusCode();
                         final String statusMessage = putPrefixResponse.statusMessage();
 
@@ -221,7 +230,7 @@ public class S3Pairtree extends AbstractPairtree {
         final Future<Void> future = Future.<Void>future().setHandler(aHandler);
 
         myS3Client.list(myBucket, listResponse -> {
-            if (listResponse.statusCode() == 200) {
+            if (listResponse.statusCode() == OK) {
                 listResponse.bodyHandler(bodyHandler -> {
                     final SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
 
@@ -244,7 +253,7 @@ public class S3Pairtree extends AbstractPairtree {
                             futures.add(deleteFuture);
 
                             myS3Client.delete(myBucket, key, deleteResponse -> {
-                                if (deleteResponse.statusCode() != 204) {
+                                if (deleteResponse.statusCode() != NO_CONTENT) {
                                     final int statusCode = deleteResponse.statusCode();
                                     final String statusMessage = deleteResponse.statusMessage();
 

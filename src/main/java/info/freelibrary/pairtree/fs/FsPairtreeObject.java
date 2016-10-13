@@ -5,8 +5,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 
+import info.freelibrary.pairtree.Constants;
 import info.freelibrary.pairtree.MessageCodes;
-import info.freelibrary.pairtree.PairtreeConstants;
 import info.freelibrary.pairtree.PairtreeObject;
 import info.freelibrary.pairtree.PairtreeUtils;
 import info.freelibrary.util.I18nObject;
@@ -26,14 +26,19 @@ import io.vertx.core.file.FileSystem;
  */
 public class FsPairtreeObject extends I18nObject implements PairtreeObject {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FsPairtreeObject.class, PairtreeConstants.BUNDLE_NAME);
+    /** The logger used with the file-system based Pairtree object */
+    private static final Logger LOGGER = LoggerFactory.getLogger(FsPairtreeObject.class, Constants.BUNDLE_NAME);
 
+    /** A connection to the Pairtree's file system */
     private final FileSystem myFileSystem;
 
+    /** The path to the file-system based Pairtree */
     private final String myPairtreePath;
 
+    /** The Pairtree's prefix (optional) */
     private final String myPrefix;
 
+    /** The ID of this Pairtree */
     private final String myID;
 
     /**
@@ -44,7 +49,7 @@ public class FsPairtreeObject extends I18nObject implements PairtreeObject {
      * @param aID The object's ID
      */
     public FsPairtreeObject(final FileSystem aFileSystem, final FsPairtree aPairtree, final String aID) {
-        super(PairtreeConstants.BUNDLE_NAME);
+        super(Constants.BUNDLE_NAME);
 
         Objects.requireNonNull(aFileSystem);
         Objects.requireNonNull(aPairtree);

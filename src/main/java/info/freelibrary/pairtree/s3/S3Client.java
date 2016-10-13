@@ -21,14 +21,19 @@ import io.vertx.core.http.HttpServerFileUpload;
  */
 public class S3Client {
 
+    /** Default S3 endpoint */
     public static final String DEFAULT_ENDPOINT = "s3.amazonaws.com"; // test bad endpoint: s3-us-east-1.amazonaws.com
 
+    /** AWS access key */
     private final String myAccessKey;
 
+    /** AWS secret key */
     private final String mySecretKey;
 
+    /** S3 session token */
     private final String mySessionToken;
 
+    /** HTTP client used to interact with S3 */
     private final HttpClient myHTTPClient;
 
     /**
@@ -53,6 +58,11 @@ public class S3Client {
 
     /**
      * Creates a new S3 client using the supplied access key, secret key, and endpoint.
+     *
+     * @param aVertx A Vert.x instance from which to create the <code>HttpClient</code>
+     * @param aAccessKey An S3 access key
+     * @param aSecretKey An S3 secret key
+     * @param aEndpoint An S3 endpoint
      */
     public S3Client(final Vertx aVertx, final String aAccessKey, final String aSecretKey, final String aEndpoint) {
         this(aVertx, aAccessKey, aSecretKey, null, aEndpoint, -1, -1, -1);

@@ -1,9 +1,9 @@
 
 package info.freelibrary.pairtree.s3;
 
+import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
 import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_045;
 import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_046;
-import static info.freelibrary.pairtree.PairtreeConstants.BUNDLE_NAME;
 import static java.util.UUID.randomUUID;
 
 import java.io.IOException;
@@ -43,8 +43,10 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 @RunWith(VertxUnitRunner.class)
 public class S3ClientIT extends AbstractS3IT {
 
+    /** The S3 client being used in the tests */
     private S3Client myClient;
 
+    /** A test ID */
     private String myTestID;
 
     @Override

@@ -35,8 +35,10 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 @RunWith(VertxUnitRunner.class)
 public class FsPairtreeObjectTest extends AbstractFsPairtreeTest {
 
-    private static final String TEST_RESOURCE_PATH = "path/to/something";
+    /** The resource used in the tests */
+    private static final String RESOURCE_PATH = "path/to/something";
 
+    /** The contents of the resource used in the tests */
     private static final String RESOURCE_CONTENT = "something";
 
     @Test
@@ -213,9 +215,9 @@ public class FsPairtreeObjectTest extends AbstractFsPairtreeTest {
             if (createResult.succeeded()) {
                 final PairtreeObject ptObj = createResult.result();
 
-                createFile(Paths.get(ptObj.getPath(), TEST_RESOURCE_PATH).toString(), RESOURCE_CONTENT);
+                createFile(Paths.get(ptObj.getPath(), RESOURCE_PATH).toString(), RESOURCE_CONTENT);
 
-                ptObj.get(TEST_RESOURCE_PATH, getResult -> {
+                ptObj.get(RESOURCE_PATH, getResult -> {
                     if (getResult.succeeded()) {
                         if (!getResult.result().toString().equals(RESOURCE_CONTENT)) {
                             aContext.fail(getI18n(PT_DEBUG_042, RESOURCE_CONTENT));
@@ -244,8 +246,8 @@ public class FsPairtreeObjectTest extends AbstractFsPairtreeTest {
 
                 LOGGER.debug("Testing putting Pairtree object resource: {}", TEST_OBJECT_NAME);
 
-                ptObj.put(TEST_RESOURCE_PATH, buffer, putResult -> {
-                    final String path = Paths.get(ptObj.getPath(), TEST_RESOURCE_PATH).toString();
+                ptObj.put(RESOURCE_PATH, buffer, putResult -> {
+                    final String path = Paths.get(ptObj.getPath(), RESOURCE_PATH).toString();
 
                     if (putResult.succeeded()) {
                         if (myFileSystem.existsBlocking(path)) {

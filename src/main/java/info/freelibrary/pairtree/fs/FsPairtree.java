@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Objects;
 
 import info.freelibrary.pairtree.AbstractPairtree;
+import info.freelibrary.pairtree.Constants;
 import info.freelibrary.pairtree.MessageCodes;
-import info.freelibrary.pairtree.PairtreeConstants;
 import info.freelibrary.pairtree.PairtreeException;
 import info.freelibrary.pairtree.PairtreeObject;
 import info.freelibrary.util.Logger;
@@ -30,10 +30,10 @@ import io.vertx.core.file.FileSystem;
  */
 public class FsPairtree extends AbstractPairtree {
 
-    /* The underlying file system */
+    /** The underlying file system */
     private final FileSystem myFileSystem;
 
-    /* File system location of Pairtree root */
+    /** File system location of Pairtree root */
     private final String myPath;
 
     /**
@@ -165,7 +165,7 @@ public class FsPairtree extends AbstractPairtree {
 
     @Override
     protected Logger getLogger() {
-        return LoggerFactory.getLogger(FsPairtree.class, PairtreeConstants.BUNDLE_NAME);
+        return LoggerFactory.getLogger(FsPairtree.class, Constants.BUNDLE_NAME);
     }
 
     private void checkVersion(final Future<Boolean> aFuture) {

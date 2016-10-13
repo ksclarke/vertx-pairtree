@@ -22,22 +22,27 @@ import io.vertx.core.Vertx;
  */
 final public class PairtreeFactory {
 
-    /* The types of pairtree backends supported by this library. */
+    /** The types of pairtree backends supported by this library. */
     public static enum PairtreeImpl {
         FileSystem, S3Bucket
     };
 
-    /* The default type of Pairtree implementation. */
+    /** The default type of Pairtree implementation. */
     public static final PairtreeImpl DEFAULT_TYPE = PairtreeImpl.FileSystem;
 
+    /** The number of Pairtree implementations supported by this library */
     private static final int PT_IMPL_COUNT = PairtreeImpl.values().length;
 
+    /** A list of Pairtree implementation factories */
     private static final List<Map.Entry<PairtreeImpl, PairtreeFactory>> myFactories = new ArrayList<>(PT_IMPL_COUNT);
 
-    private static final int MINIMUM_AWS_CONFIG_COUNT = 2;
+    /** Minimum number of configuration options required by a Pairtree */
+    private static final int MIN_CONFIG_COUNT = 2;
 
+    /** Connection to the Vertx framework */
     private final Vertx myVertx;
 
+    /** Reference to the Pairtree implementation type created by this factory */
     private final PairtreeImpl myImplType;
 
     /**
@@ -123,11 +128,11 @@ final public class PairtreeFactory {
             final String secretKey;
             final String endpoint;
 
-            if (aConfig.length > MINIMUM_AWS_CONFIG_COUNT) {
+            if (aConfig.length > MIN_CONFIG_COUNT) {
                 accessKey = aConfig[1];
                 secretKey = aConfig[2];
 
-                if (aConfig.length > MINIMUM_AWS_CONFIG_COUNT + 1) {
+                if (aConfig.length > MIN_CONFIG_COUNT + 1) {
                     endpoint = aConfig[3];
                 } else {
                     endpoint = null;
@@ -144,7 +149,8 @@ final public class PairtreeFactory {
             } else {
                 pairtree = new S3Pairtree(myVertx, bucket, accessKey, secretKey, endpoint);
             }
-        } else { // Default file-system implementation
+        } else {
+            // Default file-system implementation
             pairtree = new FsPairtree(myVertx, aConfig.length > 0 ? aConfig[0] : DEFAULT_PAIRTREE);
         }
 

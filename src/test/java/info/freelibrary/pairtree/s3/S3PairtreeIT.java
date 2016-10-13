@@ -1,7 +1,7 @@
 
 package info.freelibrary.pairtree.s3;
 
-import static info.freelibrary.pairtree.PairtreeConstants.BUNDLE_NAME;
+import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
 import static info.freelibrary.pairtree.PairtreeFactory.PairtreeImpl.S3Bucket;
 import static info.freelibrary.pairtree.PairtreeRoot.PAIRTREE_PREFIX;
 import static info.freelibrary.pairtree.PairtreeRoot.PAIRTREE_VERSION;
@@ -29,6 +29,7 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 @RunWith(VertxUnitRunner.class)
 public class S3PairtreeIT extends AbstractS3IT {
 
+    /** The Pairtree that's being tested */
     private PairtreeRoot myPairtree;
 
     /**
@@ -56,10 +57,7 @@ public class S3PairtreeIT extends AbstractS3IT {
         final Async async = aContext.async();
 
         myPairtree.create(createResult -> {
-            if (!createResult.succeeded()) {
-                aContext.fail(createResult.cause());
-                async.complete();
-            } else {
+            if (createResult.succeeded()) {
                 final boolean prefixFile = myS3Client.doesObjectExist(myTestBucket, myPairtree.getPrefixFilePath());
                 final boolean versionFile = myS3Client.doesObjectExist(myTestBucket, myPairtree.getVersionFilePath());
 
@@ -80,6 +78,9 @@ public class S3PairtreeIT extends AbstractS3IT {
 
                     async.complete();
                 });
+            } else {
+                aContext.fail(createResult.cause());
+                async.complete();
             }
         });
     }
@@ -89,14 +90,14 @@ public class S3PairtreeIT extends AbstractS3IT {
         final Async async = aContext.async();
 
         myPairtree.create(result -> {
-            if (!result.succeeded()) {
-                aContext.fail(result.cause());
-            } else {
+            if (result.succeeded()) {
                 aContext.assertTrue(myS3Client.doesObjectExist(myTestBucket, myPairtree.getVersionFilePath()));
 
                 if (myPairtree.hasPrefix()) {
                     aContext.assertTrue(myS3Client.doesObjectExist(myTestBucket, myPairtree.getPrefixFilePath()));
                 }
+            } else {
+                aContext.fail(result.cause());
             }
 
             async.complete();
@@ -108,10 +109,7 @@ public class S3PairtreeIT extends AbstractS3IT {
         final Async async = aContext.async();
 
         myPairtree.create(createResult -> {
-            if (!createResult.succeeded()) {
-                aContext.fail(createResult.cause());
-                async.complete();
-            } else {
+            if (createResult.succeeded()) {
                 final boolean prefixFile = myS3Client.doesObjectExist(myTestBucket, myPairtree.getPrefixFilePath());
                 final boolean versionFile = myS3Client.doesObjectExist(myTestBucket, myPairtree.getVersionFilePath());
 
@@ -143,6 +141,9 @@ public class S3PairtreeIT extends AbstractS3IT {
 
                     async.complete();
                 });
+            } else {
+                aContext.fail(createResult.cause());
+                async.complete();
             }
         });
     }
