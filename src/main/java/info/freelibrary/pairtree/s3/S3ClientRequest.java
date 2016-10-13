@@ -1,6 +1,9 @@
 
 package info.freelibrary.pairtree.s3;
 
+import static info.freelibrary.pairtree.Constants.EOL;
+import static info.freelibrary.pairtree.Constants.SLASH;
+
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
@@ -270,22 +273,22 @@ public class S3ClientRequest implements HttpClientRequest {
                 headers().add("X-Amz-Security-Token", mySessionToken);
             }
 
-            final StringJoiner signedHeadersBuilder = new StringJoiner("\n", "", "\n");
+            final StringJoiner headersBuilder = new StringJoiner(EOL, "", "\n");
 
-            signedHeadersBuilder.add("x-amz-date:" + xamzdate);
+            headersBuilder.add("x-amz-date:" + xamzdate);
 
             if (!isSessionTokenBlank()) {
-                signedHeadersBuilder.add("x-amz-security-token:" + mySessionToken);
+                headersBuilder.add("x-amz-security-token:" + mySessionToken);
             }
 
-            final String signedHeaders = signedHeadersBuilder.toString();
-            final String resource = "/" + myBucket + "/" + (myKey.startsWith("?") ? "" : myKey);
+            final String signedHeaders = headersBuilder.toString();
+            final String resource = SLASH + myBucket + SLASH + (myKey.startsWith("?") ? "" : myKey);
 
             // Skipping the date, we'll use the x-amz date instead
             final StringBuilder toSign = new StringBuilder();
 
-            toSign.append(myMethod).append('\n').append(myContentMd5).append('\n');
-            toSign.append(myContentType).append("\n\n").append(signedHeaders).append(resource);
+            toSign.append(myMethod).append(EOL).append(myContentMd5).append(EOL);
+            toSign.append(myContentType).append(EOL).append(EOL).append(signedHeaders).append(resource);
 
             try {
                 final String signature = b64SignHmacSha1(mySecretKey, toSign.toString());

@@ -5,6 +5,7 @@ import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
 import static info.freelibrary.pairtree.Constants.NOT_FOUND;
 import static info.freelibrary.pairtree.Constants.NO_CONTENT;
 import static info.freelibrary.pairtree.Constants.OK;
+import static info.freelibrary.pairtree.Constants.SLASH;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -47,9 +48,6 @@ public class S3Pairtree extends AbstractPairtree {
 
     /** AWS secret key */
     public static final String AWS_SECRET_KEY = "AWS_SECRET_KEY";
-
-    /** AWS S3 path separator */
-    private static final String PATH_SEP = "/";
 
     /** The Pairtree's S3 bucket */
     private final String myBucket;
@@ -168,15 +166,15 @@ public class S3Pairtree extends AbstractPairtree {
                     myS3Client.get(myBucket, getPrefixFilePath(), getPrefixResponse -> {
                         final int prefixStatusCode = getPrefixResponse.statusCode();
 
-                        if (prefixStatusCode != OK && prefixStatusCode != NOT_FOUND) {
+                        if (prefixStatusCode == OK) {
+                            future.complete(true);
+                        } else if (prefixStatusCode == NOT_FOUND) {
+                            future.complete(false);
+                        } else {
                             final int statusCode = getPrefixResponse.statusCode();
                             final String statusMessage = getPrefixResponse.statusMessage();
 
                             future.fail(getI18n(MessageCodes.PT_018, statusCode, statusMessage));
-                        } else if (prefixStatusCode == OK) {
-                            future.complete(true);
-                        } else if (prefixStatusCode == NOT_FOUND) {
-                            future.complete(false);
                         }
                     });
                 } else {
@@ -200,24 +198,26 @@ public class S3Pairtree extends AbstractPairtree {
         specNote.append(getI18n(MessageCodes.PT_012));
 
         myS3Client.put(myBucket, getVersionFilePath(), Buffer.buffer(specNote.toString()), putVersionResponse -> {
-            if (putVersionResponse.statusCode() != OK) {
+            if (putVersionResponse.statusCode() == OK) {
+                if (hasPrefix()) {
+                    myS3Client.put(myBucket, getPrefixFilePath(), Buffer.buffer(myPrefix), putPrefixResponse -> {
+                        if (putPrefixResponse.statusCode() == OK) {
+                            future.complete();
+                        } else {
+                            final int statusCode = putPrefixResponse.statusCode();
+                            final String statusMessage = putPrefixResponse.statusMessage();
+
+                            future.fail(getI18n(MessageCodes.PT_018, statusCode, statusMessage));
+                        }
+                    });
+                } else {
+                    future.complete();
+                }
+            } else {
                 final int statusCode = putVersionResponse.statusCode();
                 final String statusMessage = putVersionResponse.statusMessage();
 
                 future.fail(getI18n(MessageCodes.PT_018, statusCode, statusMessage));
-            } else if (hasPrefix()) {
-                myS3Client.put(myBucket, getPrefixFilePath(), Buffer.buffer(myPrefix), putPrefixResponse -> {
-                    if (putPrefixResponse.statusCode() != OK) {
-                        final int statusCode = putPrefixResponse.statusCode();
-                        final String statusMessage = putPrefixResponse.statusMessage();
-
-                        future.fail(getI18n(MessageCodes.PT_018, statusCode, statusMessage));
-                    } else {
-                        future.complete();
-                    }
-                });
-            } else {
-                future.complete();
             }
         });
     }
@@ -253,13 +253,13 @@ public class S3Pairtree extends AbstractPairtree {
                             futures.add(deleteFuture);
 
                             myS3Client.delete(myBucket, key, deleteResponse -> {
-                                if (deleteResponse.statusCode() != NO_CONTENT) {
+                                if (deleteResponse.statusCode() == NO_CONTENT) {
+                                    deleteFuture.complete();
+                                } else {
                                     final int statusCode = deleteResponse.statusCode();
                                     final String statusMessage = deleteResponse.statusMessage();
 
                                     deleteFuture.fail(getI18n(MessageCodes.PT_018, statusCode, statusMessage));
-                                } else {
-                                    deleteFuture.complete();
                                 }
                             });
                         }
@@ -286,7 +286,7 @@ public class S3Pairtree extends AbstractPairtree {
 
     @Override
     public String toString() {
-        return "s3://" + PATH_SEP + myBucket + PATH_SEP + PAIRTREE_ROOT;
+        return "s3://" + SLASH + myBucket + SLASH + PAIRTREE_ROOT;
     }
 
     @Override

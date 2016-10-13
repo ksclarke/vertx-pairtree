@@ -36,16 +36,19 @@ public final class Constants {
     public static final char EQUALS_SIGN = '=';
 
     /** OK HTTP response code */
-    public static int OK = 200;
+    public static final int OK = 200;
 
     /** Not Found HTTP response code */
-    public static int NOT_FOUND = 404;
+    public static final int NOT_FOUND = 404;
 
     /** No content HTTP response code */
-    public static int NO_CONTENT = 204;
+    public static final int NO_CONTENT = 204;
 
     /** Forbidden HTTP response code */
-    public static int FORBIDDEN = 403;
+    public static final int FORBIDDEN = 403;
+
+    /** System-independent end of line */
+    public static final String EOL = "\n";
 
     /** An empty private constructor for this utility class */
     private Constants() {

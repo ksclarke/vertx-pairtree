@@ -370,7 +370,7 @@ public class PairtreeUtils {
             throw new PairtreeRuntimeException(MessageCodes.PT_004);
         }
 
-        final byte[] bytes; // First pass
+        final byte[] bytes;
 
         try {
             bytes = aID.getBytes("utf-8");
@@ -433,7 +433,8 @@ public class PairtreeUtils {
             } else if (character == COMMA) {
                 idBuf.append(PERIOD);
             } else if (character == HEX_INDICATOR) {
-                final String hex = aID.substring(index + 1, index + 3); // Get the next 2 chars
+                /* Get the next two characters since they are hex characters */
+                final String hex = aID.substring(index + 1, index + 3);
                 final char[] chars = Character.toChars(Integer.parseInt(hex, 16));
 
                 assert chars.length == 1;

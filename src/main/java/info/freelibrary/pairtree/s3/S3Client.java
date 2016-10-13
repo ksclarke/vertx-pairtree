@@ -21,8 +21,9 @@ import io.vertx.core.http.HttpServerFileUpload;
  */
 public class S3Client {
 
+    // TODO: test for a bad endpoint, for example: s3-us-east-1.amazonaws.com
     /** Default S3 endpoint */
-    public static final String DEFAULT_ENDPOINT = "s3.amazonaws.com"; // test bad endpoint: s3-us-east-1.amazonaws.com
+    public static final String DEFAULT_ENDPOINT = "s3.amazonaws.com";
 
     /** AWS access key */
     private final String myAccessKey;
