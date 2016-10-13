@@ -54,16 +54,13 @@ import java.util.Objects;
  *
  * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
-public class PairtreeUtils {
+public final class PairtreeUtils {
 
     /** A colon */
     private static final char COLON = ':';
 
     /** A hex indicator */
     private static final char HEX_INDICATOR = '^';
-
-    /** A semicolon */
-    private static final char SEMICOLON = ';';
 
     /** A period */
     private static final char PERIOD = '.';
@@ -76,6 +73,9 @@ public class PairtreeUtils {
 
     /** An equals sign which replaces a slash when encoding */
     private static final char EQUALS_SIGN = '=';
+
+    /** Indicator that the Pairtree path only has one part */
+    private static final int SINGLE_PART = 1;
 
     /** The Pairtree's separating character */
     private static Character mySeparator = File.separatorChar;
@@ -167,17 +167,17 @@ public class PairtreeUtils {
      *
      * @param aID An ID to map to a Pairtree path
      * @param aBasePath The base path to use in the mapping
-     * @param aEncapsulatingDirName The name of the encapsulating directory
+     * @param aEncapsulatedName The name of the encapsulating directory
      * @return The Pairtree path for the supplied ID
      */
-    public static String mapToPtPath(final String aBasePath, final String aID, final String aEncapsulatingDirName) {
+    public static String mapToPtPath(final String aBasePath, final String aID, final String aEncapsulatedName) {
         Objects.requireNonNull(aID);
 
-        if (aEncapsulatingDirName == null) {
+        if (aEncapsulatedName == null) {
             return concat(aBasePath, mapToPtPath(aID));
         }
 
-        return concat(aBasePath, mapToPtPath(aID), encodeID(aEncapsulatingDirName));
+        return concat(aBasePath, mapToPtPath(aID), encodeID(aEncapsulatedName));
     }
 
     /**
@@ -248,7 +248,7 @@ public class PairtreeUtils {
         final String[] pPathParts = aPtPath.split("\\" + mySeparator);
 
         // If there is only 1 part
-        if (pPathParts.length == 1) {
+        if (pPathParts.length == SINGLE_PART) {
             // If part <= shorty length then no encapsulating directory
             if (pPathParts[0].length() <= myShortyLength) {
                 return null;
@@ -259,9 +259,10 @@ public class PairtreeUtils {
         }
 
         // All parts up to next to last and last should have shorty length
-        for (int i = 0; i < pPathParts.length - 2; i++) {
-            if (pPathParts[i].length() != myShortyLength) {
-                throw new InvalidPathException(MessageCodes.PT_002, myShortyLength, pPathParts[i].length(), aPtPath);
+        for (int index = 0; index < pPathParts.length - 2; index++) {
+            if (pPathParts[index].length() != myShortyLength) {
+                throw new InvalidPathException(MessageCodes.PT_002, myShortyLength, pPathParts[index].length(),
+                        aPtPath);
             }
         }
 

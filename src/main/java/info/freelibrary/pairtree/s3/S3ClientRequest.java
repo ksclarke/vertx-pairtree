@@ -39,7 +39,7 @@ public class S3ClientRequest implements HttpClientRequest {
     private static final String EOL = "\n";
 
     /** The date format used for timestamping S3 requests */
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+    private static final String DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss zzz";
 
     /** The logger used for S3 client requests */
     private static final Logger LOGGER = LoggerFactory.getLogger(S3ClientRequest.class);
@@ -91,6 +91,9 @@ public class S3ClientRequest implements HttpClientRequest {
      * @param aBucket An S3 bucket
      * @param aKey An S3 key
      * @param aRequest A HttpClientRequest
+     * @param aAccessKey An AWS access key
+     * @param aSecretKey An AWS secret key
+     * @param aSessionToken An S3 session token (optional)
      */
     public S3ClientRequest(final String aMethod, final String aBucket, final String aKey,
             final HttpClientRequest aRequest, final String aAccessKey, final String aSecretKey,
@@ -105,6 +108,11 @@ public class S3ClientRequest implements HttpClientRequest {
      * @param aBucket An S3 bucket
      * @param aKey An S3 key
      * @param aRequest A HttpClientRequest
+     * @param aAccessKey An AWS access key
+     * @param aSecretKey An AWS secret key
+     * @param aSessionToken An S3 session token (optional)
+     * @param aContentMd5 An MD5 hash for the request's content
+     * @param aContentType A type of the request's content
      */
     public S3ClientRequest(final String aMethod, final String aBucket, final String aKey,
             final HttpClientRequest aRequest, final String aAccessKey, final String aSecretKey,
@@ -254,6 +262,9 @@ public class S3ClientRequest implements HttpClientRequest {
         myRequest.end();
     }
 
+    /**
+     * Adds the authentication header.
+     */
     protected void initAuthenticationHeader() {
         if (isAuthenticated()) {
             // Calculate the v2 signature
@@ -264,7 +275,7 @@ public class S3ClientRequest implements HttpClientRequest {
             // within 15 min of S3 server time. contentMd5 and type are optional
 
             // We can't risk letting our date get clobbered and being inconsistent
-            final String xamzdate = currentDateString();
+            final String xamzdate = new SimpleDateFormat(DATE_FORMAT).format(new Date());
 
             headers().add("X-Amz-Date", xamzdate);
 
@@ -300,6 +311,11 @@ public class S3ClientRequest implements HttpClientRequest {
         }
     }
 
+    /**
+     * Tests whether the session token for the request exists.
+     *
+     * @return True if no session token exists; else, false
+     */
     private boolean isSessionTokenBlank() {
         return mySessionToken == null || mySessionToken.trim().length() == 0;
     }
@@ -376,6 +392,15 @@ public class S3ClientRequest implements HttpClientRequest {
         myContentType = aContentType;
     }
 
+    /**
+     * Returns a Base64 HmacSha1 signature.
+     *
+     * @param aAwsSecretKey An AWS secret key
+     * @param aCanonicalString A canonical string to encode
+     * @return A Base64 HmacSha1 signature
+     * @throws NoSuchAlgorithmException If the system doesn't support the encoding algorithm
+     * @throws InvalidKeyException If the supplied AWS secret key is invalid
+     */
     private static String b64SignHmacSha1(final String aAwsSecretKey, final String aCanonicalString)
             throws NoSuchAlgorithmException, InvalidKeyException {
         final SecretKeySpec signingKey = new SecretKeySpec(aAwsSecretKey.getBytes(), HASH_CODE);
@@ -384,10 +409,6 @@ public class S3ClientRequest implements HttpClientRequest {
         mac.init(signingKey);
 
         return new String(Base64.getEncoder().encode(mac.doFinal(aCanonicalString.getBytes())));
-    }
-
-    private static String currentDateString() {
-        return DATE_FORMAT.format(new Date());
     }
 
     @Override

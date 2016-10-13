@@ -20,12 +20,15 @@ import io.vertx.core.Vertx;
  *
  * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
-final public class PairtreeFactory {
+public final class PairtreeFactory {
 
     /** The types of pairtree backends supported by this library. */
     public static enum PairtreeImpl {
-        FileSystem, S3Bucket
-    };
+        /** The file system Pairtree implementation */
+        FileSystem,
+        /** The S3 Pairtree implementation */
+        S3Bucket
+    }
 
     /** The default type of Pairtree implementation. */
     public static final PairtreeImpl DEFAULT_TYPE = PairtreeImpl.FileSystem;

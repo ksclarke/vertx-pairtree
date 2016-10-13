@@ -18,7 +18,7 @@ public class PairtreeException extends I18nException {
     /**
      * Creates a generic Pairtree exception.
      *
-     * @param aMessage
+     * @param aMessage An exception message
      */
     public PairtreeException(final String aMessage) {
         super(Constants.BUNDLE_NAME, aMessage);

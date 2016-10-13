@@ -43,6 +43,9 @@ import io.vertx.core.buffer.Buffer;
  */
 public class S3Pairtree extends AbstractPairtree {
 
+    /** An S3 Pairtree logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(S3Pairtree.class, BUNDLE_NAME);
+
     /** AWS access key */
     public static final String AWS_ACCESS_KEY = "AWS_ACCESS_KEY";
 
@@ -125,6 +128,14 @@ public class S3Pairtree extends AbstractPairtree {
         if (StringUtils.trimToNull(aPairtreePrefix) != null) {
             myPrefix = aPairtreePrefix;
         }
+
+        if (LOGGER.isDebugEnabled()) {
+            if (myPrefix == null) {
+                LOGGER.debug(MessageCodes.PT_DEBUG_001, myBucket);
+            } else {
+                LOGGER.debug(MessageCodes.PT_DEBUG_002, myBucket, myPrefix);
+            }
+        }
     }
 
     @Override
@@ -156,12 +167,7 @@ public class S3Pairtree extends AbstractPairtree {
         myS3Client.get(myBucket, getVersionFilePath(), getVersionResponse -> {
             final int versionStatusCode = getVersionResponse.statusCode();
 
-            if (versionStatusCode != OK && versionStatusCode != NOT_FOUND) {
-                final int statusCode = getVersionResponse.statusCode();
-                final String statusMessage = getVersionResponse.statusMessage();
-
-                future.fail(getI18n(MessageCodes.PT_018, statusCode, statusMessage));
-            } else if (versionStatusCode == OK) {
+            if (versionStatusCode == OK) {
                 if (hasPrefix()) {
                     myS3Client.get(myBucket, getPrefixFilePath(), getPrefixResponse -> {
                         final int prefixStatusCode = getPrefixResponse.statusCode();
@@ -182,6 +188,11 @@ public class S3Pairtree extends AbstractPairtree {
                 }
             } else if (versionStatusCode == NOT_FOUND) {
                 future.complete(false);
+            } else {
+                final int statusCode = getVersionResponse.statusCode();
+                final String statusMessage = getVersionResponse.statusMessage();
+
+                future.fail(getI18n(MessageCodes.PT_018, statusCode, statusMessage));
             }
         });
     }
@@ -302,11 +313,6 @@ public class S3Pairtree extends AbstractPairtree {
     @Override
     public String getVersionFilePath() {
         return getVersionFileName();
-    }
-
-    @Override
-    public Logger getLogger() {
-        return LoggerFactory.getLogger(S3Pairtree.class, BUNDLE_NAME);
     }
 
 }

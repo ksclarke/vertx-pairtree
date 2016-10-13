@@ -40,6 +40,8 @@ public interface PairtreeRoot {
 
     /**
      * Returns whether the Pairtree is using a prefix.
+     *
+     * @return True if the Pairtree uses a prefix; else, false
      */
     public boolean hasPrefix();
 
@@ -110,6 +112,8 @@ public interface PairtreeRoot {
 
     /**
      * Returns the implementation specific path of the Pairtree.
+     *
+     * @return The implementation specific path of the Pairtree
      */
     public String getPath();
 

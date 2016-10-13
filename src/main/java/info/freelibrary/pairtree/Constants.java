@@ -23,6 +23,9 @@ public final class Constants {
     /** Forbidden HTTP response code */
     public static final int FORBIDDEN = 403;
 
+    /** Content-Length HTTP header */
+    public static final String CONTENT_LENGTH = "Content-Length";
+
     /** A system independent path separator */
     public static final char PATH_SEP = '/';
 

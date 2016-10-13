@@ -52,7 +52,8 @@ public interface PairtreeObject {
     /**
      * Gets the path of the requested object resource.
      *
-     * @param aResourcePath
+     * @param aResourcePath The Pairtree resource which the returned path should represent
+     * @return The path of the requested object resource
      */
     public String getPath(final String aResourcePath);
 

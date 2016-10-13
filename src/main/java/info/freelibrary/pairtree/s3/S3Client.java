@@ -1,7 +1,7 @@
 
 package info.freelibrary.pairtree.s3;
 
-import info.freelibrary.util.StringUtils;
+import static info.freelibrary.pairtree.Constants.PATH_SEP;
 
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
@@ -54,7 +54,7 @@ public class S3Client {
      * @param aSecretKey An S3 secret key
      */
     public S3Client(final Vertx aVertx, final String aAccessKey, final String aSecretKey) {
-        this(aVertx, aAccessKey, aSecretKey, null, DEFAULT_ENDPOINT, -1, -1, -1);
+        this(aVertx, aAccessKey, aSecretKey, null, new HttpClientOptions().setDefaultHost(DEFAULT_ENDPOINT));
     }
 
     /**
@@ -66,7 +66,8 @@ public class S3Client {
      * @param aEndpoint An S3 endpoint
      */
     public S3Client(final Vertx aVertx, final String aAccessKey, final String aSecretKey, final String aEndpoint) {
-        this(aVertx, aAccessKey, aSecretKey, null, aEndpoint, -1, -1, -1);
+        this(aVertx, aAccessKey, aSecretKey, null, new HttpClientOptions().setDefaultHost(aEndpoint));
+
     }
 
     /**
@@ -82,30 +83,13 @@ public class S3Client {
      * @param aMaxWaitQueueSize A maximum number of connections the pending queue will hold
      */
     public S3Client(final Vertx aVertx, final String aAccessKey, final String aSecretKey, final String aSessionToken,
-            final String aEndpoint, final int aIdleTimeout, final int aConnectTimeout, final int aMaxWaitQueueSize) {
-        final HttpClientOptions opts = new HttpClientOptions();
+            final HttpClientOptions aConfig) {
 
         myAccessKey = aAccessKey;
         mySecretKey = aSecretKey;
         mySessionToken = aSessionToken;
 
-        if (StringUtils.trimToNull(aEndpoint) != null) {
-            opts.setDefaultHost(aEndpoint);
-        }
-
-        if (aIdleTimeout != -1) {
-            opts.setIdleTimeout(aIdleTimeout);
-        }
-
-        if (aConnectTimeout != -1) {
-            opts.setConnectTimeout(aConnectTimeout);
-        }
-
-        if (aMaxWaitQueueSize != -1) {
-            opts.setMaxWaitQueueSize(aMaxWaitQueueSize);
-        }
-
-        myHTTPClient = aVertx.createHttpClient(opts);
+        myHTTPClient = aVertx.createHttpClient(aConfig);
     }
 
     /**
@@ -246,7 +230,7 @@ public class S3Client {
      */
     public S3ClientRequest createPutRequest(final String aBucket, final String aKey,
             final Handler<HttpClientResponse> aHandler) {
-        final HttpClientRequest httpRequest = myHTTPClient.put("/" + aBucket + "/" + aKey, aHandler);
+        final HttpClientRequest httpRequest = myHTTPClient.put(PATH_SEP + aBucket + PATH_SEP + aKey, aHandler);
         return new S3ClientRequest("PUT", aBucket, aKey, httpRequest, myAccessKey, mySecretKey, mySessionToken);
     }
 
@@ -263,7 +247,7 @@ public class S3Client {
      */
     public S3ClientRequest createHeadRequest(final String aBucket, final String aKey,
             final Handler<HttpClientResponse> aHandler) {
-        final HttpClientRequest httpRequest = myHTTPClient.head("/" + aBucket + "/" + aKey, aHandler);
+        final HttpClientRequest httpRequest = myHTTPClient.head(PATH_SEP + aBucket + PATH_SEP + aKey, aHandler);
         return new S3ClientRequest("HEAD", aBucket, aKey, httpRequest, myAccessKey, mySecretKey, mySessionToken);
     }
 
@@ -280,7 +264,7 @@ public class S3Client {
      */
     public S3ClientRequest createGetRequest(final String aBucket, final String aKey,
             final Handler<HttpClientResponse> aHandler) {
-        final HttpClientRequest httpRequest = myHTTPClient.get("/" + aBucket + "/" + aKey, aHandler);
+        final HttpClientRequest httpRequest = myHTTPClient.get(PATH_SEP + aBucket + PATH_SEP + aKey, aHandler);
         return new S3ClientRequest("GET", aBucket, aKey, httpRequest, myAccessKey, mySecretKey, mySessionToken);
     }
 
@@ -297,7 +281,7 @@ public class S3Client {
      */
     public S3ClientRequest createDeleteRequest(final String aBucket, final String aKey,
             final Handler<HttpClientResponse> aHandler) {
-        final HttpClientRequest httpRequest = myHTTPClient.delete("/" + aBucket + "/" + aKey, aHandler);
+        final HttpClientRequest httpRequest = myHTTPClient.delete(PATH_SEP + aBucket + PATH_SEP + aKey, aHandler);
         return new S3ClientRequest("DELETE", aBucket, aKey, httpRequest, myAccessKey, mySecretKey, mySessionToken);
     }
 

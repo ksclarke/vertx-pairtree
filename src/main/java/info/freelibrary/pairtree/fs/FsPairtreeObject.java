@@ -59,10 +59,10 @@ public class FsPairtreeObject extends I18nObject implements PairtreeObject {
         myPrefix = aPairtree.getPrefix();
         myFileSystem = aFileSystem;
 
-        if (myPrefix != null) {
-            myID = PairtreeUtils.removePrefix(myPrefix, aID);
-        } else {
+        if (myPrefix == null) {
             myID = aID;
+        } else {
+            myID = PairtreeUtils.removePrefix(myPrefix, aID);
         }
     }
 
