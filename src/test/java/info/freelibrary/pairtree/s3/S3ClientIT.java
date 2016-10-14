@@ -2,7 +2,6 @@
 package info.freelibrary.pairtree.s3;
 
 import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
-import static info.freelibrary.pairtree.Constants.CONTENT_LENGTH;
 import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_045;
 import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_046;
 import static java.util.UUID.randomUUID;
@@ -25,6 +24,7 @@ import org.xml.sax.XMLReader;
 
 import com.amazonaws.AmazonClientException;
 
+import info.freelibrary.pairtree.HTTP;
 import info.freelibrary.pairtree.MessageCodes;
 import info.freelibrary.util.Logger;
 import info.freelibrary.util.LoggerFactory;
@@ -83,7 +83,7 @@ public class S3ClientIT extends AbstractS3IT {
                 if (statusCode != 200) {
                     aContext.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, s3Key, response.statusMessage()));
                 } else {
-                    final String contentLength = response.getHeader(CONTENT_LENGTH);
+                    final String contentLength = response.getHeader(HTTP.CONTENT_LENGTH);
 
                     aContext.assertNotNull(contentLength);
                     aContext.assertTrue(Integer.parseInt(contentLength) > 0);

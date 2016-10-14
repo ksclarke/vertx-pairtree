@@ -144,7 +144,7 @@ public class FsPairtreeObject extends I18nObject implements PairtreeObject {
         final Path resourcePath = Paths.get(getPath(), aPath);
         final Future<Void> future = Future.<Void>future().setHandler(aHandler);
 
-        LOGGER.debug(MessageCodes.PT_DEBUG_026, resourcePath.toString());
+        LOGGER.debug(MessageCodes.PT_DEBUG_026, resourcePath);
 
         // First, create the parent directory path if it doesn't already exist
         myFileSystem.mkdirs(resourcePath.getParent().toString(), mkdirsResult -> {
@@ -170,7 +170,7 @@ public class FsPairtreeObject extends I18nObject implements PairtreeObject {
         final String resourcePath = Paths.get(getPath(), aPath).toString();
         final Future<Buffer> future = Future.<Buffer>future().setHandler(aHandler);
 
-        LOGGER.debug(MessageCodes.PT_DEBUG_027, resourcePath.toString());
+        LOGGER.debug(MessageCodes.PT_DEBUG_027, resourcePath);
 
         myFileSystem.readFile(resourcePath, result -> {
             if (result.succeeded()) {
@@ -188,7 +188,7 @@ public class FsPairtreeObject extends I18nObject implements PairtreeObject {
         final String resourcePath = Paths.get(getPath(), aPath).toString();
         final Future<Boolean> future = Future.<Boolean>future().setHandler(aHandler);
 
-        LOGGER.debug(MessageCodes.PT_DEBUG_025, resourcePath.toString());
+        LOGGER.debug(MessageCodes.PT_DEBUG_025, resourcePath);
 
         myFileSystem.exists(resourcePath, result -> {
             if (result.succeeded()) {

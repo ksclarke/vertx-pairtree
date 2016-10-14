@@ -2,9 +2,6 @@
 package info.freelibrary.pairtree.s3;
 
 import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
-import static info.freelibrary.pairtree.Constants.NOT_FOUND;
-import static info.freelibrary.pairtree.Constants.NO_CONTENT;
-import static info.freelibrary.pairtree.Constants.OK;
 import static info.freelibrary.pairtree.Constants.PATH_SEP;
 
 import java.io.IOException;
@@ -23,6 +20,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 import info.freelibrary.pairtree.AbstractPairtree;
+import info.freelibrary.pairtree.HTTP;
 import info.freelibrary.pairtree.MessageCodes;
 import info.freelibrary.pairtree.PairtreeObject;
 import info.freelibrary.util.Logger;
@@ -167,14 +165,14 @@ public class S3Pairtree extends AbstractPairtree {
         myS3Client.get(myBucket, getVersionFilePath(), getVersionResponse -> {
             final int versionStatusCode = getVersionResponse.statusCode();
 
-            if (versionStatusCode == OK) {
+            if (versionStatusCode == HTTP.OK) {
                 if (hasPrefix()) {
                     myS3Client.get(myBucket, getPrefixFilePath(), getPrefixResponse -> {
                         final int prefixStatusCode = getPrefixResponse.statusCode();
 
-                        if (prefixStatusCode == OK) {
+                        if (prefixStatusCode == HTTP.OK) {
                             future.complete(true);
-                        } else if (prefixStatusCode == NOT_FOUND) {
+                        } else if (prefixStatusCode == HTTP.NOT_FOUND) {
                             future.complete(false);
                         } else {
                             final int statusCode = getPrefixResponse.statusCode();
@@ -186,7 +184,7 @@ public class S3Pairtree extends AbstractPairtree {
                 } else {
                     future.complete(true);
                 }
-            } else if (versionStatusCode == NOT_FOUND) {
+            } else if (versionStatusCode == HTTP.NOT_FOUND) {
                 future.complete(false);
             } else {
                 final int statusCode = getVersionResponse.statusCode();
@@ -209,10 +207,10 @@ public class S3Pairtree extends AbstractPairtree {
         specNote.append(getI18n(MessageCodes.PT_012));
 
         myS3Client.put(myBucket, getVersionFilePath(), Buffer.buffer(specNote.toString()), putVersionResponse -> {
-            if (putVersionResponse.statusCode() == OK) {
+            if (putVersionResponse.statusCode() == HTTP.OK) {
                 if (hasPrefix()) {
                     myS3Client.put(myBucket, getPrefixFilePath(), Buffer.buffer(myPrefix), putPrefixResponse -> {
-                        if (putPrefixResponse.statusCode() == OK) {
+                        if (putPrefixResponse.statusCode() == HTTP.OK) {
                             future.complete();
                         } else {
                             final int statusCode = putPrefixResponse.statusCode();
@@ -241,7 +239,7 @@ public class S3Pairtree extends AbstractPairtree {
         final Future<Void> future = Future.<Void>future().setHandler(aHandler);
 
         myS3Client.list(myBucket, listResponse -> {
-            if (listResponse.statusCode() == OK) {
+            if (listResponse.statusCode() == HTTP.OK) {
                 listResponse.bodyHandler(bodyHandler -> {
                     final SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
 
@@ -264,7 +262,7 @@ public class S3Pairtree extends AbstractPairtree {
                             futures.add(deleteFuture);
 
                             myS3Client.delete(myBucket, key, deleteResponse -> {
-                                if (deleteResponse.statusCode() == NO_CONTENT) {
+                                if (deleteResponse.statusCode() == HTTP.NO_CONTENT) {
                                     deleteFuture.complete();
                                 } else {
                                     final int statusCode = deleteResponse.statusCode();

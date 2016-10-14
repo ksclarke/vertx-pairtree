@@ -305,28 +305,33 @@ public final class PairtreeUtils {
      * @return The concatenated Pairtree paths
      */
     private static String concat(final String... aPathsVarargs) {
+        final String path;
+
         if (aPathsVarargs == null || aPathsVarargs.length == 0) {
-            return null;
-        }
+            path = null;
+        } else {
+            final StringBuffer pathBuf = new StringBuffer();
 
-        final StringBuffer pathBuf = new StringBuffer();
-        Character lastChar = null;
+            Character lastChar = null;
 
-        for (final String aPathsVararg : aPathsVarargs) {
-            if (aPathsVararg != null) {
-                final int length;
+            for (final String aPathsVararg : aPathsVarargs) {
+                if (aPathsVararg != null) {
+                    final int length;
 
-                if (lastChar != null && !mySeparator.equals(lastChar)) {
-                    pathBuf.append(mySeparator);
+                    if (lastChar != null && !mySeparator.equals(lastChar)) {
+                        pathBuf.append(mySeparator);
+                    }
+
+                    pathBuf.append(aPathsVararg);
+                    length = aPathsVararg.length();
+                    lastChar = aPathsVararg.charAt(length - 1);
                 }
-
-                pathBuf.append(aPathsVararg);
-                length = aPathsVararg.length();
-                lastChar = aPathsVararg.charAt(length - 1);
             }
+
+            path = pathBuf.toString();
         }
 
-        return pathBuf.toString();
+        return path;
     }
 
     /**

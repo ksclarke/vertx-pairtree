@@ -15,6 +15,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import info.freelibrary.util.Logger;
 import info.freelibrary.util.LoggerFactory;
+import info.freelibrary.util.StringUtils;
 
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
@@ -276,29 +277,20 @@ public class S3ClientRequest implements HttpClientRequest {
 
             // We can't risk letting our date get clobbered and being inconsistent
             final String xamzdate = new SimpleDateFormat(DATE_FORMAT).format(new Date());
-
-            headers().add("X-Amz-Date", xamzdate);
-
-            if (!isSessionTokenBlank()) {
-                headers().add("X-Amz-Security-Token", mySessionToken);
-            }
-
-            final StringJoiner headersBuilder = new StringJoiner(EOL, "", EOL);
-
-            headersBuilder.add("x-amz-date:" + xamzdate);
-
-            if (!isSessionTokenBlank()) {
-                headersBuilder.add("x-amz-security-token:" + mySessionToken);
-            }
-
-            final String signedHeaders = headersBuilder.toString();
-            final String resource = PATH_SEP + myBucket + PATH_SEP + (myKey.charAt(0) == '?' ? "" : myKey);
-
-            // Skipping the date, we'll use the x-amz date instead
+            final StringJoiner signedHeaders = new StringJoiner(EOL, "", EOL);
             final StringBuilder toSign = new StringBuilder();
 
-            toSign.append(myMethod).append(EOL).append(myContentMd5).append(EOL);
-            toSign.append(myContentType).append(EOL).append(EOL).append(signedHeaders).append(resource);
+            headers().add("X-Amz-Date", xamzdate);
+            signedHeaders.add("x-amz-date:" + xamzdate);
+
+            if (!StringUtils.isEmpty(mySessionToken)) {
+                headers().add("X-Amz-Security-Token", mySessionToken);
+                signedHeaders.add("x-amz-security-token:" + mySessionToken);
+            }
+
+            toSign.append(myMethod).append(EOL).append(myContentMd5).append(EOL).append(myContentType).append(EOL)
+                    .append(EOL).append(signedHeaders).append(PATH_SEP).append(myBucket).append(PATH_SEP).append(myKey
+                    .charAt(0) == '?' ? "" : myKey);
 
             try {
                 final String signature = b64SignHmacSha1(mySecretKey, toSign.toString());
@@ -309,15 +301,6 @@ public class S3ClientRequest implements HttpClientRequest {
                 LOGGER.error("Failed to sign S3 request due to {}", details);
             }
         }
-    }
-
-    /**
-     * Tests whether the session token for the request exists.
-     *
-     * @return True if no session token exists; else, false
-     */
-    private boolean isSessionTokenBlank() {
-        return mySessionToken == null || mySessionToken.trim().length() == 0;
     }
 
     /**
