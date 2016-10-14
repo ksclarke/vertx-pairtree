@@ -5,7 +5,7 @@ package info.freelibrary.pairtree;
  *
  * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
-public class HTTP {
+public final class HTTP {
 
     /** OK HTTP response code */
     public static final int OK = 200;

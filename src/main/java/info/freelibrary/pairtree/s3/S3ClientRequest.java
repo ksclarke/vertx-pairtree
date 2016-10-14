@@ -288,9 +288,9 @@ public class S3ClientRequest implements HttpClientRequest {
                 signedHeaders.add("x-amz-security-token:" + mySessionToken);
             }
 
-            toSign.append(myMethod).append(EOL).append(myContentMd5).append(EOL).append(myContentType).append(EOL)
-                    .append(EOL).append(signedHeaders).append(PATH_SEP).append(myBucket).append(PATH_SEP).append(myKey
-                    .charAt(0) == '?' ? "" : myKey);
+            toSign.append(myMethod).append(EOL).append(myContentMd5).append(EOL).append(myContentType).append(EOL);
+            toSign.append(EOL).append(signedHeaders).append(PATH_SEP).append(myBucket).append(PATH_SEP);
+            toSign.append(myKey.charAt(0) == '?' ? "" : myKey);
 
             try {
                 final String signature = b64SignHmacSha1(mySecretKey, toSign.toString());
