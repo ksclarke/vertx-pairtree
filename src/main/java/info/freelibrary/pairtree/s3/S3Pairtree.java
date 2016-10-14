@@ -43,14 +43,14 @@ import io.vertx.core.buffer.Buffer;
  */
 public class S3Pairtree extends AbstractPairtree {
 
-    /** An S3 Pairtree logger. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(S3Pairtree.class, BUNDLE_NAME);
-
     /** AWS access key */
     public static final String AWS_ACCESS_KEY = "AWS_ACCESS_KEY";
 
     /** AWS secret key */
     public static final String AWS_SECRET_KEY = "AWS_SECRET_KEY";
+
+    /** An S3 Pairtree logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(S3Pairtree.class, BUNDLE_NAME);
 
     /** The Pairtree's S3 bucket */
     private final String myBucket;

@@ -36,42 +36,42 @@ public interface PairtreeRoot {
      *
      * @return The Pairtree prefix
      */
-    public String getPrefix();
+    String getPrefix();
 
     /**
      * Returns whether the Pairtree is using a prefix.
      *
      * @return True if the Pairtree uses a prefix; else, false
      */
-    public boolean hasPrefix();
+    boolean hasPrefix();
 
     /**
      * Gets the name of the Pairtree prefix file.
      *
      * @return The name of the Pairtree prefix file
      */
-    public String getPrefixFileName();
+    String getPrefixFileName();
 
     /**
      * Gets the path of the Pairtree prefix file.
      *
      * @return The path of the Pairtree prefix file or null if no prefix is set
      */
-    public String getPrefixFilePath();
+    String getPrefixFilePath();
 
     /**
      * Gets the name of the Pairtree version file.
      *
      * @return The name of the Pairtree version file
      */
-    public String getVersionFileName();
+    String getVersionFileName();
 
     /**
      * Gets the path of the Pairtree version file.
      *
      * @return The path of the Pairtree version file
      */
-    public String getVersionFilePath();
+    String getVersionFilePath();
 
     /**
      * Gets the Pairtree object identified by the supplied ID.
@@ -79,7 +79,7 @@ public interface PairtreeRoot {
      * @param aID An object name
      * @return The Pairtree object
      */
-    public PairtreeObject getObject(final String aID);
+    PairtreeObject getObject(final String aID);
 
     /**
      * Gets the Pairtree objects identified by the supplied ID.
@@ -87,34 +87,34 @@ public interface PairtreeRoot {
      * @param aIDList An object name
      * @return The Pairtree objects for the supplied IDs
      */
-    public List<PairtreeObject> getObjects(final List<String> aIDList);
+    List<PairtreeObject> getObjects(final List<String> aIDList);
 
     /**
      * Tests whether the Pairtree root exists.
      *
      * @param aHandler A {@link io.vertx.core.Handler} with an {@link io.vertx.core.AsyncResult}
      */
-    public void exists(final Handler<AsyncResult<Boolean>> aHandler);
+    void exists(final Handler<AsyncResult<Boolean>> aHandler);
 
     /**
      * Creates the Pairtree root file system.
      *
      * @param aHandler A {@link io.vertx.core.Handler} with an {@link io.vertx.core.AsyncResult}
      */
-    public void create(final Handler<AsyncResult<Void>> aHandler);
+    void create(final Handler<AsyncResult<Void>> aHandler);
 
     /**
      * Deletes the Pairtree.
      *
      * @param aHandler A {@link io.vertx.core.Handler} with an {@link io.vertx.core.AsyncResult}
      */
-    public void delete(final Handler<AsyncResult<Void>> aHandler);
+    void delete(final Handler<AsyncResult<Void>> aHandler);
 
     /**
      * Returns the implementation specific path of the Pairtree.
      *
      * @return The implementation specific path of the Pairtree
      */
-    public String getPath();
+    String getPath();
 
 }

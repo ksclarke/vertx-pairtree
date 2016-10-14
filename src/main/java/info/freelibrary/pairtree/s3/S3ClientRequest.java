@@ -306,7 +306,7 @@ public class S3ClientRequest implements HttpClientRequest {
 
                 headers().add("Authorization", authorization);
             } catch (InvalidKeyException | NoSuchAlgorithmException details) {
-                LOGGER.error("Failed to sign S3 request due to " + details);
+                LOGGER.error("Failed to sign S3 request due to {}", details);
             }
         }
     }

@@ -132,9 +132,11 @@ public class PairtreeUtilsTest {
     public void testGetEncapsulatingDir() throws InvalidPathException {
         assertNull(PairtreeUtils.getEncapsulatingDir("ab"));
         assertNull(PairtreeUtils.getEncapsulatingDir("ab/cd"));
+
         assertNull(PairtreeUtils.getEncapsulatingDir("ab/cd/"));
         assertNull(PairtreeUtils.getEncapsulatingDir("ab/cd/ef/g"));
         assertNull(PairtreeUtils.getEncapsulatingDir("ab/cd/ef/g/"));
+
         assertEquals("h", PairtreeUtils.getEncapsulatingDir("ab/cd/ef/g/h"));
         assertEquals("h", PairtreeUtils.getEncapsulatingDir("ab/cd/ef/g/h/"));
         assertEquals("efg", PairtreeUtils.getEncapsulatingDir("ab/cd/efg"));

@@ -41,6 +41,7 @@ THE SOFTWARE.
 
 package info.freelibrary.pairtree;
 
+import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
 import static info.freelibrary.pairtree.Constants.PATH_SEP;
 
 import java.io.File;
@@ -49,12 +50,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import info.freelibrary.util.Logger;
+import info.freelibrary.util.LoggerFactory;
+
 /**
  * Utilities for working with Pairtrees.
  *
  * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
 public final class PairtreeUtils {
+
+    /** A logger for the Pairtree utilities class */
+    private static final Logger LOGGER = LoggerFactory.getLogger(PairtreeUtils.class, BUNDLE_NAME);
 
     /** A colon */
     private static final char COLON = ':';
@@ -171,13 +178,17 @@ public final class PairtreeUtils {
      * @return The Pairtree path for the supplied ID
      */
     public static String mapToPtPath(final String aBasePath, final String aID, final String aEncapsulatedName) {
+        final String ptPath;
+
         Objects.requireNonNull(aID);
 
         if (aEncapsulatedName == null) {
-            return concat(aBasePath, mapToPtPath(aID));
+            ptPath = concat(aBasePath, mapToPtPath(aID));
+        } else {
+            ptPath = concat(aBasePath, mapToPtPath(aID), encodeID(aEncapsulatedName));
         }
 
-        return concat(aBasePath, mapToPtPath(aID), encodeID(aEncapsulatedName));
+        return ptPath;
     }
 
     /**
@@ -201,13 +212,13 @@ public final class PairtreeUtils {
      * @throws InvalidPathException If there is trouble mapping the path
      */
     public static String mapToID(final String aPtPath) throws InvalidPathException {
+        final String encapsulatingDir = getEncapsulatingDir(aPtPath);
+
         String id = aPtPath;
 
         if (id.endsWith(Character.toString(mySeparator))) {
             id = id.substring(0, id.length() - 1);
         }
-
-        final String encapsulatingDir = getEncapsulatingDir(aPtPath);
 
         if (encapsulatingDir != null) {
             id = id.substring(0, id.length() - encapsulatingDir.length());
@@ -228,8 +239,7 @@ public final class PairtreeUtils {
      * @throws InvalidPathException If there is a problem extracting the encapsulating directory
      */
     public static String getEncapsulatingDir(final String aBasePath, final String aPtPath) throws InvalidPathException {
-        final String newPath = removeBasePath(aBasePath, aPtPath);
-        return getEncapsulatingDir(newPath);
+        return getEncapsulatingDir(removeBasePath(aBasePath, aPtPath));
     }
 
     /**
@@ -240,9 +250,7 @@ public final class PairtreeUtils {
      * @throws InvalidPathException If there is a problem extracting the encapsulating directory
      */
     public static String getEncapsulatingDir(final String aPtPath) throws InvalidPathException {
-        if (aPtPath == null) {
-            throw new PairtreeRuntimeException(MessageCodes.PT_003);
-        }
+        Objects.requireNonNull(aPtPath, LOGGER.getMessage(MessageCodes.PT_003));
 
         // Walk the Pairtree path looking for first non-shorty
         final String[] pPathParts = aPtPath.split("\\" + mySeparator);
@@ -267,26 +275,27 @@ public final class PairtreeUtils {
         }
 
         final String nextToLastPart = pPathParts[pPathParts.length - 2];
-        final String lastPart = pPathParts[pPathParts.length - 1];
 
         // Next to last should have shorty length or less
         if (nextToLastPart.length() > myShortyLength) {
             throw new InvalidPathException(MessageCodes.PT_005, aPtPath);
         }
 
+        String lastPart = pPathParts[pPathParts.length - 1];
+
         // If next to last has shorty length
         if (nextToLastPart.length() == myShortyLength) {
             // If last has length > shorty length then encapsulating directory
             if (lastPart.length() > myShortyLength) {
-                return decodeID(lastPart);
+                lastPart = decodeID(lastPart);
             } else {
                 // Else no encapsulating directory
-                return null;
+                lastPart = null;
             }
         }
 
         // Else last is encapsulating directory
-        return decodeID(lastPart);
+        return lastPart == null ? null : decodeID(lastPart);
     }
 
     /**
@@ -329,19 +338,18 @@ public final class PairtreeUtils {
      * @throws PairtreeRuntimeException If the supplied prefix or ID is null
      */
     public static String removePrefix(final String aPrefix, final String aID) {
-        if (aPrefix == null) {
-            throw new PairtreeRuntimeException(MessageCodes.PT_006);
-        }
+        Objects.requireNonNull(aPrefix, LOGGER.getMessage(MessageCodes.PT_006));
+        Objects.requireNonNull(aID, LOGGER.getMessage(MessageCodes.PT_004));
 
-        if (aID == null) {
-            throw new PairtreeRuntimeException(MessageCodes.PT_004);
-        }
+        final String id;
 
         if (aID.indexOf(aPrefix) == 0) {
-            return aID.substring(aPrefix.length());
+            id = aID.substring(aPrefix.length());
+        } else {
+            id = aID;
         }
 
-        return aID;
+        return id;
     }
 
     /**
@@ -353,13 +361,8 @@ public final class PairtreeUtils {
      * @throws PairtreeRuntimeException If the supplied base path or Pairtree path are null
      */
     public static String removeBasePath(final String aBasePath, final String aPtPath) {
-        if (aBasePath == null) {
-            throw new PairtreeRuntimeException(MessageCodes.PT_007);
-        }
-
-        if (aPtPath == null) {
-            throw new PairtreeRuntimeException(MessageCodes.PT_003);
-        }
+        Objects.requireNonNull(aBasePath, LOGGER.getMessage(MessageCodes.PT_007));
+        Objects.requireNonNull(aPtPath, LOGGER.getMessage(MessageCodes.PT_003));
 
         String newPath = aPtPath;
 
@@ -382,9 +385,7 @@ public final class PairtreeUtils {
      * @throws PairtreeRuntimeException If the supplied ID is null
      */
     public static String encodeID(final String aID) {
-        if (aID == null) {
-            throw new PairtreeRuntimeException(MessageCodes.PT_004);
-        }
+        Objects.requireNonNull(aID, LOGGER.getMessage(MessageCodes.PT_004));
 
         final byte[] bytes;
 
@@ -436,7 +437,9 @@ public final class PairtreeUtils {
      * @return The unclean ID
      */
     public static String decodeID(final String aID) {
-        final StringBuffer idBuf = new StringBuffer();
+        Objects.requireNonNull(aID, LOGGER.getMessage(MessageCodes.PT_004));
+
+        final StringBuilder idBuf = new StringBuilder();
 
         for (int index = 0; index < aID.length(); index++) {
             final char character = aID.charAt(index);

@@ -31,6 +31,7 @@ import io.vertx.core.file.FileSystem;
  */
 public class FsPairtree extends AbstractPairtree {
 
+    /** A logger for the file-system based Pairtree implementation */
     private static final Logger LOGGER = LoggerFactory.getLogger(FsPairtree.class, BUNDLE_NAME);
 
     /** The underlying file system */

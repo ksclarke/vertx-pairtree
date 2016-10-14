@@ -31,7 +31,7 @@ public final class PairtreeFactory {
     }
 
     /** The default type of Pairtree implementation. */
-    public static final PairtreeImpl DEFAULT_TYPE = PairtreeImpl.FileSystem;
+    public static final PairtreeImpl DEFAULT_TYPE = FileSystem;
 
     /** The number of Pairtree implementations supported by this library */
     private static final int PT_IMPL_COUNT = PairtreeImpl.values().length;
