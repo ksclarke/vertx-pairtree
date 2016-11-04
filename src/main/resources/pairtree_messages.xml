@@ -80,5 +80,11 @@
   <entry key="PT-DEBUG-053">Found unexpected version file</entry>
   <entry key="PT-DEBUG-054">Didn't find expected prefix file</entry>
   <entry key="PT-DEBUG-055">Didn't find expected version file</entry>
+  <entry key="PT-DEBUG-056">Initializing S3 Pairtree with explicit endpoint: {}</entry>
+  <entry key="PT-DEBUG-057">Putting Pairtree object resource: {}</entry>
+  <entry key="PT-DEBUG-058">Getting Pairtree object resource: {}</entry>
+  <entry key="PT-DEBUG-059">Finding Pairtree object resource '{}' in '{}' [{}]</entry>
+  <entry key="PT-DEBUG-060">{} deployed: {}</entry>
+  <entry key="PT-DEBUG-061">Pairtree server started at port {}</entry>
 
 </properties>

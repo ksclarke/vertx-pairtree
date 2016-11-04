@@ -211,7 +211,7 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
 
         final Future<Void> future = Future.<Void>future().setHandler(aHandler);
 
-        LOGGER.debug("Putting Pairtree object resource: {}", aPath);
+        LOGGER.debug(MessageCodes.PT_DEBUG_057, aPath);
 
         myS3Client.put(myPairtreeBucket, getPath(aPath), aBuffer, response -> {
             final int statusCode = response.statusCode();
@@ -237,7 +237,7 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
 
         final Future<Buffer> future = Future.<Buffer>future().setHandler(aHandler);
 
-        LOGGER.debug("Getting Pairtree object resource: {}", aPath);
+        LOGGER.debug(MessageCodes.PT_DEBUG_058, aPath);
 
         myS3Client.get(myPairtreeBucket, getPath(aPath), response -> {
             final int statusCode = response.statusCode();
@@ -259,7 +259,7 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
 
         final Future<Boolean> future = Future.<Boolean>future().setHandler(aHandler);
 
-        LOGGER.debug("Finding Pairtree object resource '{}' in '{}' [{}]", aPath, myPairtreeBucket, getPath(aPath));
+        LOGGER.debug(MessageCodes.PT_DEBUG_059, aPath, myPairtreeBucket, getPath(aPath));
 
         myS3Client.head(myPairtreeBucket, getPath(aPath), response -> {
             final int statusCode = response.statusCode();

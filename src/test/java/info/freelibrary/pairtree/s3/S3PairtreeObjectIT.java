@@ -61,7 +61,10 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
         super.setUp(aContext);
 
         LOGGER.debug(PT_DEBUG_001, "s3:///" + myTestBucket);
-        myPairtree = PairtreeFactory.getFactory(myVertx, S3Bucket).getPairtree(myTestBucket, myAccessKey, mySecretKey);
+
+        final PairtreeFactory factory = PairtreeFactory.getFactory(myVertx, S3Bucket);
+
+        myPairtree = factory.getPairtree(myTestBucket, myAccessKey, mySecretKey, myRegion);
 
         // Create a test ID for each test run
         myUID = randomUUID().toString();
@@ -84,7 +87,7 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
             }
 
             async.complete();
-        }, myTestBucket, myAccessKey, mySecretKey, myUID);
+        }, myTestBucket, myAccessKey, mySecretKey, myRegion, myUID);
     }
 
     @Test
@@ -138,7 +141,7 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
             }
 
             async.complete();
-        }, myTestBucket, myAccessKey, mySecretKey, myUID);
+        }, myTestBucket, myAccessKey, mySecretKey, myRegion, myUID);
     }
 
     @Test

@@ -19,8 +19,7 @@ public class PairtreeVerticle extends AbstractVerticle {
     /** Logger for the verticle */
     private static final Logger LOGGER = LoggerFactory.getLogger(PairtreeVerticle.class.getName());
 
-    /** Default port the verticle will run on */
-    private static final int PORT = 8888;
+    private static final String DEFAULT_PORT = "8888";
 
     /** Default host the verticle will run at */
     private static final String HOST = "0.0.0.0";
@@ -28,8 +27,15 @@ public class PairtreeVerticle extends AbstractVerticle {
     @Override
     public void start(final Future<Void> aFuture) {
         final HttpServerOptions options = new HttpServerOptions();
+        final String portValue = System.getProperty("vertx.port", DEFAULT_PORT);
 
-        options.setPort(PORT);
+        try {
+            options.setPort(Integer.parseInt(portValue));
+        } catch (final NumberFormatException details) {
+            LOGGER.warn("Supplied port value '{}' wasn't a valid integer so using {}", portValue, DEFAULT_PORT);
+            options.setPort(Integer.parseInt(DEFAULT_PORT));
+        }
+
         options.setHost(HOST);
 
         vertx.createHttpServer(options).requestHandler(request -> {
@@ -42,13 +48,13 @@ public class PairtreeVerticle extends AbstractVerticle {
         }).listen(result -> {
             if (result.succeeded()) {
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("{} deployed: {}", PairtreeVerticle.class.getName(), deploymentID());
+                    LOGGER.debug(MessageCodes.PT_DEBUG_060, PairtreeVerticle.class.getName(), deploymentID());
                 }
 
                 aFuture.complete();
             } else {
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Pairtree server started at port: {}", PORT);
+                    LOGGER.debug(MessageCodes.PT_DEBUG_061, options.getPort());
                 }
 
                 aFuture.fail(result.cause());

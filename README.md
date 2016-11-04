@@ -24,6 +24,12 @@ The YOUR_S3_BUCKET_NAME, YOUR_ACCESS_KEY and YOUR_SECRET_KEY values obviously ne
 
 You can name the S3 bucket whatever you want (and change its system property to match), but make sure the bucket is only used for these integration tests. The tests will delete all the contents of the bucket as a part of the test tear down.
 
+If you want to put your test S3 bucket in a region other than the standard us-east-1, you will also need to supply a `vertx.pairtree.region` argument. For example:
+
+    mvn install -Ps3_it -Dvertx.pairtree.bucket=YOUR_S3_BUCKET_NAME -Dvertx.pairtree.access_key=YOUR_ACCESS_KEY -Dvertx.pairtree.secret_key=YOUR_SECRET_KEY -Dvertx.pairtree.region=s3-us-west-2.amazonaws.com
+
+It can also be supplied through your settings.xml file. At this point, only regions that support signature version 2 authentication are supported. To see the valid S3 region endpoints, consult [AWS' documentation](http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region).
+
 Lastly, if you don't want to build it yourself, the library can be downloaded from the Maven central repository by putting the following in your project's [pom.xml file](https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html):
 
     <dependency>
