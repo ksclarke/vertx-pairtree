@@ -19,6 +19,7 @@ public class PairtreeVerticle extends AbstractVerticle {
     /** Logger for the verticle */
     private static final Logger LOGGER = LoggerFactory.getLogger(PairtreeVerticle.class.getName());
 
+    /** A default port to use if another one isn't supplied */
     private static final String DEFAULT_PORT = "8888";
 
     /** Default host the verticle will run at */

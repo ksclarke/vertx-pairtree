@@ -25,8 +25,6 @@ import io.vertx.core.Vertx;
  */
 public final class PairtreeFactory {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PairtreeFactory.class, BUNDLE_NAME);
-
     /** The types of pairtree backends supported by this library. */
     public static enum PairtreeImpl {
         /** The file system Pairtree implementation */
@@ -37,6 +35,9 @@ public final class PairtreeFactory {
 
     /** The default type of Pairtree implementation. */
     public static final PairtreeImpl DEFAULT_TYPE = FileSystem;
+
+    /** Logger for the Pairtree factory */
+    private static final Logger LOGGER = LoggerFactory.getLogger(PairtreeFactory.class, BUNDLE_NAME);
 
     /** The number of Pairtree implementations supported by this library */
     private static final int PT_IMPL_COUNT = PairtreeImpl.values().length;
