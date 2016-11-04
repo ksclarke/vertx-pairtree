@@ -22,6 +22,7 @@
     <developerConnection>scm:git:git@github.com:ksclarke/vertx-pairtree.git</developerConnection>
     <url>git@github.com:ksclarke/vertx-pairtree.git</url>
   </scm>
+
   <issueManagement>
     <system>GitHub</system>
     <url>https://github.com/ksclarke/vertx-pairtree/issues</url>
@@ -44,6 +45,7 @@
     <vertx.pairtree.bucket></vertx.pairtree.bucket>
     <vertx.pairtree.access_key></vertx.pairtree.access_key>
     <vertx.pairtree.secret_key></vertx.pairtree.secret_key>
+    <vertx.pairtree.region></vertx.pairtree.region>
 
     <!-- Dependency versions -->
     <vertx.hot.plugin.version>2.1.0</vertx.hot.plugin.version>
@@ -137,13 +139,13 @@
       </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
-        <!-- Have our tests use the SLF4J loggers -->
         <configuration>
           <excludes>
             <exclude>**/*IT.java</exclude>
             <exclude>**/*IntegrationTest.java</exclude>
           </excludes>
           <systemPropertyVariables>
+            <vertx.port>${vertx.port}</vertx.port>
             <vertx.logger-delegate-factory-class-name>io.vertx.core.logging.SLF4JLogDelegateFactory</vertx.logger-delegate-factory-class-name>
           </systemPropertyVariables>
           <argLine>${jacoco.agent.arg}</argLine>
@@ -156,6 +158,24 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <configuration>
+          <portNames>
+            <portName>vertx.port</portName>
+          </portNames>
+        </configuration>
+        <executions>
+          <execution>
+            <id>reserve-port</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>reserve-network-port</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
@@ -174,6 +194,8 @@
                 <vertx.pairtree.bucket>${vertx.pairtree.bucket}</vertx.pairtree.bucket>
                 <vertx.pairtree.access_key>${vertx.pairtree.access_key}</vertx.pairtree.access_key>
                 <vertx.pairtree.secret_key>${vertx.pairtree.secret_key}</vertx.pairtree.secret_key>
+                <vertx.pairtree.region>${vertx.pairtree.region}</vertx.pairtree.region>
+                <vertx.port>${vertx.port}</vertx.port>
               </systemPropertyVariables>
               <argLine>${jacoco.agent.arg}</argLine>
               <includes>

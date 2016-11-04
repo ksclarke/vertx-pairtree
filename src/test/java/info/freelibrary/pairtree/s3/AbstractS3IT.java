@@ -20,6 +20,7 @@ import com.amazonaws.services.s3.model.S3ObjectSummary;
 import info.freelibrary.pairtree.AbstractPairtreeTest;
 import info.freelibrary.pairtree.MessageCodes;
 import info.freelibrary.util.IOUtils;
+import info.freelibrary.util.StringUtils;
 
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
@@ -35,6 +36,9 @@ public abstract class AbstractS3IT extends AbstractPairtreeTest {
     /** The test file used in the tests */
     protected static final File TEST_FILE = new File("src/test/resources/green.gif");
 
+    /** The default endpoint for S3 connections */
+    private static final String DEFAULT_ENDPOINT = "s3.amazonaws.com";
+
     /** AWS access key */
     protected static String myAccessKey;
 
@@ -43,6 +47,9 @@ public abstract class AbstractS3IT extends AbstractPairtreeTest {
 
     /** S3 bucket used in the tests */
     protected static String myTestBucket;
+
+    /** AWS region in which S3 bucket lives */
+    protected static String myRegion;
 
     /** Byte array for resource contents */
     protected static byte[] myResource;
@@ -63,6 +70,7 @@ public abstract class AbstractS3IT extends AbstractPairtreeTest {
             myTestBucket = System.getProperty("vertx.pairtree.bucket", "vertx-pairtree-tests");
             myAccessKey = System.getProperty("vertx.pairtree.access_key", "YOUR_ACCESS_KEY");
             mySecretKey = System.getProperty("vertx.pairtree.secret_key", "YOUR_SECRET_KEY");
+            myRegion = StringUtils.trimTo(System.getProperty("vertx.pairtree.region"), DEFAULT_ENDPOINT);
         } catch (final IOException details) {
             aContext.fail(details.getMessage());
         }
@@ -79,6 +87,7 @@ public abstract class AbstractS3IT extends AbstractPairtreeTest {
 
         // Initialize the S3 client we use for test set up and tear down
         myS3Client = new AmazonS3Client(new BasicAWSCredentials(myAccessKey, mySecretKey));
+        myS3Client.setEndpoint(myRegion);
     }
 
     /**

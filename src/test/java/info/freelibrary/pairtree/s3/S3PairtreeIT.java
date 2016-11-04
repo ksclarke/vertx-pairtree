@@ -43,8 +43,11 @@ public class S3PairtreeIT extends AbstractS3IT {
         super.setUp(aContext);
 
         LOGGER.debug(MessageCodes.PT_DEBUG_001, "s3:///" + myTestBucket);
+        LOGGER.debug("Using AWS region: {}", myRegion);
 
-        myPairtree = PairtreeFactory.getFactory(myVertx, S3Bucket).getPairtree(myTestBucket, myAccessKey, mySecretKey);
+        final PairtreeFactory factory = PairtreeFactory.getFactory(myVertx, S3Bucket);
+
+        myPairtree = factory.getPairtree(myTestBucket, myAccessKey, mySecretKey, myRegion);
     }
 
     @Test

@@ -1,6 +1,7 @@
 
 package info.freelibrary.pairtree;
 
+import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
 import static info.freelibrary.pairtree.PairtreeFactory.PairtreeImpl.FileSystem;
 import static info.freelibrary.pairtree.PairtreeFactory.PairtreeImpl.S3Bucket;
 import static info.freelibrary.pairtree.PairtreeRoot.DEFAULT_PAIRTREE;
@@ -12,6 +13,8 @@ import java.util.Map;
 
 import info.freelibrary.pairtree.fs.FsPairtree;
 import info.freelibrary.pairtree.s3.S3Pairtree;
+import info.freelibrary.util.Logger;
+import info.freelibrary.util.LoggerFactory;
 
 import io.vertx.core.Vertx;
 
@@ -21,6 +24,8 @@ import io.vertx.core.Vertx;
  * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
 public final class PairtreeFactory {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PairtreeFactory.class, BUNDLE_NAME);
 
     /** The types of pairtree backends supported by this library. */
     public static enum PairtreeImpl {
@@ -150,6 +155,7 @@ public final class PairtreeFactory {
             if (endpoint == null) {
                 pairtree = new S3Pairtree(myVertx, bucket, accessKey, secretKey);
             } else {
+                LOGGER.debug(MessageCodes.PT_DEBUG_056, endpoint);
                 pairtree = new S3Pairtree(myVertx, bucket, accessKey, secretKey, endpoint);
             }
         } else {
