@@ -49,6 +49,7 @@
 
     <!-- Dependency versions -->
     <vertx.hot.plugin.version>2.1.0</vertx.hot.plugin.version>
+    <codacy.plugin.version>1.0.1</codacy.plugin.version>
     <aws.sdk.version>1.11.22</aws.sdk.version>
     <vertx.version>3.3.2</vertx.version>
   </properties>
@@ -133,6 +134,11 @@
           <!-- An issue with vertx-hot prevents us from using this (https://github.com/dazraf/vertx-hot/issues/39) -->
           <skip>true</skip>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.gavinmogan</groupId>
+        <artifactId>codacy-maven-plugin</artifactId>
+        <version>${codacy.plugin.version}</version>
       </plugin>
       <plugin>
         <artifactId>maven-dependency-plugin</artifactId>
