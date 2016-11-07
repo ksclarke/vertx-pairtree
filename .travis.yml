@@ -14,9 +14,9 @@ env:
 # Overridden because parent project uses maven.test.skip instead of skipTests
 install: mvn install -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -B -V
 
-script: mvn -Ps3_it install -Dvertx.pairtree.bucket=${VERTX_PAIRTREE_BUCKET} -Dvertx.pairtree.access_key=${VERTX_PAIRTREE_ACCESS_KEY} -Dvertx.pairtree.secret_key=${VERTX_PAIRTREE_SECRET_KEY}
+script: mvn -Ps3_it install -Dvertx.pairtree.bucket="${VERTX_PAIRTREE_BUCKET}" -Dvertx.pairtree.access_key="${VERTX_PAIRTREE_ACCESS_KEY}" -Dvertx.pairtree.secret_key="${VERTX_PAIRTREE_SECRET_KEY}"
 
-after_success: mvn com.gavinmogan:codacy-maven-plugin:coverage -DcoverageReportFile=target/site/jacoco/jacoco.xml -DprojectToken=${PROJECT_TOKEN} -DapiToken=${API_TOKEN}
+after_success: mvn com.gavinmogan:codacy-maven-plugin:coverage -DcoverageReportFile=target/site/jacoco/jacoco.xml -DprojectToken="${PROJECT_TOKEN}" -DapiToken="${API_TOKEN}"
 
 cache:
   directories:
