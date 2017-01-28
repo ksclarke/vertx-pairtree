@@ -106,7 +106,7 @@ public final class PairtreeUtils {
     /**
      * Sets the Pairtree &quot;shorty&quot; length
      *
-     * @param aLength A length to set as the &quot;&shorty length
+     * @param aLength A length to set as the &quot;shorty&quot; length
      */
     public static void setShortyLength(final int aLength) {
         myShortyLength = aLength;

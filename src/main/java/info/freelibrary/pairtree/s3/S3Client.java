@@ -92,7 +92,7 @@ public class S3Client {
     /**
      * Direct asynchronous HEAD call.
      * <p>
-     * <code>HEAD (bucket, key) -> handler(Data)</code>
+     * <code>HEAD (bucket, key) -&gt; handler(Data)</code>
      * </p>
      *
      * @param aBucket An S3 bucket
@@ -106,7 +106,7 @@ public class S3Client {
     /**
      * Direct asynchronous GET call.
      * <p>
-     * <code>GET (bucket, key) -> handler(Data)</code>
+     * <code>GET (bucket, key) -&gt; handler(Data)</code>
      * </p>
      *
      * @param aBucket An S3 bucket
@@ -141,7 +141,7 @@ public class S3Client {
     /**
      * Direct asynchronous PUT call.
      * <p>
-     * <code>PUT (bucket, key, data) -> handler(Response)</code>
+     * <code>PUT (bucket, key, data) -&gt; handler(Response)</code>
      * </p>
      *
      * @param aBucket An S3 bucket
@@ -203,7 +203,7 @@ public class S3Client {
     /**
      * Deletes an S3 resource.
      * <p>
-     * <code>DELETE (bucket, key) -> handler(Response)</code>
+     * <code>DELETE (bucket, key) -&gt; handler(Response)</code>
      * </p>
      *
      * @param aBucket An S3 bucket
@@ -217,7 +217,7 @@ public class S3Client {
     /**
      * Creates an S3 PUT request.
      * <p>
-     * <code>create PUT -> requestObject</code>
+     * <code>create PUT -&gt; requestObject</code>
      * </p>
      *
      * @param aBucket An S3 bucket
@@ -234,7 +234,7 @@ public class S3Client {
     /**
      * Creates an S3 HEAD request.
      * <p>
-     * <code>create HEAD -> request Object</code>
+     * <code>create HEAD -&gt; request Object</code>
      * </p>
      *
      * @param aBucket An S3 bucket
@@ -251,7 +251,7 @@ public class S3Client {
     /**
      * Creates an S3 GET request.
      * <p>
-     * <code>create GET -> request Object</code>
+     * <code>create GET -&gt; request Object</code>
      * </p>
      *
      * @param aBucket An S3 bucket
@@ -268,7 +268,7 @@ public class S3Client {
     /**
      * Creates an S3 DELETE request.
      * <p>
-     * <code>create DELETE -> request Object</code>
+     * <code>create DELETE -&gt; request Object</code>
      * </p>
      *
      * @param aBucket An S3 bucket
