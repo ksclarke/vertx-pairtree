@@ -430,8 +430,8 @@ public class S3ClientRequest implements HttpClientRequest {
     }
 
     @Override
-    public void reset(final long aCode) {
-        myRequest.reset(aCode);
+    public boolean reset(final long aCode) {
+        return myRequest.reset(aCode);
     }
 
     @Override
