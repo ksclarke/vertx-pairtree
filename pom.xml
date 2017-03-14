@@ -4,7 +4,7 @@
 
   <artifactId>vertx-pairtree</artifactId>
   <packaging>jar</packaging>
-  <version>0.0.2-SNAPSHOT</version>
+  <version>0.0.3-SNAPSHOT</version>
   <name>Vert.x Pairtree</name>
   <description>A Pairtree library for Vert.x</description>
   <url>http://projects.freelibrary.info/vertx-pairtree</url>
@@ -50,7 +50,7 @@
     <vertx.hot.plugin.version>2.1.0</vertx.hot.plugin.version>
     <codacy.plugin.version>1.0.2</codacy.plugin.version>
     <aws.sdk.version>1.11.22</aws.sdk.version>
-    <vertx.version>3.4.0.Beta1</vertx.version>
+    <vertx.version>3.4.0</vertx.version>
   </properties>
 
   <dependencies>
