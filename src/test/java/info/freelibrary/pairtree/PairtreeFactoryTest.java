@@ -3,8 +3,9 @@ package info.freelibrary.pairtree;
 
 import static info.freelibrary.pairtree.PairtreeFactory.PairtreeImpl.FileSystem;
 import static info.freelibrary.pairtree.PairtreeRoot.PAIRTREE_ROOT;
-import static java.io.File.separatorChar;
 import static java.util.UUID.randomUUID;
+
+import java.nio.file.Paths;
 
 import org.junit.Test;
 
@@ -22,7 +23,7 @@ import junit.framework.TestCase;
 public class PairtreeFactoryTest extends TestCase {
 
     /** The system's directory for temporary files */
-    private static final String TMPDIR = System.getProperty("java.io.tmpdir") + separatorChar;
+    private static final String TMPDIR = System.getProperty("java.io.tmpdir");
 
     /** The connection to the Vertx framework */
     private Vertx myVertx;
@@ -55,18 +56,18 @@ public class PairtreeFactoryTest extends TestCase {
 
     @Test
     public void testGetPairtreeFsImplicitFactory() {
-        final String path = TMPDIR + randomUUID();
+        final String path = Paths.get(TMPDIR, randomUUID().toString()).toString();
         final PairtreeRoot root = PairtreeFactory.getFactory(myVertx).getPairtree(path);
 
-        assertEquals(path + separatorChar + PAIRTREE_ROOT, root.toString());
+        assertEquals(Paths.get(path, PAIRTREE_ROOT).toString(), root.toString());
     }
 
     @Test
     public void testGetPairtreeFsExplicitFactory() {
-        final String path = TMPDIR + randomUUID();
+        final String path = Paths.get(TMPDIR, randomUUID().toString()).toString();
         final PairtreeRoot root = PairtreeFactory.getFactory(myVertx, FileSystem).getPairtree(path);
 
-        assertEquals(path + separatorChar + PAIRTREE_ROOT, root.toString());
+        assertEquals(Paths.get(path, PAIRTREE_ROOT).toString(), root.toString());
     }
 
 }
