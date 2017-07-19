@@ -4,8 +4,9 @@ os:
   - linux
   - osx
 
-jdk:
-- oraclejdk8
+# Cf. https://github.com/travis-ci/travis-ci/issues/2317
+# jdk:
+#   - oraclejdk8
 
 env:
   global:
