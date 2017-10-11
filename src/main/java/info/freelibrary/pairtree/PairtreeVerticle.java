@@ -23,7 +23,7 @@ public class PairtreeVerticle extends AbstractVerticle {
     private static final String DEFAULT_PORT = "8888";
 
     /** Default host the verticle will run at */
-    private static final String HOST = "0.0.0.0";
+    private static final String HOST = "0.0.0.0"; // NOPMD
 
     @Override
     public void start(final Future<Void> aFuture) {

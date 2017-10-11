@@ -22,7 +22,7 @@ public class ObjectListHandler extends DefaultHandler {
     final List<String> myKeys = new ArrayList<>();
 
     /** Builder for an S3's key value */
-    final StringBuilder myKeyText = new StringBuilder();
+    final StringBuilder myKeyText = new StringBuilder(); // NOPMD
 
     /** The last element encountered while parsing S3 output */
     String myLastElement;
@@ -48,6 +48,7 @@ public class ObjectListHandler extends DefaultHandler {
     public void endElement(final String aURI, final String aLocalName, final String aQName) {
         if (aLocalName.equals(KEY)) {
             myKeys.add(myKeyText.toString());
+            myKeyText.delete(0, myKeyText.length());
         }
     }
 

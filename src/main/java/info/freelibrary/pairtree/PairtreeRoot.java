@@ -79,7 +79,7 @@ public interface PairtreeRoot {
      * @param aID An object name
      * @return The Pairtree object
      */
-    PairtreeObject getObject(final String aID);
+    PairtreeObject getObject(String aID);
 
     /**
      * Gets the Pairtree objects identified by the supplied ID.
@@ -87,28 +87,28 @@ public interface PairtreeRoot {
      * @param aIDList An object name
      * @return The Pairtree objects for the supplied IDs
      */
-    List<PairtreeObject> getObjects(final List<String> aIDList);
+    List<PairtreeObject> getObjects(List<String> aIDList);
 
     /**
      * Tests whether the Pairtree root exists.
      *
      * @param aHandler A {@link io.vertx.core.Handler} with an {@link io.vertx.core.AsyncResult}
      */
-    void exists(final Handler<AsyncResult<Boolean>> aHandler);
+    void exists(Handler<AsyncResult<Boolean>> aHandler);
 
     /**
      * Creates the Pairtree root file system.
      *
      * @param aHandler A {@link io.vertx.core.Handler} with an {@link io.vertx.core.AsyncResult}
      */
-    void create(final Handler<AsyncResult<Void>> aHandler);
+    void create(Handler<AsyncResult<Void>> aHandler);
 
     /**
      * Deletes the Pairtree.
      *
      * @param aHandler A {@link io.vertx.core.Handler} with an {@link io.vertx.core.AsyncResult}
      */
-    void delete(final Handler<AsyncResult<Void>> aHandler);
+    void delete(Handler<AsyncResult<Void>> aHandler);
 
     /**
      * Returns the implementation specific path of the Pairtree.

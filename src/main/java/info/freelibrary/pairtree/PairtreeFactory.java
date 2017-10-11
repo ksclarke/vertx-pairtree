@@ -26,7 +26,7 @@ import io.vertx.core.Vertx;
 public final class PairtreeFactory {
 
     /** The types of pairtree backends supported by this library. */
-    public static enum PairtreeImpl {
+    public enum PairtreeImpl {
         /** The file system Pairtree implementation */
         FileSystem,
         /** The S3 Pairtree implementation */
@@ -43,7 +43,7 @@ public final class PairtreeFactory {
     private static final int PT_IMPL_COUNT = PairtreeImpl.values().length;
 
     /** A list of Pairtree implementation factories */
-    private static final List<Map.Entry<PairtreeImpl, PairtreeFactory>> myFactories = new ArrayList<>(PT_IMPL_COUNT);
+    private static final List<Map.Entry<PairtreeImpl, PairtreeFactory>> FACTORIES = new ArrayList<>(PT_IMPL_COUNT);
 
     /** Minimum number of configuration options required by a Pairtree */
     private static final int MIN_CONFIG_COUNT = 2;
@@ -71,7 +71,7 @@ public final class PairtreeFactory {
      * @param aVertx A Vertx object
      * @return A <code>PairtreeFactory</code> backed by the default implementation
      */
-    public static final PairtreeFactory getFactory(final Vertx aVertx) {
+    public static PairtreeFactory getFactory(final Vertx aVertx) {
         return getFactory(aVertx, DEFAULT_TYPE);
     }
 
@@ -82,10 +82,10 @@ public final class PairtreeFactory {
      * @param aImpl The desired Pairtree implementation
      * @return A <code>PairtreeFactory</code> backed by the desired implementation
      */
-    public static final PairtreeFactory getFactory(final Vertx aVertx, final PairtreeImpl aImpl) {
+    public static PairtreeFactory getFactory(final Vertx aVertx, final PairtreeImpl aImpl) {
         PairtreeFactory factory = null;
 
-        for (final Map.Entry<PairtreeImpl, PairtreeFactory> entry : myFactories) {
+        for (final Map.Entry<PairtreeImpl, PairtreeFactory> entry : FACTORIES) {
             if (aImpl.equals(entry.getKey())) {
                 factory = entry.getValue();
             }
@@ -93,7 +93,7 @@ public final class PairtreeFactory {
 
         if (factory == null) {
             factory = new PairtreeFactory(aVertx, aImpl);
-            myFactories.add(new AbstractMap.SimpleEntry<>(aImpl, factory));
+            FACTORIES.add(new AbstractMap.SimpleEntry<>(aImpl, factory));
         }
 
         return factory;
@@ -106,7 +106,7 @@ public final class PairtreeFactory {
      *        key, and AWS secret key (the last two are only needed if the implementation is an S3 Pairtree)
      * @return A Pairtree root
      */
-    public final PairtreeRoot getPairtree(final String... aConfig) {
+    public PairtreeRoot getPairtree(final String... aConfig) {
         final PairtreeRoot pairtree;
 
         if (myImplType.equals(FileSystem)) {
@@ -128,7 +128,7 @@ public final class PairtreeFactory {
      *        key, and AWS secret key (the last two are only needed if the implementation is an S3 Pairtree)
      * @return A Pairtree root
      */
-    private final PairtreeRoot getPairtree(final PairtreeImpl aImpl, final String... aConfig) {
+    private PairtreeRoot getPairtree(final PairtreeImpl aImpl, final String... aConfig) {
         final PairtreeRoot pairtree;
 
         if (aImpl.equals(S3Bucket)) {
@@ -141,7 +141,7 @@ public final class PairtreeFactory {
                 accessKey = aConfig[1];
                 secretKey = aConfig[2];
 
-                if (aConfig.length > MIN_CONFIG_COUNT + 1) {
+                if (aConfig.length > (MIN_CONFIG_COUNT + 1)) {
                     endpoint = aConfig[3];
                 } else {
                     endpoint = null;

@@ -17,23 +17,23 @@ public interface PairtreeObject {
      *
      * @param aHandler A {@link io.vertx.core.Handler} with an {@link io.vertx.core.AsyncResult}
      */
-    void exists(final Handler<AsyncResult<Boolean>> aHandler);
+    void exists(Handler<AsyncResult<Boolean>> aHandler);
 
     /**
      * Creates the Pairtree object. This fails if the location of the Pairtree object exists and cannot have things
-     * written into it (e.g., if it is a file). It doesn't fail if the object already exists and can have things written
-     * into it.
+     * written into it (e.g., if it is a file). It doesn't fail if the object already exists and can have things
+     * written into it.
      *
      * @param aHandler A {@link io.vertx.core.Handler} with an {@link io.vertx.core.AsyncResult}
      */
-    void create(final Handler<AsyncResult<Void>> aHandler);
+    void create(Handler<AsyncResult<Void>> aHandler);
 
     /**
      * Deletes the Pairtree object.
      *
      * @param aHandler A {@link io.vertx.core.Handler} with an {@link io.vertx.core.AsyncResult}
      */
-    void delete(final Handler<AsyncResult<Void>> aHandler);
+    void delete(Handler<AsyncResult<Void>> aHandler);
 
     /**
      * Gets the object ID.
@@ -55,7 +55,7 @@ public interface PairtreeObject {
      * @param aResourcePath The Pairtree resource which the returned path should represent
      * @return The path of the requested object resource
      */
-    String getPath(final String aResourcePath);
+    String getPath(String aResourcePath);
 
     /**
      * Puts a resource into the Pairtree object. This overwrites an existing resource at that path.
@@ -64,7 +64,7 @@ public interface PairtreeObject {
      * @param aBuffer Content to be written into a resource in the Pairtree object
      * @param aHandler To handle the writing of the content into the Pairtree object
      */
-    void put(final String aPath, final Buffer aBuffer, final Handler<AsyncResult<Void>> aHandler);
+    void put(String aPath, Buffer aBuffer, Handler<AsyncResult<Void>> aHandler);
 
     /**
      * Gets a resource from the Pairtree object.
@@ -72,7 +72,7 @@ public interface PairtreeObject {
      * @param aPath A path (relative to the Pairtree object) from which a Buffer can be retrieved
      * @param aHandler To handle the reading of the content from the Pairtree object into a Buffer
      */
-    void get(final String aPath, final Handler<AsyncResult<Buffer>> aHandler);
+    void get(String aPath, Handler<AsyncResult<Buffer>> aHandler);
 
     /**
      * Checks whether a resource exists in the Pairtree object.
@@ -80,6 +80,6 @@ public interface PairtreeObject {
      * @param aPath A path (relative to the Pairtree object) for a resource to be found
      * @param aHandler To handle the finding of a resource in the Pairtree object
      */
-    void find(final String aPath, final Handler<AsyncResult<Boolean>> aHandler);
+    void find(String aPath, Handler<AsyncResult<Boolean>> aHandler);
 
 }

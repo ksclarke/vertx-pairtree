@@ -199,10 +199,10 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
 
     @Override
     public String getPath(final String aResourcePath) {
-        // We need to encode any pluses in our resource path as a workaround for an S3 bug
+        // We need to encode any pluses in our resource path as a workaround for an S3 bug [Better way?]
         // Cf. https://forums.aws.amazon.com/thread.jspa?threadID=55746
         final String awsPath = aResourcePath.replace('+', '~');
-        return awsPath.startsWith("/") ? getPath() + awsPath : getPath() + PATH_SEP + awsPath;
+        return awsPath.charAt(0) == '/' ? getPath() + awsPath : getPath() + PATH_SEP + awsPath;
     }
 
     @Override

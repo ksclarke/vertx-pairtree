@@ -201,10 +201,9 @@ public class S3Pairtree extends AbstractPairtree {
 
         final Future<Void> future = Future.<Void>future().setHandler(aHandler);
         final StringBuilder specNote = new StringBuilder();
+        final String ptVersion = getI18n(MessageCodes.PT_011, PT_VERSION_NUM);
 
-        specNote.append(getI18n(MessageCodes.PT_011, PT_VERSION_NUM));
-        specNote.append(System.lineSeparator());
-        specNote.append(getI18n(MessageCodes.PT_012));
+        specNote.append(ptVersion).append(System.lineSeparator()).append(getI18n(MessageCodes.PT_012));
 
         myS3Client.put(myBucket, getVersionFilePath(), Buffer.buffer(specNote.toString()), putVersionResponse -> {
             if (putVersionResponse.statusCode() == HTTP.OK) {

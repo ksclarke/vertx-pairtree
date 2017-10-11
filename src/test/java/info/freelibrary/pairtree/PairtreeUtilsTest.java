@@ -48,8 +48,6 @@ import static org.junit.Assert.assertNull;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import info.freelibrary.util.InvalidPtPathException;
-
 /**
  * <code>PairtreeUtils</code> tests.
  *

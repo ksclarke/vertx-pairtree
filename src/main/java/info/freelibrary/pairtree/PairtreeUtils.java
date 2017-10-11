@@ -238,7 +238,8 @@ public final class PairtreeUtils {
      * @return The name of the encapsulating directory
      * @throws InvalidPathException If there is a problem extracting the encapsulating directory
      */
-    public static String getEncapsulatingDir(final String aBasePath, final String aPtPath) throws InvalidPathException {
+    public static String getEncapsulatingDir(final String aBasePath, final String aPtPath)
+            throws InvalidPathException {
         return getEncapsulatingDir(removeBasePath(aBasePath, aPtPath));
     }
 
@@ -267,7 +268,7 @@ public final class PairtreeUtils {
         }
 
         // All parts up to next to last and last should have shorty length
-        for (int index = 0; index < pPathParts.length - 2; index++) {
+        for (int index = 0; index < (pPathParts.length - 2); index++) {
             if (pPathParts[index].length() != myShortyLength) {
                 throw new InvalidPathException(MessageCodes.PT_002, myShortyLength, pPathParts[index].length(),
                         aPtPath);
@@ -307,7 +308,7 @@ public final class PairtreeUtils {
     private static String concat(final String... aPathsVarargs) {
         final String path;
 
-        if (aPathsVarargs == null || aPathsVarargs.length == 0) {
+        if ((aPathsVarargs == null) || (aPathsVarargs.length == 0)) {
             path = null;
         } else {
             final StringBuffer pathBuf = new StringBuffer();
@@ -318,7 +319,7 @@ public final class PairtreeUtils {
                 if (aPathsVararg != null) {
                     final int length;
 
-                    if (lastChar != null && !mySeparator.equals(lastChar)) {
+                    if ((lastChar != null) && !mySeparator.equals(lastChar)) {
                         pathBuf.append(mySeparator);
                     }
 
@@ -389,6 +390,7 @@ public final class PairtreeUtils {
      * @return The cleaned ID for use in a Pairtree path
      * @throws PairtreeRuntimeException If the supplied ID is null
      */
+    @SuppressWarnings("checkstyle:BooleanExpressionComplexity")
     public static String encodeID(final String aID) {
         Objects.requireNonNull(aID, LOGGER.getMessage(MessageCodes.PT_004));
 
@@ -405,8 +407,8 @@ public final class PairtreeUtils {
         for (final byte b : bytes) {
             final int i = b & 0xff;
 
-            if (i < 0x21 || i > 0x7e || i == 0x22 || i == 0x2a || i == 0x2b || i == 0x2c || i == 0x3c || i == 0x3d ||
-                    i == 0x3e || i == 0x3f || i == 0x5c || i == 0x5e || i == 0x7c) {
+            if ((i < 0x21) || (i > 0x7e) || (i == 0x22) || (i == 0x2a) || (i == 0x2b) || (i == 0x2c) || (i == 0x3c) ||
+                    (i == 0x3d) || (i == 0x3e) || (i == 0x3f) || (i == 0x5c) || (i == 0x5e) || (i == 0x7c)) {
                 // Encode
                 idBuffer.append(HEX_INDICATOR);
                 idBuffer.append(Integer.toHexString(i));

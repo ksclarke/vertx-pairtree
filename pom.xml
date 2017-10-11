@@ -48,6 +48,7 @@
 
     <!-- Dependency versions -->
     <vertx.hot.plugin.version>2.1.0</vertx.hot.plugin.version>
+    <freelib.utils.version>0.8.5</freelib.utils.version>
     <codacy.plugin.version>1.0.2</codacy.plugin.version>
     <aws.sdk.version>1.11.22</aws.sdk.version>
     <vertx.version>3.4.2</vertx.version>
@@ -58,6 +59,7 @@
     <dependency>
       <groupId>info.freelibrary</groupId>
       <artifactId>freelib-utils</artifactId>
+      <version>${freelib.utils.version}</version>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
@@ -95,6 +97,7 @@
       <plugin>
         <groupId>info.freelibrary</groupId>
         <artifactId>freelib-utils</artifactId>
+        <version>${freelib.utils.version}</version>
         <executions>
           <execution>
             <phase>process-resources</phase>
@@ -109,6 +112,9 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-pmd-plugin</artifactId>
       </plugin>
       <plugin>
         <groupId>io.dazraf</groupId>
@@ -229,7 +235,7 @@
   <parent>
     <artifactId>freelib-parent</artifactId>
     <groupId>info.freelibrary</groupId>
-    <version>0.1.9</version>
+    <version>0.2.5</version>
   </parent>
 
 </project>

@@ -243,7 +243,7 @@ public class FsPairtree extends AbstractPairtree {
 
         myFileSystem.delete(getVersionFilePath(), result -> {
             if (result.succeeded()) {
-                if (myPrefix != null && myPrefix.length() > 0) {
+                if ((myPrefix != null) && (myPrefix.length() > 0)) {
                     deletePrefix(aFuture);
                 } else {
                     aFuture.complete();
@@ -280,10 +280,9 @@ public class FsPairtree extends AbstractPairtree {
      */
     private void setVersion(final Future<Void> aFuture) {
         final StringBuilder specNote = new StringBuilder();
+        final String ptVersion = getI18n(MessageCodes.PT_011, PT_VERSION_NUM);
 
-        specNote.append(getI18n(MessageCodes.PT_011, PT_VERSION_NUM));
-        specNote.append(System.lineSeparator());
-        specNote.append(getI18n(MessageCodes.PT_012));
+        specNote.append(ptVersion).append(System.lineSeparator()).append(getI18n(MessageCodes.PT_012));
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(MessageCodes.PT_DEBUG_005, myPath);
@@ -291,7 +290,7 @@ public class FsPairtree extends AbstractPairtree {
 
         myFileSystem.writeFile(getVersionFilePath(), Buffer.buffer(specNote.toString()), result -> {
             if (result.succeeded()) {
-                if (myPrefix != null && myPrefix.length() > 0) {
+                if ((myPrefix != null) && (myPrefix.length() > 0)) {
                     setPrefix(aFuture);
                 } else {
                     aFuture.complete();

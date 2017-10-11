@@ -8,6 +8,7 @@ import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Date;
+import java.util.Locale;
 import java.util.StringJoiner;
 
 import javax.crypto.Mac;
@@ -28,9 +29,8 @@ import io.vertx.core.http.HttpVersion;
 
 /**
  * An S3 client request implementation of <code>HttpClientRequest</code>.
- *
- * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
+@SuppressWarnings({ "PMD.ExcessivePublicCount", "PMD.TooManyMethods" })
 public class S3ClientRequest implements HttpClientRequest {
 
     /** Hash-based message authentication code used for signing AWS requests */
@@ -286,9 +286,10 @@ public class S3ClientRequest implements HttpClientRequest {
             // within 15 min of S3 server time. contentMd5 and type are optional
 
             // We can't risk letting our date get clobbered and being inconsistent
-            final String xamzdate = new SimpleDateFormat(DATE_FORMAT).format(new Date());
+            final String xamzdate = new SimpleDateFormat(DATE_FORMAT, Locale.US).format(new Date());
             final StringJoiner signedHeaders = new StringJoiner(EOL, "", EOL);
             final StringBuilder toSign = new StringBuilder();
+            final String key = myKey.charAt(0) == '?' ? "" : myKey;
 
             headers().add("X-Amz-Date", xamzdate);
             signedHeaders.add("x-amz-date:" + xamzdate);
@@ -298,9 +299,8 @@ public class S3ClientRequest implements HttpClientRequest {
                 signedHeaders.add("x-amz-security-token:" + mySessionToken);
             }
 
-            toSign.append(myMethod).append(EOL).append(myContentMd5).append(EOL).append(myContentType).append(EOL);
-            toSign.append(EOL).append(signedHeaders).append(PATH_SEP).append(myBucket).append(PATH_SEP);
-            toSign.append(myKey.charAt(0) == '?' ? "" : myKey);
+            toSign.append(myMethod).append(EOL).append(myContentMd5).append(EOL).append(myContentType).append(EOL)
+                    .append(EOL).append(signedHeaders).append(PATH_SEP).append(myBucket).append(PATH_SEP).append(key);
 
             try {
                 final String signature = b64SignHmacSha1(mySecretKey, toSign.toString());
@@ -319,7 +319,7 @@ public class S3ClientRequest implements HttpClientRequest {
      * @return True if request is authenticated; else, false
      */
     public boolean isAuthenticated() {
-        return myAccessKey != null && mySecretKey != null;
+        return (myAccessKey != null) && (mySecretKey != null);
     }
 
     /**
