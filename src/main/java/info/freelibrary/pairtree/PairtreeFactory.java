@@ -66,13 +66,34 @@ public final class PairtreeFactory {
     }
 
     /**
+     * Gets a <code>PairtreeFactory</code> that creates its own Vertx environment. This is useful if running in a
+     * simple script that isn't using Vertx for anything else.
+     *
+     * @return A <code>PairtreeFactory</code> backed by the default Pairtree implementation
+     */
+    public static PairtreeFactory getFactory() {
+        return getFactory(Vertx.vertx(), DEFAULT_TYPE);
+    }
+
+    /**
      * Gets a <code>PairtreeFactory</code> that uses the default back-end type.
      *
      * @param aVertx A Vertx object
-     * @return A <code>PairtreeFactory</code> backed by the default implementation
+     * @return A <code>PairtreeFactory</code> backed by the default Pairtree implementation
      */
     public static PairtreeFactory getFactory(final Vertx aVertx) {
         return getFactory(aVertx, DEFAULT_TYPE);
+    }
+
+    /**
+     * Gets a <code>PairtreeFactory</code> that uses the its own Vertx environment to create a Pairtree of the
+     * supplied Pairtree implementation type.
+     *
+     * @param aImpl The desired Pairtree implementation
+     * @return A <code>PairtreeFactory</code> backed by the desired implementation
+     */
+    public static PairtreeFactory getFactory(final PairtreeImpl aImpl) {
+        return getFactory(Vertx.vertx(), aImpl);
     }
 
     /**
