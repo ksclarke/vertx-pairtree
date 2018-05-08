@@ -63,6 +63,14 @@ public class PairtreeFactoryTest extends TestCase {
     }
 
     @Test
+    public void testGetPairtreeFsImplicitFactoryNoVertx() {
+        final String path = Paths.get(TMPDIR, randomUUID().toString()).toString();
+        final PairtreeRoot root = PairtreeFactory.getFactory().getPairtree(path);
+
+        assertEquals(Paths.get(path, PAIRTREE_ROOT).toString(), root.toString());
+    }
+
+    @Test
     public void testGetPairtreeFsExplicitFactory() {
         final String path = Paths.get(TMPDIR, randomUUID().toString()).toString();
         final PairtreeRoot root = PairtreeFactory.getFactory(myVertx, FileSystem).getPairtree(path);
@@ -70,4 +78,11 @@ public class PairtreeFactoryTest extends TestCase {
         assertEquals(Paths.get(path, PAIRTREE_ROOT).toString(), root.toString());
     }
 
+    @Test
+    public void testGetPairtreeFsExplicitFactoryNoVertx() {
+        final String path = Paths.get(TMPDIR, randomUUID().toString()).toString();
+        final PairtreeRoot root = PairtreeFactory.getFactory(FileSystem).getPairtree(path);
+
+        assertEquals(Paths.get(path, PAIRTREE_ROOT).toString(), root.toString());
+    }
 }
