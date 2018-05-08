@@ -49,10 +49,11 @@
 
     <!-- Dependency versions -->
     <vertx.hot.plugin.version>2.1.0</vertx.hot.plugin.version>
-    <freelib.utils.version>0.8.5</freelib.utils.version>
+    <freelib.utils.version>0.8.8</freelib.utils.version>
     <codacy.plugin.version>1.0.2</codacy.plugin.version>
     <aws.sdk.version>1.11.22</aws.sdk.version>
-    <vertx.version>3.5.0</vertx.version>
+    <vertx.version>3.5.1</vertx.version>
+    <jackson.version>2.9.5</jackson.version>
   </properties>
 
   <dependencies>
@@ -61,6 +62,11 @@
       <groupId>info.freelibrary</groupId>
       <artifactId>freelib-utils</artifactId>
       <version>${freelib.utils.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${jackson.version}</version>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
@@ -267,7 +273,7 @@
   <parent>
     <artifactId>freelib-parent</artifactId>
     <groupId>info.freelibrary</groupId>
-    <version>0.2.6</version>
+    <version>0.2.8</version>
   </parent>
 
 </project>

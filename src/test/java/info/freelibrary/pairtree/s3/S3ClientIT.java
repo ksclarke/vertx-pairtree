@@ -243,9 +243,11 @@ public class S3ClientIT extends AbstractS3IT {
             if (openResult.succeeded()) {
                 myClient.put(myTestBucket, s3Key, openResult.result(), response -> {
                     final int statusCode = response.statusCode();
+                    final String message;
 
                     if (statusCode != 200) {
-                        aContext.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, s3Key, response.statusMessage()));
+                        message = getI18n(MessageCodes.PT_DEBUG_045, statusCode, s3Key, response.statusMessage());
+                        aContext.fail(message);
                     }
 
                     async.complete();
