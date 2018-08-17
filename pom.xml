@@ -42,17 +42,17 @@
 
   <properties>
     <!-- These values, needed by integration tests, can be supplied via command line or settings.xml file -->
-    <vertx.pairtree.bucket />
-    <vertx.pairtree.access_key />
-    <vertx.pairtree.secret_key />
-    <vertx.pairtree.region />
+    <vertx.pairtree.bucket/>
+    <vertx.pairtree.access_key/>
+    <vertx.pairtree.secret_key/>
+    <vertx.pairtree.region/>
 
     <!-- Dependency versions -->
     <vertx.hot.plugin.version>2.1.0</vertx.hot.plugin.version>
     <freelib.utils.version>0.8.8</freelib.utils.version>
     <codacy.plugin.version>1.0.2</codacy.plugin.version>
     <aws.sdk.version>1.11.22</aws.sdk.version>
-    <vertx.version>3.5.1</vertx.version>
+    <vertx.version>3.5.2</vertx.version>
     <jackson.version>2.9.5</jackson.version>
   </properties>
 
