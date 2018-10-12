@@ -39,7 +39,7 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
     private static final String GREEN_GIF = "a/b/green.gif";
 
     /** A path for a secondary test object */
-    private static final String GREEN_BLUE_GIF = "green~blue.gif";
+    private static final String GREEN_BLUE_GIF = "green+blue.gif";
 
     /** The Pairtree being tested */
     private PairtreeRoot myPairtree;
@@ -109,13 +109,13 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
 
         myPairtree.getObject("ark:/99999/88888888").create(result -> {
             if (result.succeeded()) {
-                final String ptPath = PairtreeUtils.mapToPtPath("ark:/99999/88888888").replace('+', '~');
+                final String ptPath = PairtreeUtils.mapToPtPath("ark:/99999/88888888");
                 final StringJoiner objectPath = new StringJoiner("/");
 
-                objectPath.add(PAIRTREE_ROOT).add(ptPath).add("ark~=99999=88888888/README.txt");
+                objectPath.add(PAIRTREE_ROOT).add(ptPath).add("ark+=99999=88888888/README.txt");
 
                 if (!myS3Client.doesObjectExist(myTestBucket, objectPath.toString())) {
-                    aContext.fail(MessageCodes.PT_DEBUG_050);
+                    aContext.fail(getI18n(MessageCodes.PT_DEBUG_050));
                 }
             } else {
                 aContext.fail(result.cause());
@@ -166,7 +166,11 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
 
     @Test
     public final void testGetPathStringWithPlus(final TestContext aContext) {
-        aContext.assertEquals(myS3Path + "/" + GREEN_BLUE_GIF, myPairtree.getObject(myUID).getPath(GREEN_BLUE_GIF));
+        // The S3 path has a URL encoded '+' because of this S3 bug that will probably never be fixed:
+        // https://forums.aws.amazon.com/thread.jspa?threadID=55746
+        // It appears normal in S3 or in the resource name once it's copied down to a file system
+        aContext.assertEquals(myS3Path + "/" + GREEN_BLUE_GIF, myPairtree.getObject(myUID).getPath(GREEN_BLUE_GIF)
+                .replace("%2B", "+"));
     }
 
     @Test
@@ -188,8 +192,8 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
 
         myPairtree.getObject(myUID).put("ark+=99999=99999999.gif", Buffer.buffer(myResource), result -> {
             if (result.succeeded()) {
-                if (!myS3Client.doesObjectExist(myTestBucket, myS3Path + "/ark~=99999=99999999.gif")) {
-                    aContext.fail(MessageCodes.PT_DEBUG_051);
+                if (!myS3Client.doesObjectExist(myTestBucket, myS3Path + "/ark+=99999=99999999.gif")) {
+                    aContext.fail(getI18n(MessageCodes.PT_DEBUG_051));
                 }
             } else {
                 aContext.fail(result.cause());

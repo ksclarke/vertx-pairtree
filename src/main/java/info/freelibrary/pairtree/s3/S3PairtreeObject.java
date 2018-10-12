@@ -46,6 +46,12 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
     /** Creates a README file for an S3 Pairtree */
     private static final String README_FILE = "/README.txt";
 
+    /** A regular plus symbol */
+    private static final String UNENCODED_PLUS = "+";
+
+    /** A URL encoded plus symbol */
+    private static final String ENCODED_PLUS = "%2B";
+
     /** The client used to interact with the S3 Pairtree */
     private final S3Client myS3Client;
 
@@ -189,20 +195,32 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
         return myPrefix == null ? myID : myPrefix + PATH_SEP + myID;
     }
 
+    /**
+     * Gets the object path. If the path contains a '+' it will be URL encoded for interaction with S3's HTTP API.
+     *
+     * @return the path of the Pairtree object as it's found in S3
+     */
     @Override
     public String getPath() {
-        // Pairtree encodes colons to pluses so we need to pre-encode them as a workaround for an S3 bug
-        // Cf. https://forums.aws.amazon.com/thread.jspa?threadID=55746
-        final String awsID = myID.replace(':', '~');
-        return PAIRTREE_ROOT + PATH_SEP + PairtreeUtils.mapToPtPath(awsID) + PATH_SEP + PairtreeUtils.encodeID(awsID);
+        // We need to URL encode '+'s to work around an S3 bug
+        // (Cf. https://forums.aws.amazon.com/thread.jspa?threadID=55746)
+        return PAIRTREE_ROOT + PATH_SEP + PairtreeUtils.mapToPtPath(myID).replace(UNENCODED_PLUS, ENCODED_PLUS) +
+                PATH_SEP + PairtreeUtils.encodeID(myID).replace(UNENCODED_PLUS, ENCODED_PLUS);
     }
 
+    /**
+     * Gets the path of the requested object resource. If the path contains a '+' it will be URL encoded for
+     * interaction with S3's HTTP API.
+     *
+     * @param aResourcePath The Pairtree resource which the returned path should represent
+     * @return The path of the requested object resource as it's found in S3
+     */
     @Override
     public String getPath(final String aResourcePath) {
-        // We need to encode any pluses in our resource path as a workaround for an S3 bug [Better way?]
-        // Cf. https://forums.aws.amazon.com/thread.jspa?threadID=55746
-        final String awsPath = aResourcePath.replace('+', '~');
-        return awsPath.charAt(0) == '/' ? getPath() + awsPath : getPath() + PATH_SEP + awsPath;
+        // We need to URL encode '+'s to work around an S3 bug
+        // (Cf. https://forums.aws.amazon.com/thread.jspa?threadID=55746)
+        return aResourcePath.charAt(0) == '/' ? getPath() + aResourcePath.replace(UNENCODED_PLUS, ENCODED_PLUS)
+                : getPath() + PATH_SEP + aResourcePath.replace(UNENCODED_PLUS, ENCODED_PLUS);
     }
 
     @Override
