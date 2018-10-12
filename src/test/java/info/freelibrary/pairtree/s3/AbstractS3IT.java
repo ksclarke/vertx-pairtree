@@ -105,8 +105,10 @@ public abstract class AbstractS3IT extends AbstractPairtreeTest {
         final Iterator<S3ObjectSummary> iterator = listing.getObjectSummaries().iterator();
 
         while (iterator.hasNext()) {
+            final String key = iterator.next().getKey();
+
             try {
-                myS3Client.deleteObject(myTestBucket, iterator.next().getKey());
+                myS3Client.deleteObject(myTestBucket, key);
             } catch (final AmazonClientException details) {
                 aContext.fail(details);
             }
