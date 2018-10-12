@@ -53,7 +53,7 @@
     <codacy.plugin.version>1.0.2</codacy.plugin.version>
     <aws.sdk.version>1.11.22</aws.sdk.version>
     <vertx.version>3.5.2</vertx.version>
-    <jackson.version>2.9.5</jackson.version>
+    <jackson.version>2.9.6</jackson.version>
   </properties>
 
   <dependencies>
