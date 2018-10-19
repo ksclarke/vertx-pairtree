@@ -1,190 +1,299 @@
 
 package info.freelibrary.pairtree;
 
-import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
-import static info.freelibrary.pairtree.PairtreeFactory.PairtreeImpl.FileSystem;
-import static info.freelibrary.pairtree.PairtreeFactory.PairtreeImpl.S3Bucket;
-import static info.freelibrary.pairtree.PairtreeRoot.DEFAULT_PAIRTREE;
+import java.io.File;
+import java.util.Objects;
+import java.util.Optional;
 
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.RegionUtils;
 
 import info.freelibrary.pairtree.fs.FsPairtree;
 import info.freelibrary.pairtree.s3.S3Pairtree;
-import info.freelibrary.util.Logger;
-import info.freelibrary.util.LoggerFactory;
+import info.freelibrary.util.StringUtils;
 
 import io.vertx.core.Vertx;
 
 /**
  * A factory which can be used to create pairtree objects.
- *
- * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
 public final class PairtreeFactory {
 
-    /** The types of pairtree backends supported by this library. */
-    public enum PairtreeImpl {
-        /** The file system Pairtree implementation */
-        FileSystem,
-        /** The S3 Pairtree implementation */
-        S3Bucket
-    }
+    final private Vertx myVertx;
 
-    /** The default type of Pairtree implementation. */
-    public static final PairtreeImpl DEFAULT_TYPE = FileSystem;
+    final private Optional<String> myAccessKey;
 
-    /** Logger for the Pairtree factory */
-    private static final Logger LOGGER = LoggerFactory.getLogger(PairtreeFactory.class, BUNDLE_NAME);
+    final private Optional<String> mySecretKey;
 
-    /** The number of Pairtree implementations supported by this library */
-    private static final int PT_IMPL_COUNT = PairtreeImpl.values().length;
-
-    /** A list of Pairtree implementation factories */
-    private static final List<Map.Entry<PairtreeImpl, PairtreeFactory>> FACTORIES = new ArrayList<>(PT_IMPL_COUNT);
-
-    /** Minimum number of configuration options required by a Pairtree */
-    private static final int MIN_CONFIG_COUNT = 2;
-
-    /** Connection to the Vertx framework */
-    private final Vertx myVertx;
-
-    /** Reference to the Pairtree implementation type created by this factory */
-    private final PairtreeImpl myImplType;
+    final private Optional<Region> myRegion;
 
     /**
-     * Creates a PairtreeFactory with the supplied default type
-     *
-     * @param aVertx A Vertx object
-     * @param aImpl A Pairtree implementation
+     * Creates a Pairtree factory using a newly created Vert.x environment.
      */
-    private PairtreeFactory(final Vertx aVertx, final PairtreeImpl aImpl) {
+    public PairtreeFactory() {
+        this(Vertx.vertx());
+    }
+
+    /**
+     * Creates a Pairtree factory using the supplied Vert.x environment.
+     *
+     * @param aVertx A Vert.x environment
+     */
+    public PairtreeFactory(final Vertx aVertx) {
+        final String region = StringUtils.trimToNull(System.getenv(S3Pairtree.AWS_REGION));
+
+        myAccessKey = Optional.ofNullable(StringUtils.trimToNull(System.getenv(S3Pairtree.AWS_ACCESS_KEY)));
+        mySecretKey = Optional.ofNullable(StringUtils.trimToNull(System.getenv(S3Pairtree.AWS_SECRET_KEY)));
+
+        if (region != null) {
+            myRegion = Optional.ofNullable(RegionUtils.getRegion(region));
+        } else {
+            myRegion = Optional.empty();
+        }
+
         myVertx = aVertx;
-        myImplType = aImpl;
     }
 
     /**
-     * Gets a <code>PairtreeFactory</code> that creates its own Vertx environment. This is useful if running in a
-     * simple script that isn't using Vertx for anything else.
+     * Gets a file system based Pairtree using the supplied directory as the Pairtree root.
      *
-     * @return A <code>PairtreeFactory</code> backed by the default Pairtree implementation
-     */
-    public static PairtreeFactory getFactory() {
-        return getFactory(Vertx.vertx(), DEFAULT_TYPE);
-    }
-
-    /**
-     * Gets a <code>PairtreeFactory</code> that uses the default back-end type.
-     *
-     * @param aVertx A Vertx object
-     * @return A <code>PairtreeFactory</code> backed by the default Pairtree implementation
-     */
-    public static PairtreeFactory getFactory(final Vertx aVertx) {
-        return getFactory(aVertx, DEFAULT_TYPE);
-    }
-
-    /**
-     * Gets a <code>PairtreeFactory</code> that uses the its own Vertx environment to create a Pairtree of the
-     * supplied Pairtree implementation type.
-     *
-     * @param aImpl The desired Pairtree implementation
-     * @return A <code>PairtreeFactory</code> backed by the desired implementation
-     */
-    public static PairtreeFactory getFactory(final PairtreeImpl aImpl) {
-        return getFactory(Vertx.vertx(), aImpl);
-    }
-
-    /**
-     * Gets a <code>PairtreeFactory</code> that uses the supplied default back-end type.
-     *
-     * @param aVertx A Vertx object
-     * @param aImpl The desired Pairtree implementation
-     * @return A <code>PairtreeFactory</code> backed by the desired implementation
-     */
-    public static PairtreeFactory getFactory(final Vertx aVertx, final PairtreeImpl aImpl) {
-        PairtreeFactory factory = null;
-
-        for (final Map.Entry<PairtreeImpl, PairtreeFactory> entry : FACTORIES) {
-            if (aImpl.equals(entry.getKey())) {
-                factory = entry.getValue();
-            }
-        }
-
-        if (factory == null) {
-            factory = new PairtreeFactory(aVertx, aImpl);
-            FACTORIES.add(new AbstractMap.SimpleEntry<>(aImpl, factory));
-        }
-
-        return factory;
-    }
-
-    /**
-     * Gets a Pairtree root.
-     *
-     * @param aConfig The configuration values in this order: location (file system path or bucket name), AWS access
-     *        key, and AWS secret key (the last two are only needed if the implementation is an S3 Pairtree)
+     * @param aDirectory A directory to use for the Pairtree root
      * @return A Pairtree root
+     * @throws PairtreeException If there is trouble creating the Pairtree
      */
-    public PairtreeRoot getPairtree(final String... aConfig) {
-        final PairtreeRoot pairtree;
-
-        if (myImplType.equals(FileSystem)) {
-            pairtree = getPairtree(FileSystem, aConfig[0]);
-        } else if (myImplType.equals(S3Bucket)) {
-            pairtree = getPairtree(S3Bucket, aConfig);
-        } else {
-            throw new PairtreeRuntimeException(MessageCodes.PT_009, myImplType);
-        }
-
-        return pairtree;
+    public PairtreeRoot getPairtree(final File aDirectory) throws PairtreeException {
+        return new FsPairtree(myVertx, getDirPath(aDirectory));
     }
 
     /**
-     * Gets a Pairtree backed by the supplied back-end type.
+     * Gets a file system based Pairtree using the supplied directory as the Pairtree root and the supplied prefix as
+     * the Pairtree prefix.
      *
-     * @param aImpl The type of Pairtree implementation
-     * @param aConfig The configuration values in this order: location (file system path or bucket name), AWS access
-     *        key, and AWS secret key (the last two are only needed if the implementation is an S3 Pairtree)
+     * @param aPrefix A Pairtree prefix
+     * @param aDirectory A directory to use for the Pairtree root
      * @return A Pairtree root
+     * @throws PairtreeException If there is trouble creating the Pairtree
      */
-    private PairtreeRoot getPairtree(final PairtreeImpl aImpl, final String... aConfig) {
-        final PairtreeRoot pairtree;
+    public PairtreeRoot getPrefixedPairtree(final String aPrefix, final File aDirectory) throws PairtreeException {
+        return new FsPairtree(aPrefix, myVertx, getDirPath(aDirectory));
+    }
 
-        if (aImpl.equals(S3Bucket)) {
-            final String bucket = aConfig.length > 0 ? aConfig[0] : DEFAULT_PAIRTREE;
-            final String accessKey;
-            final String secretKey;
-            final String endpoint;
+    /**
+     * Gets the S3 based Pairtree using the supplied S3 bucket.
+     *
+     * @param aBucket An S3 bucket in which to create the Pairtree
+     * @return A Pairtree root
+     * @throws PairtreeException If there is trouble creating the Pairtree
+     */
+    public PairtreeRoot getPairtree(final String aBucket) throws PairtreeException {
+        if (myAccessKey.isPresent() && mySecretKey.isPresent()) {
+            final String accessKey = myAccessKey.get();
+            final String secretKey = mySecretKey.get();
 
-            if (aConfig.length > MIN_CONFIG_COUNT) {
-                accessKey = aConfig[1];
-                secretKey = aConfig[2];
-
-                if (aConfig.length > (MIN_CONFIG_COUNT + 1)) {
-                    endpoint = aConfig[3];
-                } else {
-                    endpoint = null;
-                }
+            if (myRegion.isPresent()) {
+                return new S3Pairtree(myVertx, aBucket, accessKey, secretKey, myRegion.get());
             } else {
-                accessKey = System.getProperty("AWS_ACCESS_KEY");
-                secretKey = System.getProperty("AWS_SECRET_KEY");
-                endpoint = System.getProperty("S3_ENDPOINT");
-            }
-
-            // FIXME: support Pairtree prefix
-            if (endpoint == null) {
-                pairtree = new S3Pairtree(myVertx, bucket, accessKey, secretKey);
-            } else {
-                LOGGER.debug(MessageCodes.PT_DEBUG_056, endpoint);
-                pairtree = new S3Pairtree(myVertx, bucket, accessKey, secretKey, endpoint);
+                return new S3Pairtree(myVertx, aBucket, accessKey, secretKey);
             }
         } else {
-            // Default file-system implementation
-            pairtree = new FsPairtree(myVertx, aConfig.length > 0 ? aConfig[0] : DEFAULT_PAIRTREE);
+            throw new PairtreeException("No environmental credentials found");
+        }
+    }
+
+    /**
+     * Gets the S3 based Pairtree using the supplied S3 bucket and the supplied Pairtree prefix.
+     *
+     * @param aPrefix A Pairtree prefix
+     * @param aBucket An S3 bucket in which to create the Pairtree
+     * @return A Pairtree root
+     * @throws PairtreeException If there is trouble creating the Pairtree
+     */
+    public PairtreeRoot getPrefixedPairtree(final String aPrefix, final String aBucket) throws PairtreeException {
+        if (myAccessKey.isPresent() && mySecretKey.isPresent()) {
+            final String accessKey = myAccessKey.get();
+            final String secretKey = mySecretKey.get();
+
+            if (myRegion.isPresent()) {
+                return new S3Pairtree(aPrefix, myVertx, aBucket, accessKey, secretKey, myRegion.get());
+            } else {
+                return new S3Pairtree(aPrefix, myVertx, aBucket, accessKey, secretKey);
+            }
+        } else {
+            throw new PairtreeException("No environmental credentials found");
+        }
+    }
+
+    /**
+     * Gets the S3 based Pairtree using the supplied S3 bucket and bucket path.
+     *
+     * @param aBucket An S3 bucket in which to create the Pairtree
+     * @param aBucketPath A path in the S3 bucket at which to put the Pairtree
+     * @return A Pairtree root
+     * @throws PairtreeException If there is trouble creating the Pairtree
+     */
+    public PairtreeRoot getPairtree(final String aBucket, final String aBucketPath) throws PairtreeException {
+        if (myAccessKey.isPresent() && mySecretKey.isPresent()) {
+            final String accessKey = myAccessKey.get();
+            final String secretKey = mySecretKey.get();
+
+            if (myRegion.isPresent()) {
+                return new S3Pairtree(myVertx, aBucket, aBucketPath, accessKey, secretKey, myRegion.get());
+            } else {
+                return new S3Pairtree(myVertx, aBucket, aBucketPath, accessKey, secretKey);
+            }
+        } else {
+            throw new PairtreeException("No environmental credentials found");
+        }
+    }
+
+    /**
+     * Gets the S3 based Pairtree, with the supplied prefix, using the supplied S3 bucket and bucket path.
+     *
+     * @param aPrefix A Pairtree prefix
+     * @param aBucket An S3 bucket in which to create the Pairtree
+     * @param aBucketPath A path in the S3 bucket at which to put the Pairtree
+     * @return A Pairtree root
+     * @throws PairtreeException If there is trouble creating the Pairtree
+     */
+    public PairtreeRoot getPrefixedPairtree(final String aPrefix, final String aBucket, final String aBucketPath)
+            throws PairtreeException {
+        if (myAccessKey.isPresent() && mySecretKey.isPresent()) {
+            final String accessKey = myAccessKey.get();
+            final String secretKey = mySecretKey.get();
+
+            if (myRegion.isPresent()) {
+                return new S3Pairtree(aPrefix, myVertx, aBucket, aBucketPath, accessKey, secretKey, myRegion.get());
+            } else {
+                return new S3Pairtree(aPrefix, myVertx, aBucket, aBucketPath, accessKey, secretKey);
+            }
+        } else {
+            throw new PairtreeException("No environmental credentials found");
+        }
+    }
+
+    /**
+     * Creates a Pairtree using the supplied bucket and AWS credentials.
+     *
+     * @param aBucket An S3 bucket
+     * @param aAccessKey An AWS access key
+     * @param aSecretKey An AWS secret key
+     * @return A Pairtree
+     */
+    public PairtreeRoot getPairtree(final String aBucket, final String aAccessKey, final String aSecretKey) {
+        return new S3Pairtree(myVertx, aBucket, aAccessKey, aSecretKey);
+    }
+
+    /**
+     * Creates a Pairtree using the supplied bucket and AWS credentials.
+     *
+     * @param aBucket An S3 bucket
+     * @param aAccessKey An AWS access key
+     * @param aSecretKey An AWS secret key
+     * @param aRegion An AWS region in which to put the bucket
+     * @return A Pairtree
+     */
+    public PairtreeRoot getPairtree(final String aBucket, final String aAccessKey, final String aSecretKey,
+            final Region aRegion) {
+        return new S3Pairtree(myVertx, aBucket, aAccessKey, aSecretKey, aRegion);
+    }
+
+    /**
+     * Creates a Pairtree, with the supplied prefix, using the supplied bucket and AWS credentials.
+     *
+     * @param aPrefix A Pairtree prefix
+     * @param aBucket An S3 bucket
+     * @param aAccessKey An AWS access key
+     * @param aSecretKey An AWS secret key
+     * @return A Pairtree
+     */
+    public PairtreeRoot getPrefixedPairtree(final String aPrefix, final String aBucket, final String aAccessKey,
+            final String aSecretKey) {
+        return new S3Pairtree(aPrefix, myVertx, aBucket, aAccessKey, aSecretKey);
+    }
+
+    /**
+     * Creates a Pairtree, with the supplied prefix, using the supplied bucket and AWS credentials.
+     *
+     * @param aPrefix A Pairtree prefix
+     * @param aBucket An S3 bucket
+     * @param aAccessKey An AWS access key
+     * @param aSecretKey An AWS secret key
+     * @param aRegion An AWS region in which to put the bucket
+     * @return A Pairtree
+     */
+    public PairtreeRoot getPrefixedPairtree(final String aPrefix, final String aBucket, final String aAccessKey,
+            final String aSecretKey, final Region aRegion) {
+        return new S3Pairtree(aPrefix, myVertx, aBucket, aAccessKey, aSecretKey, aRegion);
+    }
+
+    /**
+     * Creates a Pairtree using the supplied S3 bucket and internal bucket path.
+     *
+     * @param aBucket An S3 bucket
+     * @param aBucketPath A path in the S3 bucket to the Pairtree root
+     * @param aAccessKey An AWS access key
+     * @param aSecretKey An AwS secret key
+     * @return A Pairtree
+     */
+    public PairtreeRoot getPairtree(final String aBucket, final String aBucketPath, final String aAccessKey,
+            final String aSecretKey) {
+        return new S3Pairtree(myVertx, aBucket, aBucketPath, aAccessKey, aSecretKey);
+    }
+
+    /**
+     * Creates a Pairtree using the supplied S3 bucket and internal bucket path.
+     *
+     * @param aBucket An S3 bucket
+     * @param aBucketPath A path in the S3 bucket to the Pairtree root
+     * @param aAccessKey An AWS access key
+     * @param aSecretKey An AWS secret key
+     * @param aRegion An AWS region in which to put the bucket
+     * @return A Pairtree
+     */
+    public PairtreeRoot getPairtree(final String aBucket, final String aBucketPath, final String aAccessKey,
+            final String aSecretKey, final Region aRegion) {
+        return new S3Pairtree(myVertx, aBucket, aBucketPath, aAccessKey, aSecretKey, aRegion);
+    }
+
+    /**
+     * Creates a Pairtree, with the supplied prefix, using the supplied S3 bucket and internal bucket path.
+     *
+     * @param aPrefix A Pairtree prefix
+     * @param aBucket An S3 bucket
+     * @param aBucketPath A path in the S3 bucket to the Pairtree root
+     * @param aAccessKey An AWS access key
+     * @param aSecretKey An AWS secret key
+     * @return A Pairtree
+     */
+    public PairtreeRoot getPrefixedPairtree(final String aPrefix, final String aBucket, final String aBucketPath,
+            final String aAccessKey, final String aSecretKey) {
+        return new S3Pairtree(aPrefix, myVertx, aBucket, aBucketPath, aAccessKey, aSecretKey);
+    }
+
+    /**
+     * Creates a Pairtree, with the supplied prefix, using the supplied S3 bucket and internal bucket path.
+     *
+     * @param aPrefix A Pairtree prefix
+     * @param aBucket An S3 bucket
+     * @param aBucketPath A path in the S3 bucket to the Pairtree root
+     * @param aAccessKey An AWS access key
+     * @param aSecretKey An AWS secret key
+     * @param aRegion An AWS region in which to put the Pairtree
+     * @return A Pairtree
+     */
+    public PairtreeRoot getPrefixedPairtree(final String aPrefix, final String aBucket, final String aBucketPath,
+            final String aAccessKey, final String aSecretKey, final Region aRegion) {
+        return new S3Pairtree(aPrefix, myVertx, aBucket, aBucketPath, aAccessKey, aSecretKey, aRegion);
+    }
+
+    private static String getDirPath(final File aDirectory) throws PairtreeException {
+        Objects.requireNonNull(aDirectory, "Requested Pairtree location cannot be null");
+
+        if (!aDirectory.isDirectory() || !aDirectory.canWrite()) {
+            throw new PairtreeException("Pairtree location must be a directory and must be writeable");
         }
 
-        return pairtree;
+        return aDirectory.getAbsolutePath();
     }
+
 }

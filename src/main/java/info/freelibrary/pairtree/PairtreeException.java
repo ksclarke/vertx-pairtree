@@ -5,8 +5,6 @@ import info.freelibrary.util.I18nException;
 
 /**
  * A generic Pairtree related exception.
- *
- * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
 public class PairtreeException extends I18nException {
 

@@ -56,7 +56,7 @@ public class S3ClientIT extends AbstractS3IT {
         super.setUp(aContext);
 
         myTestID = randomUUID().toString();
-        myClient = new S3Client(myVertx, myAccessKey, mySecretKey, myRegion);
+        myClient = new S3Client(myVertx, myAccessKey, mySecretKey, myEndpoint);
     }
 
     @Override

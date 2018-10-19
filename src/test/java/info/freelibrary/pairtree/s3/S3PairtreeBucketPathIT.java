@@ -6,9 +6,14 @@ import static info.freelibrary.pairtree.PairtreeRoot.PAIRTREE_PREFIX;
 import static info.freelibrary.pairtree.PairtreeRoot.PAIRTREE_VERSION;
 import static info.freelibrary.pairtree.PairtreeRoot.PT_VERSION_NUM;
 
+import java.util.UUID;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.RegionUtils;
 
 import info.freelibrary.pairtree.MessageCodes;
 import info.freelibrary.pairtree.PairtreeFactory;
@@ -21,10 +26,12 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 
 /**
- * Tests for the S3 Pairtree implementation.
+ * Tests for the S3 Pairtree implementation that puts the Pairtree in a subdirectory of the S3 bucket.
  */
 @RunWith(VertxUnitRunner.class)
-public class S3PairtreeIT extends AbstractS3IT {
+public class S3PairtreeBucketPathIT extends AbstractS3IT {
+
+    private final String BUCKET_PATH = "/path/to/pairtree";
 
     /** The Pairtree that's being tested */
     private PairtreeRoot myPairtree;
@@ -43,13 +50,15 @@ public class S3PairtreeIT extends AbstractS3IT {
         LOGGER.debug("Using AWS region: {}", myRegionName);
 
         final PairtreeFactory factory = new PairtreeFactory(myVertx);
+        final Region region = RegionUtils.getRegion(myEndpoint);
 
-        myPairtree = factory.getPairtree(myTestBucket, myAccessKey, mySecretKey, myEndpoint);
+        myPairtree = factory.getPairtree(myTestBucket, BUCKET_PATH, myAccessKey, mySecretKey, region);
     }
 
     @Test
     public final void testGetObject(final TestContext aContext) {
-        aContext.assertEquals(myPairtree.getObject("asdf").getID(), "asdf");
+        final String id = UUID.randomUUID().toString();
+        aContext.assertEquals(myPairtree.getObject(id).getID(), id);
     }
 
     @Test
@@ -170,6 +179,6 @@ public class S3PairtreeIT extends AbstractS3IT {
 
     @Override
     public Logger getLogger() {
-        return LoggerFactory.getLogger(S3PairtreeIT.class, BUNDLE_NAME);
+        return LoggerFactory.getLogger(S3PairtreeBucketPathIT.class, BUNDLE_NAME);
     }
 }

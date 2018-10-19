@@ -7,6 +7,7 @@ import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_042;
 import static java.io.File.separatorChar;
 import static java.util.UUID.randomUUID;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -14,6 +15,7 @@ import org.junit.After;
 import org.junit.Before;
 
 import info.freelibrary.pairtree.AbstractPairtreeTest;
+import info.freelibrary.pairtree.PairtreeException;
 import info.freelibrary.pairtree.PairtreeFactory;
 import info.freelibrary.pairtree.PairtreeRoot;
 
@@ -23,8 +25,6 @@ import io.vertx.ext.unit.TestContext;
 
 /**
  * Tests for the <code>AbstractFsPairtree</code>.
- *
- * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
 public abstract class AbstractFsPairtreeTest extends AbstractPairtreeTest {
 
@@ -47,7 +47,12 @@ public abstract class AbstractFsPairtreeTest extends AbstractPairtreeTest {
         final String path = System.getProperty("java.io.tmpdir") + separatorChar + randomUUID();
 
         myFileSystem = myVertx.fileSystem();
-        myPairtree = PairtreeFactory.getFactory(myVertx).getPairtree(path);
+
+        try {
+            myPairtree = new PairtreeFactory(myVertx).getPairtree(new File(path));
+        } catch (final PairtreeException details) {
+            throw new RuntimeException(details);
+        }
     }
 
     /**

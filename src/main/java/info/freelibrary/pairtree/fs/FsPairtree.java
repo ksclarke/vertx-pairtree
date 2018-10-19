@@ -26,8 +26,6 @@ import io.vertx.core.file.FileSystem;
 
 /**
  * A file-system backed Pairtree implementation.
- *
- * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
 public class FsPairtree extends AbstractPairtree {
 
@@ -47,7 +45,7 @@ public class FsPairtree extends AbstractPairtree {
      * @param aDirPath The directory in which to put the Pairtree
      */
     public FsPairtree(final Vertx aVertx, final String aDirPath) {
-        this(aVertx, aDirPath, null);
+        this(null, aVertx, aDirPath);
     }
 
     /**
@@ -57,7 +55,7 @@ public class FsPairtree extends AbstractPairtree {
      * @param aDirPath The directory in which to put the Pairtree
      * @param aPairtreePrefix The Pairtree's prefix
      */
-    public FsPairtree(final Vertx aVertx, final String aDirPath, final String aPairtreePrefix) {
+    public FsPairtree(final String aPairtreePrefix, final Vertx aVertx, final String aDirPath) {
         Objects.requireNonNull(aVertx);
         Objects.requireNonNull(aDirPath);
 
@@ -243,7 +241,7 @@ public class FsPairtree extends AbstractPairtree {
 
         myFileSystem.delete(getVersionFilePath(), result -> {
             if (result.succeeded()) {
-                if ((myPrefix != null) && (myPrefix.length() > 0)) {
+                if (myPrefix != null && myPrefix.length() > 0) {
                     deletePrefix(aFuture);
                 } else {
                     aFuture.complete();
@@ -290,7 +288,7 @@ public class FsPairtree extends AbstractPairtree {
 
         myFileSystem.writeFile(getVersionFilePath(), Buffer.buffer(specNote.toString()), result -> {
             if (result.succeeded()) {
-                if ((myPrefix != null) && (myPrefix.length() > 0)) {
+                if (myPrefix != null && myPrefix.length() > 0) {
                     setPrefix(aFuture);
                 } else {
                     aFuture.complete();

@@ -2,8 +2,6 @@
 package info.freelibrary.pairtree.s3;
 
 import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_001;
-import static info.freelibrary.pairtree.PairtreeFactory.PairtreeImpl.S3Bucket;
 import static info.freelibrary.pairtree.PairtreeRoot.PAIRTREE_ROOT;
 import static java.util.UUID.randomUUID;
 
@@ -29,8 +27,6 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 
 /**
  * Tests for the <code>S3PairtreeObject</code>.
- *
- * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
 @RunWith(VertxUnitRunner.class)
 public class S3PairtreeObjectIT extends AbstractS3IT {
@@ -60,17 +56,18 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
     public void setUp(final TestContext aContext) {
         super.setUp(aContext);
 
-        LOGGER.debug(PT_DEBUG_001, "s3:///" + myTestBucket);
+        LOGGER.debug(MessageCodes.PT_DEBUG_001, "s3:///" + myTestBucket);
 
-        final PairtreeFactory factory = PairtreeFactory.getFactory(myVertx, S3Bucket);
+        final PairtreeFactory factory = new PairtreeFactory(myVertx);
 
-        myPairtree = factory.getPairtree(myTestBucket, myAccessKey, mySecretKey, myRegion);
+        myPairtree = factory.getPairtree(myTestBucket, myAccessKey, mySecretKey, myEndpoint);
 
         // Create a test ID for each test run
         myUID = randomUUID().toString();
         myS3Path = PAIRTREE_ROOT + "/" + PairtreeUtils.mapToPtPath(myUID) + "/" + myUID;
     }
 
+    /*
     @Test
     public final void testExists(final TestContext aContext) {
         final Async async = aContext.async();
@@ -87,8 +84,8 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
             }
 
             async.complete();
-        }, myTestBucket, myAccessKey, mySecretKey, myRegion, myUID);
-    }
+        }, myTestBucket, myAccessKey, mySecretKey, myEndpoint, myUID);
+    } */
 
     @Test
     public final void testCreate(final TestContext aContext) {
@@ -125,6 +122,7 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
         });
     }
 
+    /*
     @Test
     public final void testDelete(final TestContext aContext) {
         final Async async = aContext.async();
@@ -141,8 +139,8 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
             }
 
             async.complete();
-        }, myTestBucket, myAccessKey, mySecretKey, myRegion, myUID);
-    }
+        }, myTestBucket, myAccessKey, mySecretKey, myEndpoint, myUID);
+    }*/
 
     @Test
     public final void testGetID(final TestContext aContext) {

@@ -23,6 +23,7 @@
   <entry key="PT-017">S3 Pairtree secret key not supplied</entry>
   <entry key="PT-018">Response code: {} [{}]</entry>
   <entry key="PT-019">Content-Length was not an integer: {}</entry>
+  <entry key="PT-020">Region for S3 Pairtree creation does not exist: {}</entry>
   
   <!-- Debugging messages -->
   <entry key="PT-DEBUG-001">Initializing Pairtree in '{}'</entry>
@@ -80,7 +81,7 @@
   <entry key="PT-DEBUG-053">Found unexpected version file</entry>
   <entry key="PT-DEBUG-054">Didn't find expected prefix file</entry>
   <entry key="PT-DEBUG-055">Didn't find expected version file</entry>
-  <entry key="PT-DEBUG-056">Initializing S3 Pairtree with explicit endpoint: {}</entry>
+  <entry key="PT-DEBUG-056">Initializing S3 Pairtree in an explicit region: {}</entry>
   <entry key="PT-DEBUG-057">Putting Pairtree object resource: {}</entry>
   <entry key="PT-DEBUG-058">Getting Pairtree object resource: {}</entry>
   <entry key="PT-DEBUG-059">Finding Pairtree object resource '{}' in '{}' [{}]</entry>

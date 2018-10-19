@@ -35,8 +35,6 @@ import io.vertx.core.buffer.Buffer;
 
 /**
  * An S3-backed Pairtree object implementation.
- *
- * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
 public class S3PairtreeObject extends I18nObject implements PairtreeObject {
 
@@ -58,6 +56,9 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
     /** The bucket in which the Pairtree resides */
     private final String myPairtreeBucket;
 
+    /** The path in the bucket to the Pairtree */
+    private final String myBucketPath;
+
     /** The Pairtree's prefix (optional) */
     private final String myPrefix;
 
@@ -74,6 +75,7 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
     public S3PairtreeObject(final S3Client aS3Client, final S3Pairtree aPairtree, final String aID) {
         super(BUNDLE_NAME);
 
+        myBucketPath = aPairtree.getBucketPath();
         myPairtreeBucket = aPairtree.getPath();
         myPrefix = aPairtree.getPrefix();
         myS3Client = aS3Client;
@@ -86,7 +88,7 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
 
         final Future<Boolean> future = Future.<Boolean>future().setHandler(aHandler);
 
-        myS3Client.head(myPairtreeBucket, getPath() + README_FILE, response -> {
+        myS3Client.head(myPairtreeBucket, myBucketPath + getPath() + README_FILE, response -> {
             final int statusCode = response.statusCode();
 
             if (statusCode == HTTP.OK) {
@@ -116,7 +118,7 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
 
         final Future<Void> future = Future.<Void>future().setHandler(aHandler);
 
-        myS3Client.put(myPairtreeBucket, getPath() + README_FILE, Buffer.buffer(myID), response -> {
+        myS3Client.put(myPairtreeBucket, myBucketPath + getPath() + README_FILE, Buffer.buffer(myID), response -> {
             final int statusCode = response.statusCode();
 
             if (statusCode == HTTP.OK) {
@@ -128,14 +130,13 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
         });
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
     public void delete(final Handler<AsyncResult<Void>> aHandler) {
         Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".delete()"));
 
         final Future<Void> future = Future.<Void>future().setHandler(aHandler);
 
-        myS3Client.list(myPairtreeBucket, getPath(), listResponse -> {
+        myS3Client.list(myPairtreeBucket, myBucketPath + getPath(), listResponse -> {
             final int listStatusCode = listResponse.statusCode();
 
             if (listStatusCode == HTTP.OK) {
@@ -231,7 +232,7 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
 
         LOGGER.debug(MessageCodes.PT_DEBUG_057, aPath);
 
-        myS3Client.put(myPairtreeBucket, getPath(aPath), aBuffer, response -> {
+        myS3Client.put(myPairtreeBucket, myBucketPath + getPath(aPath), aBuffer, response -> {
             final int statusCode = response.statusCode();
 
             if (statusCode == HTTP.OK) {
@@ -257,7 +258,7 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
 
         LOGGER.debug(MessageCodes.PT_DEBUG_058, aPath);
 
-        myS3Client.get(myPairtreeBucket, getPath(aPath), response -> {
+        myS3Client.get(myPairtreeBucket, myBucketPath + getPath(aPath), response -> {
             final int statusCode = response.statusCode();
 
             if (statusCode == HTTP.OK) {
@@ -279,7 +280,7 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
 
         LOGGER.debug(MessageCodes.PT_DEBUG_059, aPath, myPairtreeBucket, getPath(aPath));
 
-        myS3Client.head(myPairtreeBucket, getPath(aPath), response -> {
+        myS3Client.head(myPairtreeBucket, myBucketPath + getPath(aPath), response -> {
             final int statusCode = response.statusCode();
 
             if (statusCode == HTTP.OK) {

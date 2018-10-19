@@ -26,7 +26,7 @@ You can name the S3 bucket whatever you want (and change its system property to 
 
 If you want to put your test S3 bucket in a region other than the standard us-east-1, you will also need to supply a `vertx.pairtree.region` argument. For example:
 
-    mvn install -Ps3_it -Dvertx.pairtree.bucket=YOUR_S3_BUCKET_NAME -Dvertx.pairtree.access_key=YOUR_ACCESS_KEY -Dvertx.pairtree.secret_key=YOUR_SECRET_KEY -Dvertx.pairtree.region=s3-us-west-2.amazonaws.com
+    mvn install -Ps3_it -Dvertx.pairtree.bucket=YOUR_S3_BUCKET_NAME -Dvertx.pairtree.access_key=YOUR_ACCESS_KEY -Dvertx.pairtree.secret_key=YOUR_SECRET_KEY -Dvertx.pairtree.region="us-west-2"
 
 It can also be supplied through your settings.xml file. At this point, only regions that support signature version 2 authentication are supported. To see the valid S3 region endpoints, consult [AWS' documentation](http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region).
 
@@ -44,4 +44,4 @@ This library incorporates code from the [SuperS3t](https://github.com/spartango/
 
 ### Contact
 
-If you have questions about vertx-pairtree feel free to ask them on the FreeLibrary Projects [mailing list](https://groups.google.com/forum/#!forum/freelibrary-projects); or, if you encounter a problem, please feel free to [open an issue](https://github.com/ksclarke/vertx-pairtree/issues "GitHub Issue Queue") in the project's issue queue.
+If you have questions about vertx-pairtree <a href="mailto:ksclarke@ksclarke.io">feel free to ask</a> or, if you encounter a problem, please feel free to [open a ticket](https://github.com/ksclarke/vertx-pairtree/issues "GitHub Issue Queue") in the project's issues queue.

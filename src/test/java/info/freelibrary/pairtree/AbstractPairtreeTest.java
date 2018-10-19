@@ -3,14 +3,14 @@ package info.freelibrary.pairtree;
 
 import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
 
-import java.util.Arrays;
+import java.io.File;
 import java.util.Objects;
+import java.util.UUID;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 
-import info.freelibrary.pairtree.PairtreeFactory.PairtreeImpl;
 import info.freelibrary.util.I18nObject;
 import info.freelibrary.util.Logger;
 
@@ -23,14 +23,12 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 
 /**
  * An abstract Pairtree test object.
- *
- * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
 @RunWith(VertxUnitRunner.class)
 public abstract class AbstractPairtreeTest extends I18nObject {
 
     /** The name of a test object */
-    protected static final String TEST_OBJECT_NAME = "asdf";
+    protected static final String TEST_OBJECT_NAME = UUID.randomUUID().toString();
 
     /** The logger for the test */
     protected final Logger LOGGER = getLogger();
@@ -76,25 +74,26 @@ public abstract class AbstractPairtreeTest extends I18nObject {
     protected abstract Logger getLogger();
 
     /**
-     * Does the work of creating a test Pairtree object in a test Pairtree so that tests against that object can be run.
+     * Does the work of creating a test Pairtree object in a test Pairtree so that tests against that object can be
+     * run.
      *
      * @param aPairtreeImpl A Pairtree implementation
      * @param aHandler to handle the result of the creation event
-     * @param aConfig A configuration passed as a varargs
+     * @param aFile A file system directory Pairtree
+     * @param aID A Pairtree object ID
      */
-    protected void createTestPairtreeObject(final PairtreeImpl aPairtreeImpl,
-            final Handler<AsyncResult<PairtreeObject>> aHandler, final String... aConfig) {
+    protected void createTestFsPairtreeObject(final Handler<AsyncResult<PairtreeObject>> aHandler,
+            final File aFile, final String aID) throws PairtreeException {
         Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(),
                 ".createTestPairtreeObject()"));
 
-        final String[] config = Arrays.copyOf(aConfig, aConfig.length - 1);
-        final PairtreeRoot root = PairtreeFactory.getFactory(myVertx, aPairtreeImpl).getPairtree(config);
+        final PairtreeRoot root = new PairtreeFactory(myVertx).getPairtree(aFile);
         final Future<PairtreeObject> future = Future.<PairtreeObject>future().setHandler(aHandler);
 
         root.create(createPtResult -> {
             if (createPtResult.succeeded()) {
                 // Last thing passed in via our configuration arguments is the test object's ID
-                final PairtreeObject ptObject = root.getObject(aConfig[aConfig.length - 1]);
+                final PairtreeObject ptObject = root.getObject(aID);
 
                 ptObject.create(createPtObjResult -> {
                     if (createPtObjResult.succeeded()) {
