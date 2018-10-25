@@ -2,8 +2,6 @@ package info.freelibrary.pairtree;
 
 /**
  * HTTP constants defined for use by the Pairtree library.
- *
- * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
 public final class HTTP {
 

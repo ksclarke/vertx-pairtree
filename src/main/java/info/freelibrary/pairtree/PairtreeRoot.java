@@ -8,8 +8,6 @@ import io.vertx.core.Handler;
 
 /**
  * A public interface for Pairtree root implementations.
- *
- * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
 public interface PairtreeRoot {
 

@@ -38,8 +38,6 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 
 /**
  * Integration tests for {@link S3Client}.
- *
- * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
 @RunWith(VertxUnitRunner.class)
 public class S3ClientIT extends AbstractS3IT {

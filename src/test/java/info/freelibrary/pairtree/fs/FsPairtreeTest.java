@@ -18,8 +18,6 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 
 /**
  * Tests for <code>FsPairtree</code>.
- *
- * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
 @RunWith(VertxUnitRunner.class)
 public class FsPairtreeTest extends AbstractFsPairtreeTest {

@@ -16,8 +16,6 @@ import io.vertx.core.http.HttpServerFileUpload;
 
 /**
  * An S3 client implementation used by the S3Pairtree object.
- *
- * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
 public class S3Client {
 

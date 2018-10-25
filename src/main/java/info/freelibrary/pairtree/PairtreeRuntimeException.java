@@ -7,8 +7,6 @@ import info.freelibrary.util.I18nRuntimeException;
 
 /**
  * A generic Pairtree related runtime exception.
- *
- * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
 public class PairtreeRuntimeException extends I18nRuntimeException {
 

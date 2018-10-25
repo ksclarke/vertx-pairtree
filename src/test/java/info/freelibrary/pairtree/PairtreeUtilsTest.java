@@ -50,8 +50,6 @@ import org.junit.Test;
 
 /**
  * <code>PairtreeUtils</code> tests.
- *
- * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
 public class PairtreeUtilsTest {
 
