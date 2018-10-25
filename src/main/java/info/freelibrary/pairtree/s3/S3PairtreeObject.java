@@ -125,6 +125,7 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
                 future.complete();
             } else {
                 final String statusMessage = response.statusMessage();
+
                 future.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, getPath() + README_FILE, statusMessage));
             }
         });

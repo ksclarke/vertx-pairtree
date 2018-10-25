@@ -24,6 +24,9 @@
   <entry key="PT-018">Response code: {} [{}]</entry>
   <entry key="PT-019">Content-Length was not an integer: {}</entry>
   <entry key="PT-020">Region for S3 Pairtree creation does not exist: {}</entry>
+  <entry key="PT-021">No environmental credentials found</entry>
+  <entry key="PT-022">Requested Pairtree location cannot be null</entry>
+  <entry key="PT-023">Pairtree location must be a directory and must be writeable: {}</entry>
   
   <!-- Debugging messages -->
   <entry key="PT-DEBUG-001">Initializing Pairtree in '{}'</entry>

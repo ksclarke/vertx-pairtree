@@ -12,8 +12,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.amazonaws.AmazonClientException;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.RegionUtils;
 
 import info.freelibrary.pairtree.MessageCodes;
+import info.freelibrary.pairtree.PairtreeException;
 import info.freelibrary.pairtree.PairtreeFactory;
 import info.freelibrary.pairtree.PairtreeRoot;
 import info.freelibrary.pairtree.PairtreeUtils;
@@ -59,20 +62,20 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
         LOGGER.debug(MessageCodes.PT_DEBUG_001, "s3:///" + myTestBucket);
 
         final PairtreeFactory factory = new PairtreeFactory(myVertx);
+        final Region region = RegionUtils.getRegion(myEndpoint);
 
-        myPairtree = factory.getPairtree(myTestBucket, myAccessKey, mySecretKey, myEndpoint);
+        myPairtree = factory.getPairtree(myTestBucket, myAccessKey, mySecretKey, region);
 
         // Create a test ID for each test run
         myUID = randomUUID().toString();
         myS3Path = PAIRTREE_ROOT + "/" + PairtreeUtils.mapToPtPath(myUID) + "/" + myUID;
     }
 
-    /*
     @Test
-    public final void testExists(final TestContext aContext) {
+    public final void testExists(final TestContext aContext) throws PairtreeException {
         final Async async = aContext.async();
 
-        createTestPairtreeObject(S3Bucket, createResult -> {
+        createTestS3PairtreeObject(createResult -> {
             if (createResult.succeeded()) {
                 myPairtree.getObject(myUID).exists(existsResult -> {
                     if (!existsResult.succeeded()) {
@@ -85,7 +88,7 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
 
             async.complete();
         }, myTestBucket, myAccessKey, mySecretKey, myEndpoint, myUID);
-    } */
+    }
 
     @Test
     public final void testCreate(final TestContext aContext) {
@@ -122,12 +125,11 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
         });
     }
 
-    /*
     @Test
-    public final void testDelete(final TestContext aContext) {
+    public final void testDelete(final TestContext aContext) throws PairtreeException {
         final Async async = aContext.async();
 
-        createTestPairtreeObject(S3Bucket, createResult -> {
+        createTestS3PairtreeObject(createResult -> {
             if (createResult.succeeded()) {
                 myPairtree.getObject(myUID).delete(deleteResult -> {
                     if (!deleteResult.succeeded()) {
@@ -140,7 +142,7 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
 
             async.complete();
         }, myTestBucket, myAccessKey, mySecretKey, myEndpoint, myUID);
-    }*/
+    }
 
     @Test
     public final void testGetID(final TestContext aContext) {

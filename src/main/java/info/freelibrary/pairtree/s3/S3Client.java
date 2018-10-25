@@ -79,7 +79,6 @@ public class S3Client {
      */
     public S3Client(final Vertx aVertx, final String aAccessKey, final String aSecretKey, final String aSessionToken,
             final HttpClientOptions aConfig) {
-
         myAccessKey = aAccessKey;
         mySecretKey = aSecretKey;
         mySessionToken = aSessionToken;

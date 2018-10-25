@@ -32,8 +32,6 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 
 /**
  * Support for S3 test interactions.
- *
- * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
 @RunWith(VertxUnitRunner.class)
 public abstract class AbstractS3IT extends AbstractPairtreeTest {

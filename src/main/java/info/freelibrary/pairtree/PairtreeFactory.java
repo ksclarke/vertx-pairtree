@@ -19,13 +19,13 @@ import io.vertx.core.Vertx;
  */
 public final class PairtreeFactory {
 
-    final private Vertx myVertx;
+    private final Vertx myVertx;
 
-    final private Optional<String> myAccessKey;
+    private final Optional<String> myAccessKey;
 
-    final private Optional<String> mySecretKey;
+    private final Optional<String> mySecretKey;
 
-    final private Optional<Region> myRegion;
+    private final Optional<Region> myRegion;
 
     /**
      * Creates a Pairtree factory using a newly created Vert.x environment.
@@ -40,15 +40,21 @@ public final class PairtreeFactory {
      * @param aVertx A Vert.x environment
      */
     public PairtreeFactory(final Vertx aVertx) {
-        final String region = StringUtils.trimToNull(System.getenv(S3Pairtree.AWS_REGION));
+        final String accessKey = StringUtils.trimToNull(System.getenv(S3Pairtree.AWS_ACCESS_KEY));
+        final String secretKey = StringUtils.trimToNull(System.getenv(S3Pairtree.AWS_SECRET_KEY));
 
-        myAccessKey = Optional.ofNullable(StringUtils.trimToNull(System.getenv(S3Pairtree.AWS_ACCESS_KEY)));
-        mySecretKey = Optional.ofNullable(StringUtils.trimToNull(System.getenv(S3Pairtree.AWS_SECRET_KEY)));
+        String region = StringUtils.trimToNull(System.getenv(S3Pairtree.AWS_REGION));
+
+        myAccessKey = accessKey == null ? Optional.ofNullable(System.getProperty(S3Pairtree.AWS_ACCESS_KEY))
+                : Optional.ofNullable(accessKey);
+        mySecretKey = secretKey == null ? Optional.ofNullable(System.getProperty(S3Pairtree.AWS_SECRET_KEY))
+                : Optional.ofNullable(secretKey);
 
         if (region != null) {
             myRegion = Optional.ofNullable(RegionUtils.getRegion(region));
         } else {
-            myRegion = Optional.empty();
+            region = System.getProperty(S3Pairtree.AWS_REGION);
+            myRegion = region != null ? Optional.ofNullable(RegionUtils.getRegion(region)) : Optional.empty();
         }
 
         myVertx = aVertx;
@@ -96,7 +102,7 @@ public final class PairtreeFactory {
                 return new S3Pairtree(myVertx, aBucket, accessKey, secretKey);
             }
         } else {
-            throw new PairtreeException("No environmental credentials found");
+            throw new PairtreeException(MessageCodes.PT_021);
         }
     }
 
@@ -119,7 +125,7 @@ public final class PairtreeFactory {
                 return new S3Pairtree(aPrefix, myVertx, aBucket, accessKey, secretKey);
             }
         } else {
-            throw new PairtreeException("No environmental credentials found");
+            throw new PairtreeException(MessageCodes.PT_021);
         }
     }
 
@@ -142,7 +148,7 @@ public final class PairtreeFactory {
                 return new S3Pairtree(myVertx, aBucket, aBucketPath, accessKey, secretKey);
             }
         } else {
-            throw new PairtreeException("No environmental credentials found");
+            throw new PairtreeException(MessageCodes.PT_021);
         }
     }
 
@@ -167,7 +173,7 @@ public final class PairtreeFactory {
                 return new S3Pairtree(aPrefix, myVertx, aBucket, aBucketPath, accessKey, secretKey);
             }
         } else {
-            throw new PairtreeException("No environmental credentials found");
+            throw new PairtreeException(MessageCodes.PT_021);
         }
     }
 
@@ -287,10 +293,10 @@ public final class PairtreeFactory {
     }
 
     private static String getDirPath(final File aDirectory) throws PairtreeException {
-        Objects.requireNonNull(aDirectory, "Requested Pairtree location cannot be null");
+        Objects.requireNonNull(aDirectory, MessageCodes.PT_022);
 
-        if (!aDirectory.isDirectory() || !aDirectory.canWrite()) {
-            throw new PairtreeException("Pairtree location must be a directory and must be writeable");
+        if (aDirectory.exists() && (!aDirectory.isDirectory() || !aDirectory.canWrite())) {
+            throw new PairtreeException(MessageCodes.PT_023, aDirectory);
         }
 
         return aDirectory.getAbsolutePath();

@@ -147,8 +147,8 @@ public class S3Pairtree extends AbstractPairtree {
      * @param aAccessKey An S3 access key
      * @param aSecretKey An S3 secret key
      */
-    public S3Pairtree(final String aPairtreePrefix, final Vertx aVertx, final String aBucket, final String aBucketPath,
-            final String aAccessKey, final String aSecretKey) {
+    public S3Pairtree(final String aPairtreePrefix, final Vertx aVertx, final String aBucket,
+            final String aBucketPath, final String aAccessKey, final String aSecretKey) {
         this(Optional.of(aPairtreePrefix), aVertx, aBucket, Optional.of(aBucketPath), aAccessKey, aSecretKey, Optional
                 .empty());
     }
@@ -180,8 +180,8 @@ public class S3Pairtree extends AbstractPairtree {
      * @param aSecretKey An S3 secret key
      * @param aRegion An S3 endpoint
      */
-    public S3Pairtree(final String aPairtreePrefix, final Vertx aVertx, final String aBucket, final String aBucketPath,
-            final String aAccessKey, final String aSecretKey, final Region aRegion) {
+    public S3Pairtree(final String aPairtreePrefix, final Vertx aVertx, final String aBucket,
+            final String aBucketPath, final String aAccessKey, final String aSecretKey, final Region aRegion) {
         this(Optional.of(aPairtreePrefix), aVertx, aBucket, Optional.of(aBucketPath), aAccessKey, aSecretKey, Optional
                 .of(aRegion));
     }
@@ -255,16 +255,13 @@ public class S3Pairtree extends AbstractPairtree {
         Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".exists()"));
 
         final Future<Boolean> future = Future.<Boolean>future().setHandler(aHandler);
-        final String versionFilePath = getBucketPath() + getVersionFilePath();
 
-        myS3Client.get(myBucket, versionFilePath, getVersionResponse -> {
+        myS3Client.get(myBucket, getVersionFilePath(), getVersionResponse -> {
             final int versionStatusCode = getVersionResponse.statusCode();
 
             if (versionStatusCode == HTTP.OK) {
                 if (hasPrefix()) {
-                    final String prefixFilePath = getBucketPath() + getPrefixFilePath();
-
-                    myS3Client.get(myBucket, prefixFilePath, getPrefixResponse -> {
+                    myS3Client.get(myBucket, getPrefixFilePath(), getPrefixResponse -> {
                         final int prefixStatusCode = getPrefixResponse.statusCode();
 
                         if (prefixStatusCode == HTTP.OK) {
@@ -299,17 +296,15 @@ public class S3Pairtree extends AbstractPairtree {
         final Future<Void> future = Future.<Void>future().setHandler(aHandler);
         final StringBuilder specNote = new StringBuilder();
         final String ptVersion = getI18n(MessageCodes.PT_011, PT_VERSION_NUM);
-        final String versionFilePath = getBucketPath() + getVersionFilePath();
 
         specNote.append(ptVersion).append(System.lineSeparator()).append(getI18n(MessageCodes.PT_012));
 
-        myS3Client.put(myBucket, versionFilePath, Buffer.buffer(specNote.toString()), putVersionResponse -> {
+        myS3Client.put(myBucket, getVersionFilePath(), Buffer.buffer(specNote.toString()), putVersionResponse -> {
             if (putVersionResponse.statusCode() == HTTP.OK) {
                 if (hasPrefix()) {
-                    final String prefixFilePath = getBucketPath() + getPrefixFilePath();
                     final String prefix = myPrefix.get();
 
-                    myS3Client.put(myBucket, prefixFilePath, Buffer.buffer(prefix), putPrefixResponse -> {
+                    myS3Client.put(myBucket, getPrefixFilePath(), Buffer.buffer(prefix), putPrefixResponse -> {
                         if (putPrefixResponse.statusCode() == HTTP.OK) {
                             future.complete();
                         } else {
@@ -394,7 +389,7 @@ public class S3Pairtree extends AbstractPairtree {
 
     @Override
     public String toString() {
-        return "s3://" + PATH_SEP + myBucket + PATH_SEP + getBucketPath() + PAIRTREE_ROOT;
+        return "s3://" + PATH_SEP + myBucket + getBucketPath() + PATH_SEP + PAIRTREE_ROOT;
     }
 
     @Override
@@ -414,12 +409,16 @@ public class S3Pairtree extends AbstractPairtree {
 
     @Override
     public String getPrefixFilePath() {
-        return PAIRTREE_PREFIX;
+        final String bucketPath = getBucketPath();
+
+        return "".equals(bucketPath) ? PAIRTREE_PREFIX : bucketPath + PATH_SEP + PAIRTREE_PREFIX;
     }
 
     @Override
     public String getVersionFilePath() {
-        return getVersionFileName();
+        final String bucketPath = getBucketPath();
+
+        return "".equals(bucketPath) ? getVersionFileName() : bucketPath + PATH_SEP + getVersionFileName();
     }
 
 }

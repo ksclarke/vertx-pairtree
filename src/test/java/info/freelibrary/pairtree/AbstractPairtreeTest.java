@@ -11,6 +11,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.RegionUtils;
+
 import info.freelibrary.util.I18nObject;
 import info.freelibrary.util.Logger;
 
@@ -74,7 +77,7 @@ public abstract class AbstractPairtreeTest extends I18nObject {
     protected abstract Logger getLogger();
 
     /**
-     * Does the work of creating a test Pairtree object in a test Pairtree so that tests against that object can be
+     * Does the work of creating a test Pairtree object in the file system so that tests against that object can be
      * run.
      *
      * @param aPairtreeImpl A Pairtree implementation
@@ -82,12 +85,48 @@ public abstract class AbstractPairtreeTest extends I18nObject {
      * @param aFile A file system directory Pairtree
      * @param aID A Pairtree object ID
      */
-    protected void createTestFsPairtreeObject(final Handler<AsyncResult<PairtreeObject>> aHandler,
-            final File aFile, final String aID) throws PairtreeException {
+    protected void createTestFsPairtreeObject(final Handler<AsyncResult<PairtreeObject>> aHandler, final File aFile,
+            final String aID) throws PairtreeException {
         Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(),
                 ".createTestPairtreeObject()"));
 
         final PairtreeRoot root = new PairtreeFactory(myVertx).getPairtree(aFile);
+        final Future<PairtreeObject> future = Future.<PairtreeObject>future().setHandler(aHandler);
+
+        root.create(createPtResult -> {
+            if (createPtResult.succeeded()) {
+                // Last thing passed in via our configuration arguments is the test object's ID
+                final PairtreeObject ptObject = root.getObject(aID);
+
+                ptObject.create(createPtObjResult -> {
+                    if (createPtObjResult.succeeded()) {
+                        future.complete(ptObject);
+                    } else {
+                        future.fail(createPtObjResult.cause());
+                    }
+                });
+            } else {
+                future.fail(createPtResult.cause());
+            }
+        });
+    }
+
+    /**
+     * Does the work of creating a test Pairtree object in S3 so that tests against that object can be run.
+     *
+     * @param aPairtreeImpl A Pairtree implementation
+     * @param aHandler to handle the result of the creation event
+     * @param aFile A file system directory Pairtree
+     * @param aID A Pairtree object ID
+     */
+    protected void createTestS3PairtreeObject(final Handler<AsyncResult<PairtreeObject>> aHandler,
+            final String aBucket, final String aAccessKey, final String aSecretKey, final String aEndpoint,
+            final String aID) throws PairtreeException {
+        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(),
+                ".createTestPairtreeObject()"));
+
+        final Region region = RegionUtils.getRegion(aEndpoint);
+        final PairtreeRoot root = new PairtreeFactory(myVertx).getPairtree(aBucket, aAccessKey, aSecretKey, region);
         final Future<PairtreeObject> future = Future.<PairtreeObject>future().setHandler(aHandler);
 
         root.create(createPtResult -> {

@@ -10,6 +10,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.RegionUtils;
+
 import info.freelibrary.pairtree.MessageCodes;
 import info.freelibrary.pairtree.PairtreeFactory;
 import info.freelibrary.pairtree.PairtreeRoot;
@@ -43,8 +46,9 @@ public class S3PairtreeIT extends AbstractS3IT {
         LOGGER.debug("Using AWS region: {}", myRegionName);
 
         final PairtreeFactory factory = new PairtreeFactory(myVertx);
+        final Region region = RegionUtils.getRegion(myEndpoint);
 
-        myPairtree = factory.getPairtree(myTestBucket, myAccessKey, mySecretKey, myEndpoint);
+        myPairtree = factory.getPairtree(myTestBucket, myAccessKey, mySecretKey, region);
     }
 
     @Test
@@ -61,12 +65,12 @@ public class S3PairtreeIT extends AbstractS3IT {
                 final boolean prefixFile = myS3Client.doesObjectExist(myTestBucket, myPairtree.getPrefixFilePath());
                 final boolean versionFile = myS3Client.doesObjectExist(myTestBucket, myPairtree.getVersionFilePath());
 
-                aContext.assertTrue(versionFile, MessageCodes.PT_DEBUG_055);
+                aContext.assertTrue(versionFile, LOGGER.getMessage(MessageCodes.PT_DEBUG_055));
 
                 if (myPairtree.hasPrefix()) {
-                    aContext.assertTrue(prefixFile, MessageCodes.PT_DEBUG_054);
+                    aContext.assertTrue(prefixFile, LOGGER.getMessage(MessageCodes.PT_DEBUG_054));
                 } else {
-                    aContext.assertFalse(prefixFile, MessageCodes.PT_DEBUG_052);
+                    aContext.assertFalse(prefixFile, LOGGER.getMessage(MessageCodes.PT_DEBUG_052));
                 }
 
                 myPairtree.exists(existsResults -> {
@@ -113,12 +117,12 @@ public class S3PairtreeIT extends AbstractS3IT {
                 final boolean prefixFile = myS3Client.doesObjectExist(myTestBucket, myPairtree.getPrefixFilePath());
                 final boolean versionFile = myS3Client.doesObjectExist(myTestBucket, myPairtree.getVersionFilePath());
 
-                aContext.assertTrue(versionFile, MessageCodes.PT_DEBUG_055);
+                aContext.assertTrue(versionFile, LOGGER.getMessage(MessageCodes.PT_DEBUG_055));
 
                 if (myPairtree.hasPrefix()) {
-                    aContext.assertTrue(prefixFile, MessageCodes.PT_DEBUG_054);
+                    aContext.assertTrue(prefixFile, LOGGER.getMessage(MessageCodes.PT_DEBUG_054));
                 } else {
-                    aContext.assertFalse(prefixFile, MessageCodes.PT_DEBUG_052);
+                    aContext.assertFalse(prefixFile, LOGGER.getMessage(MessageCodes.PT_DEBUG_052));
                 }
 
                 // Now delete the Pairtree we just created
@@ -129,13 +133,13 @@ public class S3PairtreeIT extends AbstractS3IT {
                         final String versionFilePath = myPairtree.getVersionFilePath();
                         final boolean vfpExists = myS3Client.doesObjectExist(myTestBucket, versionFilePath);
 
-                        aContext.assertFalse(vfpExists, MessageCodes.PT_DEBUG_053);
+                        aContext.assertFalse(vfpExists, LOGGER.getMessage(MessageCodes.PT_DEBUG_053));
 
                         if (myPairtree.hasPrefix()) {
                             final String prefixFilePath = myPairtree.getPrefixFilePath();
                             final boolean pfpExists = myS3Client.doesObjectExist(myTestBucket, prefixFilePath);
 
-                            aContext.assertFalse(pfpExists, MessageCodes.PT_DEBUG_052);
+                            aContext.assertFalse(pfpExists, LOGGER.getMessage(MessageCodes.PT_DEBUG_052));
                         }
                     }
 
