@@ -89,7 +89,7 @@ public class S3Pairtree extends AbstractPairtree {
      */
     public S3Pairtree(final Vertx aVertx, final String aBucket, final String aBucketPath, final String aAccessKey,
             final String aSecretKey) {
-        this(Optional.empty(), aVertx, aBucket, Optional.empty(), aAccessKey, aSecretKey, Optional.empty());
+        this(Optional.empty(), aVertx, aBucket, Optional.of(aBucketPath), aAccessKey, aSecretKey, Optional.empty());
     }
 
     /**
@@ -214,7 +214,7 @@ public class S3Pairtree extends AbstractPairtree {
         myPrefix = aPairtreePrefix;
 
         if (aBucketPath.isPresent()) {
-            if (aBucketPath.get().startsWith("/")) {
+            if (aBucketPath.get().charAt(0) == '/') {
                 myBucketPath = aBucketPath;
             } else {
                 myBucketPath = Optional.of(PATH_SEP + aBucketPath.get());
