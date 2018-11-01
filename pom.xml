@@ -272,7 +272,7 @@
   <parent>
     <artifactId>freelib-parent</artifactId>
     <groupId>info.freelibrary</groupId>
-    <version>0.2.9</version>
+    <version>0.3.1-SNAPSHOT</version>
   </parent>
 
 </project>
