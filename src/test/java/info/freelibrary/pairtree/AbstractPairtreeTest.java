@@ -90,7 +90,7 @@ public abstract class AbstractPairtreeTest extends I18nObject {
         Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(),
                 ".createTestPairtreeObject()"));
 
-        final PairtreeRoot root = new PairtreeFactory(myVertx).getPairtree(aFile);
+        final Pairtree root = new PairtreeFactory(myVertx).getPairtree(aFile);
         final Future<PairtreeObject> future = Future.<PairtreeObject>future().setHandler(aHandler);
 
         root.create(createPtResult -> {
@@ -126,7 +126,7 @@ public abstract class AbstractPairtreeTest extends I18nObject {
                 ".createTestPairtreeObject()"));
 
         final Region region = RegionUtils.getRegion(aEndpoint);
-        final PairtreeRoot root = new PairtreeFactory(myVertx).getPairtree(aBucket, aAccessKey, aSecretKey, region);
+        final Pairtree root = new PairtreeFactory(myVertx).getPairtree(aBucket, aAccessKey, aSecretKey, region);
         final Future<PairtreeObject> future = Future.<PairtreeObject>future().setHandler(aHandler);
 
         root.create(createPtResult -> {

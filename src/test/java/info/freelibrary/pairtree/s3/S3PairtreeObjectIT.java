@@ -2,7 +2,7 @@
 package info.freelibrary.pairtree.s3;
 
 import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
-import static info.freelibrary.pairtree.PairtreeRoot.PAIRTREE_ROOT;
+import static info.freelibrary.pairtree.Pairtree.PAIRTREE_ROOT;
 import static java.util.UUID.randomUUID;
 
 import java.util.StringJoiner;
@@ -18,7 +18,7 @@ import com.amazonaws.regions.RegionUtils;
 import info.freelibrary.pairtree.MessageCodes;
 import info.freelibrary.pairtree.PairtreeException;
 import info.freelibrary.pairtree.PairtreeFactory;
-import info.freelibrary.pairtree.PairtreeRoot;
+import info.freelibrary.pairtree.Pairtree;
 import info.freelibrary.pairtree.PairtreeUtils;
 import info.freelibrary.util.Logger;
 import info.freelibrary.util.LoggerFactory;
@@ -41,7 +41,7 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
     private static final String GREEN_BLUE_GIF = "green+blue.gif";
 
     /** The Pairtree being tested */
-    private PairtreeRoot myPairtree;
+    private Pairtree myPairtree;
 
     /** The ID for the object being tested */
     private String myUID;

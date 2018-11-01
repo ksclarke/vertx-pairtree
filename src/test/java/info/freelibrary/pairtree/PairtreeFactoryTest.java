@@ -1,7 +1,7 @@
 
 package info.freelibrary.pairtree;
 
-import static info.freelibrary.pairtree.PairtreeRoot.PAIRTREE_ROOT;
+import static info.freelibrary.pairtree.Pairtree.PAIRTREE_ROOT;
 import static java.util.UUID.randomUUID;
 
 import java.io.File;
@@ -35,7 +35,7 @@ public class PairtreeFactoryTest extends TestCase {
     @Test
     public void testGetPairtreeFsImplicitFactory() throws PairtreeException {
         final String path = Paths.get(TMPDIR, randomUUID().toString()).toString();
-        final PairtreeRoot root = new PairtreeFactory(myVertx).getPairtree(new File(path));
+        final Pairtree root = new PairtreeFactory(myVertx).getPairtree(new File(path));
 
         assertEquals(Paths.get(path, PAIRTREE_ROOT).toString(), root.toString());
     }
@@ -43,7 +43,7 @@ public class PairtreeFactoryTest extends TestCase {
     @Test
     public void testGetPairtreeFsImplicitFactoryNoVertx() throws PairtreeException {
         final String path = Paths.get(TMPDIR, randomUUID().toString()).toString();
-        final PairtreeRoot root = new PairtreeFactory().getPairtree(new File(path));
+        final Pairtree root = new PairtreeFactory().getPairtree(new File(path));
 
         assertEquals(Paths.get(path, PAIRTREE_ROOT).toString(), root.toString());
     }
@@ -51,7 +51,7 @@ public class PairtreeFactoryTest extends TestCase {
     @Test
     public void testGetPairtreeFsExplicitFactory() throws PairtreeException {
         final String path = Paths.get(TMPDIR, randomUUID().toString()).toString();
-        final PairtreeRoot root = new PairtreeFactory(myVertx).getPairtree(new File(path));
+        final Pairtree root = new PairtreeFactory(myVertx).getPairtree(new File(path));
 
         assertEquals(Paths.get(path, PAIRTREE_ROOT).toString(), root.toString());
     }
@@ -59,7 +59,7 @@ public class PairtreeFactoryTest extends TestCase {
     @Test
     public void testGetPairtreeFsExplicitFactoryNoVertx() throws PairtreeException {
         final String path = Paths.get(TMPDIR, randomUUID().toString()).toString();
-        final PairtreeRoot root = new PairtreeFactory().getPairtree(new File(path));
+        final Pairtree root = new PairtreeFactory().getPairtree(new File(path));
 
         assertEquals(Paths.get(path, PAIRTREE_ROOT).toString(), root.toString());
     }

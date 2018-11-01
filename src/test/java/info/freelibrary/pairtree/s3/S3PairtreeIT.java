@@ -2,9 +2,9 @@
 package info.freelibrary.pairtree.s3;
 
 import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
-import static info.freelibrary.pairtree.PairtreeRoot.PAIRTREE_PREFIX;
-import static info.freelibrary.pairtree.PairtreeRoot.PAIRTREE_VERSION;
-import static info.freelibrary.pairtree.PairtreeRoot.PT_VERSION_NUM;
+import static info.freelibrary.pairtree.Pairtree.PAIRTREE_PREFIX;
+import static info.freelibrary.pairtree.Pairtree.PAIRTREE_VERSION;
+import static info.freelibrary.pairtree.Pairtree.PT_VERSION_NUM;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -15,7 +15,7 @@ import com.amazonaws.regions.RegionUtils;
 
 import info.freelibrary.pairtree.MessageCodes;
 import info.freelibrary.pairtree.PairtreeFactory;
-import info.freelibrary.pairtree.PairtreeRoot;
+import info.freelibrary.pairtree.Pairtree;
 import info.freelibrary.util.Logger;
 import info.freelibrary.util.LoggerFactory;
 
@@ -30,7 +30,7 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 public class S3PairtreeIT extends AbstractS3IT {
 
     /** The Pairtree that's being tested */
-    private PairtreeRoot myPairtree;
+    private Pairtree myPairtree;
 
     /**
      * Test setup creates a Pairtree object and puts an expected resource into S3

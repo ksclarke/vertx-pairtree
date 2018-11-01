@@ -9,7 +9,7 @@ import io.vertx.core.Handler;
 /**
  * A public interface for Pairtree root implementations.
  */
-public interface PairtreeRoot {
+public interface Pairtree {
 
     /** Default Pairtree name */
     String DEFAULT_PAIRTREE = "pairtree";

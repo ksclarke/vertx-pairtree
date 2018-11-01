@@ -17,7 +17,7 @@ import org.junit.Before;
 import info.freelibrary.pairtree.AbstractPairtreeTest;
 import info.freelibrary.pairtree.PairtreeException;
 import info.freelibrary.pairtree.PairtreeFactory;
-import info.freelibrary.pairtree.PairtreeRoot;
+import info.freelibrary.pairtree.Pairtree;
 
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.file.FileSystem;
@@ -29,7 +29,7 @@ import io.vertx.ext.unit.TestContext;
 public abstract class AbstractFsPairtreeTest extends AbstractPairtreeTest {
 
     /** The Pairtree being tested */
-    protected PairtreeRoot myPairtree;
+    protected Pairtree myPairtree;
 
     /** A connection to the file system */
     protected FileSystem myFileSystem;

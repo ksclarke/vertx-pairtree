@@ -2,9 +2,9 @@
 package info.freelibrary.pairtree.s3;
 
 import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
-import static info.freelibrary.pairtree.PairtreeRoot.PAIRTREE_PREFIX;
-import static info.freelibrary.pairtree.PairtreeRoot.PAIRTREE_VERSION;
-import static info.freelibrary.pairtree.PairtreeRoot.PT_VERSION_NUM;
+import static info.freelibrary.pairtree.Pairtree.PAIRTREE_PREFIX;
+import static info.freelibrary.pairtree.Pairtree.PAIRTREE_VERSION;
+import static info.freelibrary.pairtree.Pairtree.PT_VERSION_NUM;
 
 import java.util.UUID;
 
@@ -17,7 +17,7 @@ import com.amazonaws.regions.RegionUtils;
 
 import info.freelibrary.pairtree.MessageCodes;
 import info.freelibrary.pairtree.PairtreeFactory;
-import info.freelibrary.pairtree.PairtreeRoot;
+import info.freelibrary.pairtree.Pairtree;
 import info.freelibrary.util.Logger;
 import info.freelibrary.util.LoggerFactory;
 
@@ -34,7 +34,7 @@ public class S3PairtreeBucketPathIT extends AbstractS3IT {
     private final String BUCKET_PATH = "/path/to/pairtree";
 
     /** The Pairtree that's being tested */
-    private PairtreeRoot myPairtree;
+    private Pairtree myPairtree;
 
     /**
      * Test setup creates a Pairtree object and puts an expected resource into S3

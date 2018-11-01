@@ -67,7 +67,7 @@ public final class PairtreeFactory {
      * @return A Pairtree root
      * @throws PairtreeException If there is trouble creating the Pairtree
      */
-    public PairtreeRoot getPairtree(final File aDirectory) throws PairtreeException {
+    public Pairtree getPairtree(final File aDirectory) throws PairtreeException {
         return new FsPairtree(myVertx, getDirPath(aDirectory));
     }
 
@@ -80,7 +80,7 @@ public final class PairtreeFactory {
      * @return A Pairtree root
      * @throws PairtreeException If there is trouble creating the Pairtree
      */
-    public PairtreeRoot getPrefixedPairtree(final String aPrefix, final File aDirectory) throws PairtreeException {
+    public Pairtree getPrefixedPairtree(final String aPrefix, final File aDirectory) throws PairtreeException {
         return new FsPairtree(aPrefix, myVertx, getDirPath(aDirectory));
     }
 
@@ -91,7 +91,7 @@ public final class PairtreeFactory {
      * @return A Pairtree root
      * @throws PairtreeException If there is trouble creating the Pairtree
      */
-    public PairtreeRoot getPairtree(final String aBucket) throws PairtreeException {
+    public Pairtree getPairtree(final String aBucket) throws PairtreeException {
         if (myAccessKey.isPresent() && mySecretKey.isPresent()) {
             final String accessKey = myAccessKey.get();
             final String secretKey = mySecretKey.get();
@@ -114,7 +114,7 @@ public final class PairtreeFactory {
      * @return A Pairtree root
      * @throws PairtreeException If there is trouble creating the Pairtree
      */
-    public PairtreeRoot getPrefixedPairtree(final String aPrefix, final String aBucket) throws PairtreeException {
+    public Pairtree getPrefixedPairtree(final String aPrefix, final String aBucket) throws PairtreeException {
         if (myAccessKey.isPresent() && mySecretKey.isPresent()) {
             final String accessKey = myAccessKey.get();
             final String secretKey = mySecretKey.get();
@@ -137,7 +137,7 @@ public final class PairtreeFactory {
      * @return A Pairtree root
      * @throws PairtreeException If there is trouble creating the Pairtree
      */
-    public PairtreeRoot getPairtree(final String aBucket, final String aBucketPath) throws PairtreeException {
+    public Pairtree getPairtree(final String aBucket, final String aBucketPath) throws PairtreeException {
         if (myAccessKey.isPresent() && mySecretKey.isPresent()) {
             final String accessKey = myAccessKey.get();
             final String secretKey = mySecretKey.get();
@@ -161,7 +161,7 @@ public final class PairtreeFactory {
      * @return A Pairtree root
      * @throws PairtreeException If there is trouble creating the Pairtree
      */
-    public PairtreeRoot getPrefixedPairtree(final String aPrefix, final String aBucket, final String aBucketPath)
+    public Pairtree getPrefixedPairtree(final String aPrefix, final String aBucket, final String aBucketPath)
             throws PairtreeException {
         if (myAccessKey.isPresent() && mySecretKey.isPresent()) {
             final String accessKey = myAccessKey.get();
@@ -185,7 +185,7 @@ public final class PairtreeFactory {
      * @param aSecretKey An AWS secret key
      * @return A Pairtree
      */
-    public PairtreeRoot getPairtree(final String aBucket, final String aAccessKey, final String aSecretKey) {
+    public Pairtree getPairtree(final String aBucket, final String aAccessKey, final String aSecretKey) {
         return new S3Pairtree(myVertx, aBucket, aAccessKey, aSecretKey);
     }
 
@@ -198,7 +198,7 @@ public final class PairtreeFactory {
      * @param aRegion An AWS region in which to put the bucket
      * @return A Pairtree
      */
-    public PairtreeRoot getPairtree(final String aBucket, final String aAccessKey, final String aSecretKey,
+    public Pairtree getPairtree(final String aBucket, final String aAccessKey, final String aSecretKey,
             final Region aRegion) {
         return new S3Pairtree(myVertx, aBucket, aAccessKey, aSecretKey, aRegion);
     }
@@ -212,7 +212,7 @@ public final class PairtreeFactory {
      * @param aSecretKey An AWS secret key
      * @return A Pairtree
      */
-    public PairtreeRoot getPrefixedPairtree(final String aPrefix, final String aBucket, final String aAccessKey,
+    public Pairtree getPrefixedPairtree(final String aPrefix, final String aBucket, final String aAccessKey,
             final String aSecretKey) {
         return new S3Pairtree(aPrefix, myVertx, aBucket, aAccessKey, aSecretKey);
     }
@@ -227,7 +227,7 @@ public final class PairtreeFactory {
      * @param aRegion An AWS region in which to put the bucket
      * @return A Pairtree
      */
-    public PairtreeRoot getPrefixedPairtree(final String aPrefix, final String aBucket, final String aAccessKey,
+    public Pairtree getPrefixedPairtree(final String aPrefix, final String aBucket, final String aAccessKey,
             final String aSecretKey, final Region aRegion) {
         return new S3Pairtree(aPrefix, myVertx, aBucket, aAccessKey, aSecretKey, aRegion);
     }
@@ -241,7 +241,7 @@ public final class PairtreeFactory {
      * @param aSecretKey An AwS secret key
      * @return A Pairtree
      */
-    public PairtreeRoot getPairtree(final String aBucket, final String aBucketPath, final String aAccessKey,
+    public Pairtree getPairtree(final String aBucket, final String aBucketPath, final String aAccessKey,
             final String aSecretKey) {
         return new S3Pairtree(myVertx, aBucket, aBucketPath, aAccessKey, aSecretKey);
     }
@@ -256,7 +256,7 @@ public final class PairtreeFactory {
      * @param aRegion An AWS region in which to put the bucket
      * @return A Pairtree
      */
-    public PairtreeRoot getPairtree(final String aBucket, final String aBucketPath, final String aAccessKey,
+    public Pairtree getPairtree(final String aBucket, final String aBucketPath, final String aAccessKey,
             final String aSecretKey, final Region aRegion) {
         return new S3Pairtree(myVertx, aBucket, aBucketPath, aAccessKey, aSecretKey, aRegion);
     }
@@ -271,7 +271,7 @@ public final class PairtreeFactory {
      * @param aSecretKey An AWS secret key
      * @return A Pairtree
      */
-    public PairtreeRoot getPrefixedPairtree(final String aPrefix, final String aBucket, final String aBucketPath,
+    public Pairtree getPrefixedPairtree(final String aPrefix, final String aBucket, final String aBucketPath,
             final String aAccessKey, final String aSecretKey) {
         return new S3Pairtree(aPrefix, myVertx, aBucket, aBucketPath, aAccessKey, aSecretKey);
     }
@@ -287,7 +287,7 @@ public final class PairtreeFactory {
      * @param aRegion An AWS region in which to put the Pairtree
      * @return A Pairtree
      */
-    public PairtreeRoot getPrefixedPairtree(final String aPrefix, final String aBucket, final String aBucketPath,
+    public Pairtree getPrefixedPairtree(final String aPrefix, final String aBucket, final String aBucketPath,
             final String aAccessKey, final String aSecretKey, final Region aRegion) {
         return new S3Pairtree(aPrefix, myVertx, aBucket, aBucketPath, aAccessKey, aSecretKey, aRegion);
     }

@@ -3,7 +3,7 @@ package info.freelibrary.pairtree.s3;
 
 import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
 import static info.freelibrary.pairtree.Constants.PATH_SEP;
-import static info.freelibrary.pairtree.PairtreeRoot.PAIRTREE_ROOT;
+import static info.freelibrary.pairtree.Pairtree.PAIRTREE_ROOT;
 
 import java.io.IOException;
 import java.io.StringReader;
