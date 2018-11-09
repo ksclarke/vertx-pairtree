@@ -394,7 +394,7 @@ public class S3Pairtree extends AbstractPairtree {
 
     @Override
     public String getPath() {
-        return myBucket;
+        return myBucket + getBucketPath();
     }
 
     /**

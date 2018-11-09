@@ -16,8 +16,8 @@ import com.amazonaws.regions.Region;
 import com.amazonaws.regions.RegionUtils;
 
 import info.freelibrary.pairtree.MessageCodes;
-import info.freelibrary.pairtree.PairtreeFactory;
 import info.freelibrary.pairtree.Pairtree;
+import info.freelibrary.pairtree.PairtreeFactory;
 import info.freelibrary.util.Logger;
 import info.freelibrary.util.LoggerFactory;
 
@@ -167,7 +167,7 @@ public class S3PairtreeBucketPathIT extends AbstractS3IT {
 
     @Test
     public final void testGetPath(final TestContext aContext) {
-        aContext.assertEquals(myTestBucket, myPairtree.getPath());
+        aContext.assertEquals(myTestBucket + BUCKET_PATH, myPairtree.getPath());
     }
 
     @Test
