@@ -12,8 +12,8 @@
 
   <licenses>
     <license>
-      <name>The MIT License (Expat)</name>
-      <url>https://opensource.org/licenses/MIT</url>
+      <name>The 3-Clause BSD License</name>
+      <url>https://opensource.org/licenses/BSD-3-clause</url>
     </license>
   </licenses>
 
@@ -152,10 +152,11 @@
           <detectLinks>false</detectLinks>
           <additionalJOptions>
             <additionalJOption>-J-Dhttp.agent=maven-javadoc-plugin-${project.name}</additionalJOption>
+            <additionalJOption>-html5</additionalJOption>
           </additionalJOptions>
           <links>
-            <link>http://javadoc.io/page/io.airlift/airline/${airline.version}</link>
-            <link>https://google.github.io/guava/releases/${guava.version}/api/docs/</link>
+            <link>https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/</link>
+            <link>https://vertx.io/docs/apidocs/</link>
             <link>https://docs.oracle.com/javase/8/docs/api/</link>
           </links>
           <sourcepath>src/main/java:src/main/generated</sourcepath>
