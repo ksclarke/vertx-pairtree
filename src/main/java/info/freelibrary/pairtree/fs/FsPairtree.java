@@ -92,7 +92,7 @@ public class FsPairtree extends AbstractPairtree {
 
     @Override
     public void exists(final Handler<AsyncResult<Boolean>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".exists()"));
+        Objects.requireNonNull(aHandler, LOGGER.getMessage(MessageCodes.PT_010));
 
         final Future<Boolean> future = Future.<Boolean>future().setHandler(aHandler);
 
@@ -111,7 +111,7 @@ public class FsPairtree extends AbstractPairtree {
 
     @Override
     public void create(final Handler<AsyncResult<Void>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".create()"));
+        Objects.requireNonNull(aHandler, LOGGER.getMessage(MessageCodes.PT_010));
 
         final Future<Void> future = Future.<Void>future().setHandler(aHandler);
 
@@ -128,7 +128,7 @@ public class FsPairtree extends AbstractPairtree {
 
     @Override
     public void delete(final Handler<AsyncResult<Void>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".delete()"));
+        Objects.requireNonNull(aHandler, LOGGER.getMessage(MessageCodes.PT_010));
 
         final Future<Void> future = Future.<Void>future().setHandler(aHandler);
 
@@ -278,9 +278,10 @@ public class FsPairtree extends AbstractPairtree {
      */
     private void setVersion(final Future<Void> aFuture) {
         final StringBuilder specNote = new StringBuilder();
-        final String ptVersion = getI18n(MessageCodes.PT_011, PT_VERSION_NUM);
+        final String ptVersion = LOGGER.getMessage(MessageCodes.PT_011, PT_VERSION_NUM);
 
-        specNote.append(ptVersion).append(System.lineSeparator()).append(getI18n(MessageCodes.PT_012));
+        specNote.append(ptVersion).append(System.lineSeparator());
+        specNote.append(LOGGER.getMessage(MessageCodes.PT_012));
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(MessageCodes.PT_DEBUG_005, myPath);

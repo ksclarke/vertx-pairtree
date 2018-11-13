@@ -84,7 +84,7 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
 
     @Override
     public void exists(final Handler<AsyncResult<Boolean>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".exists()"));
+        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010));
 
         final Future<Boolean> future = Future.<Boolean>future().setHandler(aHandler);
 
@@ -114,7 +114,7 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
 
     @Override
     public void create(final Handler<AsyncResult<Void>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".create()"));
+        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010));
 
         final Future<Void> future = Future.<Void>future().setHandler(aHandler);
 
@@ -133,7 +133,7 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
 
     @Override
     public void delete(final Handler<AsyncResult<Void>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".delete()"));
+        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010));
 
         final Future<Void> future = Future.<Void>future().setHandler(aHandler);
 
@@ -227,7 +227,7 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
 
     @Override
     public void put(final String aPath, final Buffer aBuffer, final Handler<AsyncResult<Void>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".put()"));
+        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010));
 
         final Future<Void> future = Future.<Void>future().setHandler(aHandler);
 
@@ -253,7 +253,7 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
 
     @Override
     public void get(final String aPath, final Handler<AsyncResult<Buffer>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".get()"));
+        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010));
 
         final Future<Buffer> future = Future.<Buffer>future().setHandler(aHandler);
 
@@ -275,7 +275,7 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
 
     @Override
     public void find(final String aPath, final Handler<AsyncResult<Boolean>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".find()"));
+        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010));
 
         final Future<Boolean> future = Future.<Boolean>future().setHandler(aHandler);
 

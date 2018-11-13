@@ -1,8 +1,6 @@
 
 package info.freelibrary.pairtree;
 
-import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
-
 import java.io.File;
 import java.util.Objects;
 import java.util.UUID;
@@ -14,7 +12,6 @@ import org.junit.runner.RunWith;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.RegionUtils;
 
-import info.freelibrary.util.I18nObject;
 import info.freelibrary.util.Logger;
 
 import io.vertx.core.AsyncResult;
@@ -28,7 +25,7 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
  * An abstract Pairtree test object.
  */
 @RunWith(VertxUnitRunner.class)
-public abstract class AbstractPairtreeTest extends I18nObject {
+public abstract class AbstractPairtreeTest {
 
     /** The name of a test object */
     protected static final String TEST_OBJECT_NAME = UUID.randomUUID().toString();
@@ -38,13 +35,6 @@ public abstract class AbstractPairtreeTest extends I18nObject {
 
     /** The connection to the Vertx framework */
     protected Vertx myVertx;
-
-    /**
-     * Creates an abstract Pairtree test.
-     */
-    public AbstractPairtreeTest() {
-        super(BUNDLE_NAME);
-    }
 
     /**
      * Setup for the tests.
@@ -65,8 +55,6 @@ public abstract class AbstractPairtreeTest extends I18nObject {
     @After
     public void tearDown(final TestContext aContext) {
         LOGGER.debug("Shutting down Vert.x");
-        // FIXME: This causes problems... Why?
-        // myVertx.close(aContext.asyncAssertSuccess());
     }
 
     /**
@@ -87,8 +75,7 @@ public abstract class AbstractPairtreeTest extends I18nObject {
      */
     protected void createTestFsPairtreeObject(final Handler<AsyncResult<PairtreeObject>> aHandler, final File aFile,
             final String aID) throws PairtreeException {
-        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(),
-                ".createTestPairtreeObject()"));
+        Objects.requireNonNull(aHandler, LOGGER.getMessage(MessageCodes.PT_010));
 
         final Pairtree root = new PairtreeFactory(myVertx).getPairtree(aFile);
         final Future<PairtreeObject> future = Future.<PairtreeObject>future().setHandler(aHandler);
@@ -122,8 +109,7 @@ public abstract class AbstractPairtreeTest extends I18nObject {
     protected void createTestS3PairtreeObject(final Handler<AsyncResult<PairtreeObject>> aHandler,
             final String aBucket, final String aAccessKey, final String aSecretKey, final String aEndpoint,
             final String aID) throws PairtreeException {
-        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(),
-                ".createTestPairtreeObject()"));
+        Objects.requireNonNull(aHandler, LOGGER.getMessage(MessageCodes.PT_010));
 
         final Region region = RegionUtils.getRegion(aEndpoint);
         final Pairtree root = new PairtreeFactory(myVertx).getPairtree(aBucket, aAccessKey, aSecretKey, region);

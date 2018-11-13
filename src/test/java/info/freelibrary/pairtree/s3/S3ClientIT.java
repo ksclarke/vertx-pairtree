@@ -79,7 +79,9 @@ public class S3ClientIT extends AbstractS3IT {
                 final int statusCode = response.statusCode();
 
                 if (statusCode != 200) {
-                    aContext.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, s3Key, response.statusMessage()));
+                    final String statusMsg = response.statusMessage();
+
+                    aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_045, statusCode, s3Key, statusMsg));
                 } else {
                     final String contentLength = response.getHeader(HTTP.CONTENT_LENGTH);
 
@@ -133,7 +135,7 @@ public class S3ClientIT extends AbstractS3IT {
                     final String keyValues = StringUtils.toString(keys, '|');
                     final String message = response.statusMessage();
 
-                    aContext.fail(getI18n(PT_DEBUG_045, statusCode, keyValues, message));
+                    aContext.fail(LOGGER.getMessage(PT_DEBUG_045, statusCode, keyValues, message));
                     async.complete();
                 }
             });
@@ -180,7 +182,7 @@ public class S3ClientIT extends AbstractS3IT {
                     final String keyValues = StringUtils.toString(keys, '|');
                     final String message = response.statusMessage();
 
-                    aContext.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, keyValues, message));
+                    aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_045, statusCode, keyValues, message));
                     async.complete();
                 }
             });
@@ -201,7 +203,9 @@ public class S3ClientIT extends AbstractS3IT {
                 final int statusCode = response.statusCode();
 
                 if (statusCode != 200) {
-                    aContext.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, s3Key, response.statusMessage()));
+                    final String statusMsg = response.statusMessage();
+
+                    aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_045, statusCode, s3Key, statusMsg));
                     async.complete();
                 } else {
                     response.bodyHandler(buffer -> {
@@ -225,7 +229,9 @@ public class S3ClientIT extends AbstractS3IT {
             final int statusCode = response.statusCode();
 
             if (statusCode != 200) {
-                aContext.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, s3Key, response.statusMessage()));
+                final String statusMsg = response.statusMessage();
+
+                aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_045, statusCode, s3Key, statusMsg));
             }
 
             async.complete();
@@ -241,11 +247,13 @@ public class S3ClientIT extends AbstractS3IT {
             if (openResult.succeeded()) {
                 myClient.put(myTestBucket, s3Key, openResult.result(), response -> {
                     final int statusCode = response.statusCode();
-                    final String message;
+                    final String statusMessage;
+                    final String logMessage;
 
                     if (statusCode != 200) {
-                        message = getI18n(MessageCodes.PT_DEBUG_045, statusCode, s3Key, response.statusMessage());
-                        aContext.fail(message);
+                        statusMessage = response.statusMessage();
+                        logMessage = LOGGER.getMessage(MessageCodes.PT_DEBUG_045, statusCode, s3Key, statusMessage);
+                        aContext.fail(logMessage);
                     }
 
                     async.complete();
@@ -269,9 +277,11 @@ public class S3ClientIT extends AbstractS3IT {
         if (createResource(s3Key, aContext, async)) {
             myClient.delete(myTestBucket, s3Key, response -> {
                 final int statusCode = response.statusCode();
+                final String statusMessage;
 
                 if (statusCode != 204) {
-                    aContext.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, s3Key, response.statusMessage()));
+                    statusMessage = response.statusMessage();
+                    aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_045, statusCode, s3Key, statusMessage));
                 }
 
                 async.complete();
@@ -290,9 +300,11 @@ public class S3ClientIT extends AbstractS3IT {
 
         final S3ClientRequest request = myClient.createPutRequest(myTestBucket, s3Key, response -> {
             final int statusCode = response.statusCode();
+            final String statusMessage;
 
             if (statusCode != 200) {
-                aContext.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, s3Key, response.statusMessage()));
+                statusMessage = response.statusMessage();
+                aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_045, statusCode, s3Key, statusMessage));
             }
 
             async.complete();
@@ -313,9 +325,11 @@ public class S3ClientIT extends AbstractS3IT {
         if (createResource(s3Key, aContext, async)) {
             final S3ClientRequest request = myClient.createGetRequest(myTestBucket, s3Key, response -> {
                 final int statusCode = response.statusCode();
+                final String statusMessage;
 
-                if (statusCode != 200) {
-                    aContext.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, s3Key, response.statusMessage()));
+                if (statusCode != HTTP.OK) {
+                    statusMessage = response.statusMessage();
+                    aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_045, statusCode, s3Key, statusMessage));
                     async.complete();
                 } else {
                     response.bodyHandler(buffer -> {
@@ -346,9 +360,11 @@ public class S3ClientIT extends AbstractS3IT {
         if (createResource(s3Key, aContext, async)) {
             final S3ClientRequest request = myClient.createDeleteRequest(myTestBucket, s3Key, response -> {
                 final int statusCode = response.statusCode();
+                final String statusMessage;
 
                 if (statusCode != 204) {
-                    aContext.fail(getI18n(PT_DEBUG_045, statusCode, s3Key, response.statusMessage()));
+                    statusMessage = response.statusMessage();
+                    aContext.fail(LOGGER.getMessage(PT_DEBUG_045, statusCode, s3Key, statusMessage));
                 }
 
                 async.complete();
@@ -373,8 +389,7 @@ public class S3ClientIT extends AbstractS3IT {
                 myS3Client.putObject(myTestBucket, resource, TEST_FILE);
             } catch (final AmazonClientException details) {
                 LOGGER.error(details.getMessage(), details);
-
-                aContext.fail(getI18n(PT_DEBUG_046, resource));
+                aContext.fail(LOGGER.getMessage(PT_DEBUG_046, resource));
                 aAsync.complete();
 
                 return false;

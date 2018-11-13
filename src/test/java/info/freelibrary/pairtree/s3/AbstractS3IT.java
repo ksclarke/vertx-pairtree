@@ -96,7 +96,7 @@ public abstract class AbstractS3IT extends AbstractPairtreeTest {
         super.setUp(aContext);
 
         if (mySecretKey.equals("YOUR_SECRET_KEY") || myAccessKey.equals("YOUR_ACCESS_KEY")) {
-            aContext.fail(getI18n(MessageCodes.PT_DEBUG_049));
+            aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_049));
         }
 
         // Initialize the S3 client we use for test set up and tear down

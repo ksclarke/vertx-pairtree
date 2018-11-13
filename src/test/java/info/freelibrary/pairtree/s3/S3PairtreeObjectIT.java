@@ -16,9 +16,9 @@ import com.amazonaws.regions.Region;
 import com.amazonaws.regions.RegionUtils;
 
 import info.freelibrary.pairtree.MessageCodes;
+import info.freelibrary.pairtree.Pairtree;
 import info.freelibrary.pairtree.PairtreeException;
 import info.freelibrary.pairtree.PairtreeFactory;
-import info.freelibrary.pairtree.Pairtree;
 import info.freelibrary.pairtree.PairtreeUtils;
 import info.freelibrary.util.Logger;
 import info.freelibrary.util.LoggerFactory;
@@ -115,7 +115,7 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
                 objectPath.add(PAIRTREE_ROOT).add(ptPath).add("ark+=99999=88888888/README.txt");
 
                 if (!myS3Client.doesObjectExist(myTestBucket, objectPath.toString())) {
-                    aContext.fail(getI18n(MessageCodes.PT_DEBUG_050));
+                    aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_050));
                 }
             } else {
                 aContext.fail(result.cause());
@@ -193,7 +193,7 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
         myPairtree.getObject(myUID).put("ark+=99999=99999999.gif", Buffer.buffer(myResource), result -> {
             if (result.succeeded()) {
                 if (!myS3Client.doesObjectExist(myTestBucket, myS3Path + "/ark+=99999=99999999.gif")) {
-                    aContext.fail(getI18n(MessageCodes.PT_DEBUG_051));
+                    aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_051));
                 }
             } else {
                 aContext.fail(result.cause());

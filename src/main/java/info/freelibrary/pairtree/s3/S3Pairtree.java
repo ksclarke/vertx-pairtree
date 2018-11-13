@@ -252,7 +252,7 @@ public class S3Pairtree extends AbstractPairtree {
 
     @Override
     public void exists(final Handler<AsyncResult<Boolean>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".exists()"));
+        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010));
 
         final Future<Boolean> future = Future.<Boolean>future().setHandler(aHandler);
 
@@ -291,7 +291,7 @@ public class S3Pairtree extends AbstractPairtree {
 
     @Override
     public void create(final Handler<AsyncResult<Void>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".create()"));
+        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010));
 
         final Future<Void> future = Future.<Void>future().setHandler(aHandler);
         final StringBuilder specNote = new StringBuilder();
@@ -328,7 +328,7 @@ public class S3Pairtree extends AbstractPairtree {
 
     @Override
     public void delete(final Handler<AsyncResult<Void>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".delete()"));
+        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010));
 
         final Future<Void> future = Future.<Void>future().setHandler(aHandler);
 

@@ -13,7 +13,7 @@
   <entry key="PT-007">A Pairtree base path may not be null</entry>
   <entry key="PT-008">Runtime environment does not support UTF-8 charset</entry>
   <entry key="PT-009">Invalid Pairtree implementation type supplied: {}</entry>
-  <entry key="PT-010">A null handler was passed to the {}{} method</entry>
+  <entry key="PT-010">A null handler was passed into the method</entry>
   <entry key="PT-011">This directory conforms to Pairtree Version {}. Updated spec:</entry>
   <entry key="PT-012">https://tools.ietf.org/id/draft-kunze-pairtree-01.txt</entry>
   <entry key="PT-013">Didn't find expected Pairtree prefix file: {}</entry>
