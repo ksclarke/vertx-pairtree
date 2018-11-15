@@ -421,4 +421,13 @@ public class S3Pairtree extends AbstractPairtree {
         return "".equals(bucketPath) ? getVersionFileName() : bucketPath + PATH_SEP + getVersionFileName();
     }
 
+    /**
+     * Returns the S3 client that the Pairtree uses.
+     *
+     * @return The S3 client that the Pairtree uses
+     */
+    public S3Client getS3Client() {
+        return myS3Client;
+    }
+
 }
