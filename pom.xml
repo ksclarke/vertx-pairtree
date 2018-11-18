@@ -48,12 +48,14 @@
     <vertx.pairtree.region/>
 
     <!-- Dependency versions -->
-    <vertx.hot.plugin.version>2.1.0</vertx.hot.plugin.version>
     <freelib.utils.version>0.8.9</freelib.utils.version>
-    <codacy.plugin.version>1.0.2</codacy.plugin.version>
     <aws.sdk.version>1.11.428</aws.sdk.version>
     <vertx.version>3.5.4</vertx.version>
     <jackson.version>2.9.7</jackson.version>
+
+    <!-- Plugin versions -->
+    <vertx.hot.plugin.version>2.1.0</vertx.hot.plugin.version>
+    <codacy.plugin.version>1.0.2</codacy.plugin.version>
   </properties>
 
   <dependencies>

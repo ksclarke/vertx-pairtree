@@ -45,9 +45,7 @@ Lastly, if you don't want to build it yourself, the library can be downloaded fr
 
 ### Acknowledgements
 
-This project incorporates code from the [SuperS3t](https://github.com/spartango/SuperS3t/) project. It's published under the [MIT License](src/licenses/LICENSE-SuperS3t.txt).
-
-This project also incorporates code from an early version of the Library of Congress' [Pairtree](https://github.com/LibraryOfCongress/pairtree) implementation. It was released into the [public domain](src/licenses/LICENSE-LoC.txt) because it was developed by a U.S. government agency.
+In addition to all the dependencies listed in the pom.xml file, this project incorporates a [Pairtree  implementation](https://github.com/LibraryOfCongress/pairtree) from the Library of Congress and a Vert.x S3Client from the [SuperS3t](https://github.com/spartango/SuperS3t/) project. The licenses for their use are included in the headers of their Java files. Both have been modified from their original versions.
 
 ### Contact
 
