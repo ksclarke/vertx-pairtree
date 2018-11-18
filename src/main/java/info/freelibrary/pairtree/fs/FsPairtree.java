@@ -279,9 +279,9 @@ public class FsPairtree extends AbstractPairtree {
     private void setVersion(final Future<Void> aFuture) {
         final StringBuilder specNote = new StringBuilder();
         final String ptVersion = LOGGER.getMessage(MessageCodes.PT_011, PT_VERSION_NUM);
+        final String urlString = LOGGER.getMessage(MessageCodes.PT_012);
 
-        specNote.append(ptVersion).append(System.lineSeparator());
-        specNote.append(LOGGER.getMessage(MessageCodes.PT_012));
+        specNote.append(ptVersion).append(System.lineSeparator()).append(urlString);
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(MessageCodes.PT_DEBUG_005, myPath);

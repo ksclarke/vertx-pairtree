@@ -153,7 +153,7 @@ public final class PairtreeUtils {
             start = end;
         }
 
-        return concat(shorties.toArray(new String[shorties.size()]));
+        return concat(shorties.toArray(new String[0]));
     }
 
     /**
