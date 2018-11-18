@@ -45,9 +45,9 @@ Lastly, if you don't want to build it yourself, the library can be downloaded fr
 
 ### Acknowledgements
 
-This project incorporates code from the [SuperS3t](https://github.com/spartango/SuperS3t/) project. It's published under the [MIT License](licenses/LICENSE-SuperS3t.txt).
+This project incorporates code from the [SuperS3t](https://github.com/spartango/SuperS3t/) project. It's published under the [MIT License](src/licenses/LICENSE-SuperS3t.txt).
 
-This project also incorporates code from an early version of the Library of Congress' [Pairtree](https://github.com/LibraryOfCongress/pairtree) implementation. It was released into the [public domain](licenses/LICENSE-LoC.txt) because it was developed by a U.S. government agency.
+This project also incorporates code from an early version of the Library of Congress' [Pairtree](https://github.com/LibraryOfCongress/pairtree) implementation. It was released into the [public domain](src/licenses/LICENSE-LoC.txt) because it was developed by a U.S. government agency.
 
 ### Contact
 
