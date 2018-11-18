@@ -5,15 +5,15 @@
 
   <artifactId>vertx-pairtree</artifactId>
   <packaging>jar</packaging>
-  <version>0.0.4-SNAPSHOT</version>
+  <version>1.0.0-SNAPSHOT</version>
   <name>Vert.x Pairtree</name>
   <description>A Pairtree library for Vert.x</description>
   <url>http://projects.freelibrary.info/vertx-pairtree</url>
 
   <licenses>
     <license>
-      <name>The MIT License (Expat)</name>
-      <url>https://opensource.org/licenses/MIT</url>
+      <name>The 3-Clause BSD License</name>
+      <url>https://opensource.org/licenses/BSD-3-clause</url>
     </license>
   </licenses>
 
@@ -49,11 +49,11 @@
 
     <!-- Dependency versions -->
     <vertx.hot.plugin.version>2.1.0</vertx.hot.plugin.version>
-    <freelib.utils.version>0.8.8</freelib.utils.version>
+    <freelib.utils.version>0.8.9</freelib.utils.version>
     <codacy.plugin.version>1.0.2</codacy.plugin.version>
-    <aws.sdk.version>1.11.22</aws.sdk.version>
-    <vertx.version>3.5.2</vertx.version>
-    <jackson.version>2.9.6</jackson.version>
+    <aws.sdk.version>1.11.428</aws.sdk.version>
+    <vertx.version>3.5.4</vertx.version>
+    <jackson.version>2.9.7</jackson.version>
   </properties>
 
   <dependencies>
@@ -73,6 +73,11 @@
       <artifactId>vertx-core</artifactId>
       <version>${vertx.version}</version>
     </dependency>
+    <dependency>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>aws-java-sdk-s3</artifactId>
+      <version>${aws.sdk.version}</version>
+    </dependency>
     <!-- Below dependencies are only used for testing -->
     <dependency>
       <groupId>ch.qos.logback</groupId>
@@ -88,12 +93,6 @@
       <groupId>io.vertx</groupId>
       <artifactId>vertx-unit</artifactId>
       <version>${vertx.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.amazonaws</groupId>
-      <artifactId>aws-java-sdk-s3</artifactId>
-      <version>${aws.sdk.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -153,10 +152,11 @@
           <detectLinks>false</detectLinks>
           <additionalJOptions>
             <additionalJOption>-J-Dhttp.agent=maven-javadoc-plugin-${project.name}</additionalJOption>
+            <additionalJOption>-html5</additionalJOption>
           </additionalJOptions>
           <links>
-            <link>http://javadoc.io/page/io.airlift/airline/${airline.version}</link>
-            <link>https://google.github.io/guava/releases/${guava.version}/api/docs/</link>
+            <link>https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/</link>
+            <link>https://vertx.io/docs/apidocs/</link>
             <link>https://docs.oracle.com/javase/8/docs/api/</link>
           </links>
           <sourcepath>src/main/java:src/main/generated</sourcepath>
@@ -273,7 +273,7 @@
   <parent>
     <artifactId>freelib-parent</artifactId>
     <groupId>info.freelibrary</groupId>
-    <version>0.2.9</version>
+    <version>0.3.2</version>
   </parent>
 
 </project>

@@ -1,12 +1,10 @@
 
 package info.freelibrary.pairtree.fs;
 
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_040;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_041;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_042;
 import static java.io.File.separatorChar;
 import static java.util.UUID.randomUUID;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -14,8 +12,10 @@ import org.junit.After;
 import org.junit.Before;
 
 import info.freelibrary.pairtree.AbstractPairtreeTest;
+import info.freelibrary.pairtree.MessageCodes;
+import info.freelibrary.pairtree.Pairtree;
+import info.freelibrary.pairtree.PairtreeException;
 import info.freelibrary.pairtree.PairtreeFactory;
-import info.freelibrary.pairtree.PairtreeRoot;
 
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.file.FileSystem;
@@ -23,16 +23,18 @@ import io.vertx.ext.unit.TestContext;
 
 /**
  * Tests for the <code>AbstractFsPairtree</code>.
- *
- * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
 public abstract class AbstractFsPairtreeTest extends AbstractPairtreeTest {
 
     /** The Pairtree being tested */
-    protected PairtreeRoot myPairtree;
+    protected Pairtree myPairtree;
 
     /** A connection to the file system */
     protected FileSystem myFileSystem;
+
+    protected AbstractFsPairtreeTest() {
+        super();
+    }
 
     /**
      * Setup for the tests.
@@ -47,7 +49,12 @@ public abstract class AbstractFsPairtreeTest extends AbstractPairtreeTest {
         final String path = System.getProperty("java.io.tmpdir") + separatorChar + randomUUID();
 
         myFileSystem = myVertx.fileSystem();
-        myPairtree = PairtreeFactory.getFactory(myVertx).getPairtree(path);
+
+        try {
+            myPairtree = new PairtreeFactory(myVertx).getPairtree(new File(path));
+        } catch (final PairtreeException details) {
+            throw new RuntimeException(details);
+        }
     }
 
     /**
@@ -72,7 +79,7 @@ public abstract class AbstractFsPairtreeTest extends AbstractPairtreeTest {
      */
     protected void createDir(final String aDirPath) {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(getI18n(PT_DEBUG_040, aDirPath));
+            LOGGER.debug(LOGGER.getMessage(MessageCodes.PT_DEBUG_040, aDirPath));
         }
 
         myFileSystem.mkdirsBlocking(aDirPath);
@@ -88,7 +95,7 @@ public abstract class AbstractFsPairtreeTest extends AbstractPairtreeTest {
         final String file = path.toString();
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(getI18n(PT_DEBUG_041, file));
+            LOGGER.debug(LOGGER.getMessage(MessageCodes.PT_DEBUG_041, file));
         }
 
         createDir(path.getParent().toString());
@@ -105,7 +112,7 @@ public abstract class AbstractFsPairtreeTest extends AbstractPairtreeTest {
         final String file = path.toString();
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(getI18n(PT_DEBUG_042, file, aContentValue));
+            LOGGER.debug(LOGGER.getMessage(MessageCodes.PT_DEBUG_042, file, aContentValue));
         }
 
         createDir(path.getParent().toString());

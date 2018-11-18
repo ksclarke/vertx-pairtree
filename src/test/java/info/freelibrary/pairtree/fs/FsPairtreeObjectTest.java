@@ -1,23 +1,15 @@
 
 package info.freelibrary.pairtree.fs;
 
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_011;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_019;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_020;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_024;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_028;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_030;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_037;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_038;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_042;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_044;
-
+import java.io.File;
 import java.nio.file.Paths;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import info.freelibrary.pairtree.PairtreeFactory.PairtreeImpl;
+import info.freelibrary.pairtree.Constants;
+import info.freelibrary.pairtree.MessageCodes;
+import info.freelibrary.pairtree.PairtreeException;
 import info.freelibrary.pairtree.PairtreeObject;
 import info.freelibrary.util.Logger;
 import info.freelibrary.util.LoggerFactory;
@@ -29,8 +21,6 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 
 /**
  * Tests for the <code>FsPairtreeObject</code>.
- *
- * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
 @RunWith(VertxUnitRunner.class)
 public class FsPairtreeObjectTest extends AbstractFsPairtreeTest {
@@ -52,7 +42,7 @@ public class FsPairtreeObjectTest extends AbstractFsPairtreeTest {
                 ptObj.create(createPtObjResult -> {
                     if (createPtObjResult.succeeded()) {
                         if (!myFileSystem.existsBlocking(ptObj.getPath())) {
-                            aContext.fail(getI18n(PT_DEBUG_028, ptObj));
+                            aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_028, ptObj));
                         }
                     } else {
                         aContext.fail(createPtObjResult.cause());
@@ -80,10 +70,10 @@ public class FsPairtreeObjectTest extends AbstractFsPairtreeTest {
                 ptObj.exists(existsResult -> {
                     if (existsResult.succeeded()) {
                         if (existsResult.result()) {
-                            aContext.fail(getI18n(PT_DEBUG_019, ptObj));
+                            aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_019, ptObj));
                         }
                     } else {
-                        aContext.fail(getI18n(PT_DEBUG_030, ptObj));
+                        aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_030, ptObj));
                     }
 
                     async.complete();
@@ -96,20 +86,20 @@ public class FsPairtreeObjectTest extends AbstractFsPairtreeTest {
     }
 
     @Test
-    public void testExists(final TestContext aContext) {
+    public void testExists(final TestContext aContext) throws PairtreeException {
         final Async async = aContext.async();
 
-        createTestPairtreeObject(PairtreeImpl.FileSystem, createResult -> {
+        createTestFsPairtreeObject(createResult -> {
             if (createResult.succeeded()) {
                 final PairtreeObject ptObj = createResult.result();
 
                 ptObj.exists(existsResult -> {
                     if (existsResult.succeeded()) {
                         if (!existsResult.result()) {
-                            aContext.fail(getI18n(PT_DEBUG_020, ptObj));
+                            aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_020, ptObj));
                         }
                     } else {
-                        aContext.fail(getI18n(PT_DEBUG_030, ptObj));
+                        aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_030, ptObj));
                     }
 
                     async.complete();
@@ -118,24 +108,24 @@ public class FsPairtreeObjectTest extends AbstractFsPairtreeTest {
                 aContext.fail(createResult.cause());
                 async.complete();
             }
-        }, myPairtree.getPath(), TEST_OBJECT_NAME);
+        }, new File(myPairtree.getPath()), TEST_OBJECT_NAME);
     }
 
     @Test
-    public void testDelete(final TestContext aContext) {
+    public void testDelete(final TestContext aContext) throws PairtreeException {
         final Async async = aContext.async();
 
-        createTestPairtreeObject(PairtreeImpl.FileSystem, createResult -> {
+        createTestFsPairtreeObject(createResult -> {
             if (createResult.succeeded()) {
                 final PairtreeObject ptObj = createResult.result();
 
                 ptObj.delete(deleteResult -> {
                     if (deleteResult.succeeded()) {
                         if (myFileSystem.existsBlocking(ptObj.getPath())) {
-                            aContext.fail(getI18n(PT_DEBUG_024, ptObj));
+                            aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_024, ptObj));
                         }
                     } else {
-                        aContext.fail(getI18n(PT_DEBUG_011, ptObj));
+                        aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_011, ptObj));
                     }
 
                     async.complete();
@@ -144,18 +134,18 @@ public class FsPairtreeObjectTest extends AbstractFsPairtreeTest {
                 aContext.fail(createResult.cause());
                 async.complete();
             }
-        }, myPairtree.getPath(), TEST_OBJECT_NAME);
+        }, new File(myPairtree.getPath()), TEST_OBJECT_NAME);
     }
 
     @Test
-    public void testNullHandlerExists(final TestContext aContext) {
+    public void testNullHandlerExists(final TestContext aContext) throws PairtreeException {
         final Async async = aContext.async();
 
-        createTestPairtreeObject(PairtreeImpl.FileSystem, result -> {
+        createTestFsPairtreeObject(result -> {
             if (result.succeeded()) {
                 try {
                     result.result().exists(null);
-                    aContext.fail(PT_DEBUG_044);
+                    aContext.fail(MessageCodes.PT_DEBUG_044);
                 } catch (final NullPointerException details) {
                     // Expected
                 }
@@ -164,18 +154,18 @@ public class FsPairtreeObjectTest extends AbstractFsPairtreeTest {
             }
 
             async.complete();
-        }, myPairtree.getPath(), TEST_OBJECT_NAME);
+        }, new File(myPairtree.getPath()), TEST_OBJECT_NAME);
     }
 
     @Test
-    public void testNullHandlerDelete(final TestContext aContext) {
+    public void testNullHandlerDelete(final TestContext aContext) throws PairtreeException {
         final Async async = aContext.async();
 
-        createTestPairtreeObject(PairtreeImpl.FileSystem, result -> {
+        createTestFsPairtreeObject(result -> {
             if (result.succeeded()) {
                 try {
                     result.result().delete(null);
-                    aContext.fail(PT_DEBUG_044);
+                    aContext.fail(MessageCodes.PT_DEBUG_044);
                 } catch (final NullPointerException details) {
                     // Expected
                 }
@@ -184,18 +174,18 @@ public class FsPairtreeObjectTest extends AbstractFsPairtreeTest {
             }
 
             async.complete();
-        }, myPairtree.getPath(), TEST_OBJECT_NAME);
+        }, new File(myPairtree.getPath()), TEST_OBJECT_NAME);
     }
 
     @Test
-    public void testNullHandlerCreate(final TestContext aContext) {
+    public void testNullHandlerCreate(final TestContext aContext) throws PairtreeException {
         final Async async = aContext.async();
 
-        createTestPairtreeObject(PairtreeImpl.FileSystem, result -> {
+        createTestFsPairtreeObject(result -> {
             if (result.succeeded()) {
                 try {
                     result.result().create(null);
-                    aContext.fail(PT_DEBUG_044);
+                    aContext.fail(MessageCodes.PT_DEBUG_044);
                 } catch (final NullPointerException details) {
                     // Expected
                 }
@@ -204,14 +194,14 @@ public class FsPairtreeObjectTest extends AbstractFsPairtreeTest {
             }
 
             async.complete();
-        }, myPairtree.getPath(), TEST_OBJECT_NAME);
+        }, new File(myPairtree.getPath()), TEST_OBJECT_NAME);
     }
 
     @Test
-    public void testGet(final TestContext aContext) {
+    public void testGet(final TestContext aContext) throws PairtreeException {
         final Async async = aContext.async();
 
-        createTestPairtreeObject(PairtreeImpl.FileSystem, createResult -> {
+        createTestFsPairtreeObject(createResult -> {
             if (createResult.succeeded()) {
                 final PairtreeObject ptObj = createResult.result();
 
@@ -220,7 +210,7 @@ public class FsPairtreeObjectTest extends AbstractFsPairtreeTest {
                 ptObj.get(RESOURCE_PATH, getResult -> {
                     if (getResult.succeeded()) {
                         if (!getResult.result().toString().equals(RESOURCE_CONTENT)) {
-                            aContext.fail(getI18n(PT_DEBUG_042, RESOURCE_CONTENT));
+                            aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_042, RESOURCE_CONTENT));
                         }
                     } else {
                         aContext.fail(getResult.cause());
@@ -232,14 +222,14 @@ public class FsPairtreeObjectTest extends AbstractFsPairtreeTest {
                 aContext.fail(createResult.cause());
                 async.complete();
             }
-        }, myPairtree.getPath(), TEST_OBJECT_NAME);
+        }, new File(myPairtree.getPath()), TEST_OBJECT_NAME);
     }
 
     @Test
-    public void testPut(final TestContext aContext) {
+    public void testPut(final TestContext aContext) throws PairtreeException {
         final Async async = aContext.async();
 
-        createTestPairtreeObject(PairtreeImpl.FileSystem, createResult -> {
+        createTestFsPairtreeObject(createResult -> {
             if (createResult.succeeded()) {
                 final PairtreeObject ptObj = createResult.result();
                 final Buffer buffer = Buffer.buffer(RESOURCE_CONTENT);
@@ -254,10 +244,10 @@ public class FsPairtreeObjectTest extends AbstractFsPairtreeTest {
                             final Buffer fileBuffer = myFileSystem.readFileBlocking(path);
 
                             if (!fileBuffer.toString().equals(RESOURCE_CONTENT)) {
-                                aContext.fail(getI18n(PT_DEBUG_038, path));
+                                aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_038, path));
                             }
                         } else {
-                            aContext.fail(getI18n(PT_DEBUG_037, path));
+                            aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_037, path));
                         }
                     } else {
                         aContext.fail(putResult.cause());
@@ -269,11 +259,11 @@ public class FsPairtreeObjectTest extends AbstractFsPairtreeTest {
                 aContext.fail(createResult.cause());
                 async.complete();
             }
-        }, myPairtree.getPath(), TEST_OBJECT_NAME);
+        }, new File(myPairtree.getPath()), TEST_OBJECT_NAME);
     }
 
     @Override
     protected Logger getLogger() {
-        return LoggerFactory.getLogger(FsPairtreeObjectTest.class);
+        return LoggerFactory.getLogger(FsPairtreeObjectTest.class, Constants.BUNDLE_NAME);
     }
 }

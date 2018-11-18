@@ -10,10 +10,8 @@ import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * A SAX handler for S3's ObjectList response.
- *
- * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
-public class ObjectListHandler extends DefaultHandler {
+class ObjectListHandler extends DefaultHandler {
 
     /** The element name for an S3 key */
     private static final String KEY = "Key";

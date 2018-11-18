@@ -12,8 +12,13 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 
 import com.amazonaws.AmazonClientException;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.RegionUtils;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 
@@ -27,17 +32,12 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 
 /**
  * Support for S3 test interactions.
- *
- * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
 @RunWith(VertxUnitRunner.class)
 public abstract class AbstractS3IT extends AbstractPairtreeTest {
 
     /** The test file used in the tests */
     protected static final File TEST_FILE = new File("src/test/resources/green.gif");
-
-    /** The default endpoint for S3 connections */
-    private static final String DEFAULT_ENDPOINT = "s3.amazonaws.com";
 
     /** AWS access key */
     protected static String myAccessKey;
@@ -49,13 +49,16 @@ public abstract class AbstractS3IT extends AbstractPairtreeTest {
     protected static String myTestBucket;
 
     /** AWS region in which S3 bucket lives */
-    protected static String myRegion;
+    protected static String myRegionName;
+
+    /** S3 endpoint for S3 bucket */
+    protected static String myEndpoint;
 
     /** Byte array for resource contents */
     protected static byte[] myResource;
 
     /** The S3 client used to setup some of the tests */
-    protected AmazonS3Client myS3Client;
+    protected AmazonS3 myS3Client;
 
     /**
      * Static test setup.
@@ -64,13 +67,24 @@ public abstract class AbstractS3IT extends AbstractPairtreeTest {
      */
     @BeforeClass
     public static void setUpBeforeClass(final TestContext aContext) {
+        final Region region;
+
         try {
             myResource = IOUtils.readBytes(new FileInputStream(TEST_FILE));
-
             myTestBucket = System.getProperty("vertx.pairtree.bucket", "vertx-pairtree-tests");
             myAccessKey = System.getProperty("vertx.pairtree.access_key", "YOUR_ACCESS_KEY");
             mySecretKey = System.getProperty("vertx.pairtree.secret_key", "YOUR_SECRET_KEY");
-            myRegion = StringUtils.trimTo(System.getProperty("vertx.pairtree.region"), DEFAULT_ENDPOINT);
+            myEndpoint = StringUtils.trimToNull(System.getProperty("vertx.pairtree.region"));
+
+            // We use "us-east-1" as the default region
+            if (myEndpoint != null) {
+                region = RegionUtils.getRegion(myEndpoint);
+            } else {
+                region = RegionUtils.getRegion("us-east-1");
+            }
+
+            myRegionName = region.getName();
+            myEndpoint = "s3." + myRegionName + '.' + region.getDomain();
         } catch (final IOException details) {
             aContext.fail(details.getMessage());
         }
@@ -82,12 +96,15 @@ public abstract class AbstractS3IT extends AbstractPairtreeTest {
         super.setUp(aContext);
 
         if (mySecretKey.equals("YOUR_SECRET_KEY") || myAccessKey.equals("YOUR_ACCESS_KEY")) {
-            aContext.fail(getI18n(MessageCodes.PT_DEBUG_049));
+            aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_049));
         }
 
         // Initialize the S3 client we use for test set up and tear down
-        myS3Client = new AmazonS3Client(new BasicAWSCredentials(myAccessKey, mySecretKey));
-        myS3Client.setEndpoint(myRegion);
+        final AmazonS3ClientBuilder builder = AmazonS3ClientBuilder.standard().withCredentials(
+                new AWSStaticCredentialsProvider(new BasicAWSCredentials(myAccessKey, mySecretKey)));
+
+        builder.setEndpointConfiguration(new EndpointConfiguration(myEndpoint, myRegionName));
+        myS3Client = builder.build();
     }
 
     /**
@@ -105,8 +122,10 @@ public abstract class AbstractS3IT extends AbstractPairtreeTest {
         final Iterator<S3ObjectSummary> iterator = listing.getObjectSummaries().iterator();
 
         while (iterator.hasNext()) {
+            final String key = iterator.next().getKey();
+
             try {
-                myS3Client.deleteObject(myTestBucket, iterator.next().getKey());
+                myS3Client.deleteObject(myTestBucket, key);
             } catch (final AmazonClientException details) {
                 aContext.fail(details);
             }

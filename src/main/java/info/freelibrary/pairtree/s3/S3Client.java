@@ -16,12 +16,9 @@ import io.vertx.core.http.HttpServerFileUpload;
 
 /**
  * An S3 client implementation used by the S3Pairtree object.
- *
- * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
 public class S3Client {
 
-    // TODO: test for a bad endpoint, for example: s3-us-east-1.amazonaws.com
     /** Default S3 endpoint */
     public static final String DEFAULT_ENDPOINT = "s3.amazonaws.com";
 
@@ -67,7 +64,6 @@ public class S3Client {
      */
     public S3Client(final Vertx aVertx, final String aAccessKey, final String aSecretKey, final String aEndpoint) {
         this(aVertx, aAccessKey, aSecretKey, null, new HttpClientOptions().setDefaultHost(aEndpoint));
-
     }
 
     /**
@@ -81,7 +77,6 @@ public class S3Client {
      */
     public S3Client(final Vertx aVertx, final String aAccessKey, final String aSecretKey, final String aSessionToken,
             final HttpClientOptions aConfig) {
-
         myAccessKey = aAccessKey;
         mySecretKey = aSecretKey;
         mySessionToken = aSessionToken;

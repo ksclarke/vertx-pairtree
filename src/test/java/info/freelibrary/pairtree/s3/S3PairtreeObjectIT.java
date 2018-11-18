@@ -2,9 +2,7 @@
 package info.freelibrary.pairtree.s3;
 
 import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
-import static info.freelibrary.pairtree.MessageCodes.PT_DEBUG_001;
-import static info.freelibrary.pairtree.PairtreeFactory.PairtreeImpl.S3Bucket;
-import static info.freelibrary.pairtree.PairtreeRoot.PAIRTREE_ROOT;
+import static info.freelibrary.pairtree.Pairtree.PAIRTREE_ROOT;
 import static java.util.UUID.randomUUID;
 
 import java.util.StringJoiner;
@@ -14,10 +12,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.amazonaws.AmazonClientException;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.RegionUtils;
 
 import info.freelibrary.pairtree.MessageCodes;
+import info.freelibrary.pairtree.Pairtree;
+import info.freelibrary.pairtree.PairtreeException;
 import info.freelibrary.pairtree.PairtreeFactory;
-import info.freelibrary.pairtree.PairtreeRoot;
 import info.freelibrary.pairtree.PairtreeUtils;
 import info.freelibrary.util.Logger;
 import info.freelibrary.util.LoggerFactory;
@@ -29,8 +30,6 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 
 /**
  * Tests for the <code>S3PairtreeObject</code>.
- *
- * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
 @RunWith(VertxUnitRunner.class)
 public class S3PairtreeObjectIT extends AbstractS3IT {
@@ -39,10 +38,10 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
     private static final String GREEN_GIF = "a/b/green.gif";
 
     /** A path for a secondary test object */
-    private static final String GREEN_BLUE_GIF = "green~blue.gif";
+    private static final String GREEN_BLUE_GIF = "green+blue.gif";
 
     /** The Pairtree being tested */
-    private PairtreeRoot myPairtree;
+    private Pairtree myPairtree;
 
     /** The ID for the object being tested */
     private String myUID;
@@ -60,11 +59,12 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
     public void setUp(final TestContext aContext) {
         super.setUp(aContext);
 
-        LOGGER.debug(PT_DEBUG_001, "s3:///" + myTestBucket);
+        LOGGER.debug(MessageCodes.PT_DEBUG_001, "s3:///" + myTestBucket);
 
-        final PairtreeFactory factory = PairtreeFactory.getFactory(myVertx, S3Bucket);
+        final PairtreeFactory factory = new PairtreeFactory(myVertx);
+        final Region region = RegionUtils.getRegion(myEndpoint);
 
-        myPairtree = factory.getPairtree(myTestBucket, myAccessKey, mySecretKey, myRegion);
+        myPairtree = factory.getPairtree(myTestBucket, myAccessKey, mySecretKey, region);
 
         // Create a test ID for each test run
         myUID = randomUUID().toString();
@@ -72,10 +72,10 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
     }
 
     @Test
-    public final void testExists(final TestContext aContext) {
+    public final void testExists(final TestContext aContext) throws PairtreeException {
         final Async async = aContext.async();
 
-        createTestPairtreeObject(S3Bucket, createResult -> {
+        createTestS3PairtreeObject(createResult -> {
             if (createResult.succeeded()) {
                 myPairtree.getObject(myUID).exists(existsResult -> {
                     if (!existsResult.succeeded()) {
@@ -87,7 +87,7 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
             }
 
             async.complete();
-        }, myTestBucket, myAccessKey, mySecretKey, myRegion, myUID);
+        }, myTestBucket, myAccessKey, mySecretKey, myEndpoint, myUID);
     }
 
     @Test
@@ -109,13 +109,13 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
 
         myPairtree.getObject("ark:/99999/88888888").create(result -> {
             if (result.succeeded()) {
-                final String ptPath = PairtreeUtils.mapToPtPath("ark:/99999/88888888").replace('+', '~');
+                final String ptPath = PairtreeUtils.mapToPtPath("ark:/99999/88888888");
                 final StringJoiner objectPath = new StringJoiner("/");
 
-                objectPath.add(PAIRTREE_ROOT).add(ptPath).add("ark~=99999=88888888/README.txt");
+                objectPath.add(PAIRTREE_ROOT).add(ptPath).add("ark+=99999=88888888/README.txt");
 
                 if (!myS3Client.doesObjectExist(myTestBucket, objectPath.toString())) {
-                    aContext.fail(MessageCodes.PT_DEBUG_050);
+                    aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_050));
                 }
             } else {
                 aContext.fail(result.cause());
@@ -126,10 +126,10 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
     }
 
     @Test
-    public final void testDelete(final TestContext aContext) {
+    public final void testDelete(final TestContext aContext) throws PairtreeException {
         final Async async = aContext.async();
 
-        createTestPairtreeObject(S3Bucket, createResult -> {
+        createTestS3PairtreeObject(createResult -> {
             if (createResult.succeeded()) {
                 myPairtree.getObject(myUID).delete(deleteResult -> {
                     if (!deleteResult.succeeded()) {
@@ -141,7 +141,7 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
             }
 
             async.complete();
-        }, myTestBucket, myAccessKey, mySecretKey, myRegion, myUID);
+        }, myTestBucket, myAccessKey, mySecretKey, myEndpoint, myUID);
     }
 
     @Test
@@ -166,7 +166,11 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
 
     @Test
     public final void testGetPathStringWithPlus(final TestContext aContext) {
-        aContext.assertEquals(myS3Path + "/" + GREEN_BLUE_GIF, myPairtree.getObject(myUID).getPath(GREEN_BLUE_GIF));
+        // The S3 path has a URL encoded '+' because of this S3 bug that will probably never be fixed:
+        // https://forums.aws.amazon.com/thread.jspa?threadID=55746
+        // It appears normal in S3 or in the resource name once it's copied down to a file system
+        aContext.assertEquals(myS3Path + "/" + GREEN_BLUE_GIF, myPairtree.getObject(myUID).getPath(GREEN_BLUE_GIF)
+                .replace("%2B", "+"));
     }
 
     @Test
@@ -188,8 +192,8 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
 
         myPairtree.getObject(myUID).put("ark+=99999=99999999.gif", Buffer.buffer(myResource), result -> {
             if (result.succeeded()) {
-                if (!myS3Client.doesObjectExist(myTestBucket, myS3Path + "/ark~=99999=99999999.gif")) {
-                    aContext.fail(MessageCodes.PT_DEBUG_051);
+                if (!myS3Client.doesObjectExist(myTestBucket, myS3Path + "/ark+=99999=99999999.gif")) {
+                    aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_051));
                 }
             } else {
                 aContext.fail(result.cause());

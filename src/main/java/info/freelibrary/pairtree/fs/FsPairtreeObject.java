@@ -9,7 +9,6 @@ import info.freelibrary.pairtree.Constants;
 import info.freelibrary.pairtree.MessageCodes;
 import info.freelibrary.pairtree.PairtreeObject;
 import info.freelibrary.pairtree.PairtreeUtils;
-import info.freelibrary.util.I18nObject;
 import info.freelibrary.util.Logger;
 import info.freelibrary.util.LoggerFactory;
 
@@ -21,10 +20,8 @@ import io.vertx.core.file.FileSystem;
 
 /**
  * A file-system backed implementation of a Pairtree object.
- *
- * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
-public class FsPairtreeObject extends I18nObject implements PairtreeObject {
+public class FsPairtreeObject implements PairtreeObject {
 
     /** The logger used with the file-system based Pairtree object */
     private static final Logger LOGGER = LoggerFactory.getLogger(FsPairtreeObject.class, Constants.BUNDLE_NAME);
@@ -49,8 +46,6 @@ public class FsPairtreeObject extends I18nObject implements PairtreeObject {
      * @param aID The object's ID
      */
     public FsPairtreeObject(final FileSystem aFileSystem, final FsPairtree aPairtree, final String aID) {
-        super(Constants.BUNDLE_NAME);
-
         Objects.requireNonNull(aFileSystem);
         Objects.requireNonNull(aPairtree);
         Objects.requireNonNull(aID);
@@ -68,7 +63,7 @@ public class FsPairtreeObject extends I18nObject implements PairtreeObject {
 
     @Override
     public void exists(final Handler<AsyncResult<Boolean>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".exists()"));
+        Objects.requireNonNull(aHandler, LOGGER.getMessage(MessageCodes.PT_010));
 
         final Future<Boolean> future = Future.<Boolean>future().setHandler(aHandler);
 
@@ -85,7 +80,7 @@ public class FsPairtreeObject extends I18nObject implements PairtreeObject {
 
     @Override
     public void create(final Handler<AsyncResult<Void>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".create()"));
+        Objects.requireNonNull(aHandler, LOGGER.getMessage(MessageCodes.PT_010));
 
         final Future<Void> future = Future.<Void>future().setHandler(aHandler);
 
@@ -102,7 +97,7 @@ public class FsPairtreeObject extends I18nObject implements PairtreeObject {
 
     @Override
     public void delete(final Handler<AsyncResult<Void>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".delete()"));
+        Objects.requireNonNull(aHandler, LOGGER.getMessage(MessageCodes.PT_010));
 
         final Future<Void> future = Future.<Void>future().setHandler(aHandler);
 
@@ -139,7 +134,7 @@ public class FsPairtreeObject extends I18nObject implements PairtreeObject {
 
     @Override
     public void put(final String aPath, final Buffer aBuffer, final Handler<AsyncResult<Void>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".put()"));
+        Objects.requireNonNull(aHandler, LOGGER.getMessage(MessageCodes.PT_010));
 
         final Path resourcePath = Paths.get(getPath(), aPath);
         final Future<Void> future = Future.<Void>future().setHandler(aHandler);
@@ -165,7 +160,7 @@ public class FsPairtreeObject extends I18nObject implements PairtreeObject {
 
     @Override
     public void get(final String aPath, final Handler<AsyncResult<Buffer>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".get()"));
+        Objects.requireNonNull(aHandler, LOGGER.getMessage(MessageCodes.PT_010));
 
         final String resourcePath = Paths.get(getPath(), aPath).toString();
         final Future<Buffer> future = Future.<Buffer>future().setHandler(aHandler);
@@ -183,7 +178,7 @@ public class FsPairtreeObject extends I18nObject implements PairtreeObject {
 
     @Override
     public void find(final String aPath, final Handler<AsyncResult<Boolean>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".find()"));
+        Objects.requireNonNull(aHandler, LOGGER.getMessage(MessageCodes.PT_010));
 
         final String resourcePath = Paths.get(getPath(), aPath).toString();
         final Future<Boolean> future = Future.<Boolean>future().setHandler(aHandler);

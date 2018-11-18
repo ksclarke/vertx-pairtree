@@ -283,7 +283,7 @@ public class S3ClientRequest implements HttpClientRequest {
             // #ConstructingTheAuthenticationHeader
 
             // Date should look like Thu, 17 Nov 2005 18:49:58 GMT, and must be
-            // within 15 min of S3 server time. contentMd5 and type are optional
+            // within 15 min. of S3 server time. contentMd5 and type are optional
 
             // We can't risk letting our date get clobbered and being inconsistent
             final String xamzdate = new SimpleDateFormat(DATE_FORMAT, Locale.US).format(new Date());
@@ -319,7 +319,7 @@ public class S3ClientRequest implements HttpClientRequest {
      * @return True if request is authenticated; else, false
      */
     public boolean isAuthenticated() {
-        return (myAccessKey != null) && (mySecretKey != null);
+        return myAccessKey != null && mySecretKey != null;
     }
 
     /**

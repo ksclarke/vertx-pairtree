@@ -5,10 +5,8 @@ import info.freelibrary.util.I18nObject;
 
 /**
  * A base pairtree class which can be extended by specific implementations.
- *
- * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
-public abstract class AbstractPairtree extends I18nObject implements PairtreeRoot {
+public abstract class AbstractPairtree extends I18nObject implements Pairtree {
 
     /** The Pairtree's prefix (optional) */
     protected String myPrefix;

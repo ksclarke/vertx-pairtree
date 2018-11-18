@@ -6,6 +6,8 @@ import static info.freelibrary.pairtree.Pairtree.PAIRTREE_PREFIX;
 import static info.freelibrary.pairtree.Pairtree.PAIRTREE_VERSION;
 import static info.freelibrary.pairtree.Pairtree.PT_VERSION_NUM;
 
+import java.util.UUID;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,8 +16,8 @@ import com.amazonaws.regions.Region;
 import com.amazonaws.regions.RegionUtils;
 
 import info.freelibrary.pairtree.MessageCodes;
-import info.freelibrary.pairtree.PairtreeFactory;
 import info.freelibrary.pairtree.Pairtree;
+import info.freelibrary.pairtree.PairtreeFactory;
 import info.freelibrary.util.Logger;
 import info.freelibrary.util.LoggerFactory;
 
@@ -24,10 +26,12 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 
 /**
- * Tests for the S3 Pairtree implementation.
+ * Tests for the S3 Pairtree implementation that puts the Pairtree in a subdirectory of the S3 bucket.
  */
 @RunWith(VertxUnitRunner.class)
-public class S3PairtreeIT extends AbstractS3IT {
+public class S3PairtreeBucketPathIT extends AbstractS3IT {
+
+    private final String BUCKET_PATH = "/path/to/pairtree";
 
     /** The Pairtree that's being tested */
     private Pairtree myPairtree;
@@ -48,12 +52,13 @@ public class S3PairtreeIT extends AbstractS3IT {
         final PairtreeFactory factory = new PairtreeFactory(myVertx);
         final Region region = RegionUtils.getRegion(myEndpoint);
 
-        myPairtree = factory.getPairtree(myTestBucket, myAccessKey, mySecretKey, region);
+        myPairtree = factory.getPairtree(myTestBucket, BUCKET_PATH, myAccessKey, mySecretKey, region);
     }
 
     @Test
     public final void testGetObject(final TestContext aContext) {
-        aContext.assertEquals(myPairtree.getObject("asdf").getID(), "asdf");
+        final String id = UUID.randomUUID().toString();
+        aContext.assertEquals(myPairtree.getObject(id).getID(), id);
     }
 
     @Test
@@ -95,10 +100,13 @@ public class S3PairtreeIT extends AbstractS3IT {
 
         myPairtree.create(result -> {
             if (result.succeeded()) {
-                aContext.assertTrue(myS3Client.doesObjectExist(myTestBucket, myPairtree.getVersionFilePath()));
+                boolean expected = myS3Client.doesObjectExist(myTestBucket, myPairtree.getVersionFilePath());
+
+                aContext.assertTrue(expected, LOGGER.getMessage(MessageCodes.PT_DEBUG_055));
 
                 if (myPairtree.hasPrefix()) {
-                    aContext.assertTrue(myS3Client.doesObjectExist(myTestBucket, myPairtree.getPrefixFilePath()));
+                    expected = myS3Client.doesObjectExist(myTestBucket, myPairtree.getPrefixFilePath());
+                    aContext.assertTrue(expected, LOGGER.getMessage(MessageCodes.PT_DEBUG_054));
                 }
             } else {
                 aContext.fail(result.cause());
@@ -154,26 +162,27 @@ public class S3PairtreeIT extends AbstractS3IT {
 
     @Test
     public final void testToString(final TestContext aContext) {
-        aContext.assertEquals("s3:///" + myTestBucket + "/pairtree_root", myPairtree.toString());
+        aContext.assertEquals("s3:///" + myTestBucket + BUCKET_PATH + "/pairtree_root", myPairtree.toString());
     }
 
     @Test
     public final void testGetPath(final TestContext aContext) {
-        aContext.assertEquals(myTestBucket, myPairtree.getPath());
+        aContext.assertEquals(myTestBucket + BUCKET_PATH, myPairtree.getPath());
     }
 
     @Test
     public final void testGetPrefixFilePath(final TestContext aContext) {
-        aContext.assertEquals(PAIRTREE_PREFIX, myPairtree.getPrefixFilePath());
+        aContext.assertEquals(BUCKET_PATH + '/' + PAIRTREE_PREFIX, myPairtree.getPrefixFilePath());
     }
 
     @Test
     public final void testGetVersionFilePath(final TestContext aContext) {
-        aContext.assertEquals(PAIRTREE_VERSION + PT_VERSION_NUM.replace('.', '_'), myPairtree.getVersionFilePath());
+        final String expected = BUCKET_PATH + '/' + PAIRTREE_VERSION + PT_VERSION_NUM.replace('.', '_');
+        aContext.assertEquals(expected, myPairtree.getVersionFilePath());
     }
 
     @Override
     public Logger getLogger() {
-        return LoggerFactory.getLogger(S3PairtreeIT.class, BUNDLE_NAME);
+        return LoggerFactory.getLogger(S3PairtreeBucketPathIT.class, BUNDLE_NAME);
     }
 }

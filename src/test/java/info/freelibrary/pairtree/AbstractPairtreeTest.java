@@ -1,17 +1,17 @@
 
 package info.freelibrary.pairtree;
 
-import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
-
-import java.util.Arrays;
+import java.io.File;
 import java.util.Objects;
+import java.util.UUID;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 
-import info.freelibrary.pairtree.PairtreeFactory.PairtreeImpl;
-import info.freelibrary.util.I18nObject;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.RegionUtils;
+
 import info.freelibrary.util.Logger;
 
 import io.vertx.core.AsyncResult;
@@ -23,27 +23,18 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 
 /**
  * An abstract Pairtree test object.
- *
- * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
 @RunWith(VertxUnitRunner.class)
-public abstract class AbstractPairtreeTest extends I18nObject {
+public abstract class AbstractPairtreeTest {
 
     /** The name of a test object */
-    protected static final String TEST_OBJECT_NAME = "asdf";
+    protected static final String TEST_OBJECT_NAME = UUID.randomUUID().toString();
 
     /** The logger for the test */
     protected final Logger LOGGER = getLogger();
 
     /** The connection to the Vertx framework */
     protected Vertx myVertx;
-
-    /**
-     * Creates an abstract Pairtree test.
-     */
-    public AbstractPairtreeTest() {
-        super(BUNDLE_NAME);
-    }
 
     /**
      * Setup for the tests.
@@ -64,8 +55,6 @@ public abstract class AbstractPairtreeTest extends I18nObject {
     @After
     public void tearDown(final TestContext aContext) {
         LOGGER.debug("Shutting down Vert.x");
-        // FIXME: This causes problems... Why?
-        // myVertx.close(aContext.asyncAssertSuccess());
     }
 
     /**
@@ -76,25 +65,60 @@ public abstract class AbstractPairtreeTest extends I18nObject {
     protected abstract Logger getLogger();
 
     /**
-     * Does the work of creating a test Pairtree object in a test Pairtree so that tests against that object can be run.
+     * Does the work of creating a test Pairtree object in the file system so that tests against that object can be
+     * run.
      *
      * @param aPairtreeImpl A Pairtree implementation
      * @param aHandler to handle the result of the creation event
-     * @param aConfig A configuration passed as a varargs
+     * @param aFile A file system directory Pairtree
+     * @param aID A Pairtree object ID
      */
-    protected void createTestPairtreeObject(final PairtreeImpl aPairtreeImpl,
-            final Handler<AsyncResult<PairtreeObject>> aHandler, final String... aConfig) {
-        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(),
-                ".createTestPairtreeObject()"));
+    protected void createTestFsPairtreeObject(final Handler<AsyncResult<PairtreeObject>> aHandler, final File aFile,
+            final String aID) throws PairtreeException {
+        Objects.requireNonNull(aHandler, LOGGER.getMessage(MessageCodes.PT_010));
 
-        final String[] config = Arrays.copyOf(aConfig, aConfig.length - 1);
-        final PairtreeRoot root = PairtreeFactory.getFactory(myVertx, aPairtreeImpl).getPairtree(config);
+        final Pairtree root = new PairtreeFactory(myVertx).getPairtree(aFile);
         final Future<PairtreeObject> future = Future.<PairtreeObject>future().setHandler(aHandler);
 
         root.create(createPtResult -> {
             if (createPtResult.succeeded()) {
                 // Last thing passed in via our configuration arguments is the test object's ID
-                final PairtreeObject ptObject = root.getObject(aConfig[aConfig.length - 1]);
+                final PairtreeObject ptObject = root.getObject(aID);
+
+                ptObject.create(createPtObjResult -> {
+                    if (createPtObjResult.succeeded()) {
+                        future.complete(ptObject);
+                    } else {
+                        future.fail(createPtObjResult.cause());
+                    }
+                });
+            } else {
+                future.fail(createPtResult.cause());
+            }
+        });
+    }
+
+    /**
+     * Does the work of creating a test Pairtree object in S3 so that tests against that object can be run.
+     *
+     * @param aPairtreeImpl A Pairtree implementation
+     * @param aHandler to handle the result of the creation event
+     * @param aFile A file system directory Pairtree
+     * @param aID A Pairtree object ID
+     */
+    protected void createTestS3PairtreeObject(final Handler<AsyncResult<PairtreeObject>> aHandler,
+            final String aBucket, final String aAccessKey, final String aSecretKey, final String aEndpoint,
+            final String aID) throws PairtreeException {
+        Objects.requireNonNull(aHandler, LOGGER.getMessage(MessageCodes.PT_010));
+
+        final Region region = RegionUtils.getRegion(aEndpoint);
+        final Pairtree root = new PairtreeFactory(myVertx).getPairtree(aBucket, aAccessKey, aSecretKey, region);
+        final Future<PairtreeObject> future = Future.<PairtreeObject>future().setHandler(aHandler);
+
+        root.create(createPtResult -> {
+            if (createPtResult.succeeded()) {
+                // Last thing passed in via our configuration arguments is the test object's ID
+                final PairtreeObject ptObject = root.getObject(aID);
 
                 ptObject.create(createPtObjResult -> {
                     if (createPtObjResult.succeeded()) {

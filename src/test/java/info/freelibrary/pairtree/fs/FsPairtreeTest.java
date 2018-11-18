@@ -18,8 +18,6 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 
 /**
  * Tests for <code>FsPairtree</code>.
- *
- * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
 @RunWith(VertxUnitRunner.class)
 public class FsPairtreeTest extends AbstractFsPairtreeTest {
@@ -28,7 +26,7 @@ public class FsPairtreeTest extends AbstractFsPairtreeTest {
     public void testNullHandlerExists(final TestContext aContext) {
         try {
             myPairtree.exists(null);
-            aContext.fail(getI18n(MessageCodes.PT_DEBUG_044));
+            aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_044));
         } catch (final NullPointerException details) {
             // Expected
         }
@@ -38,7 +36,7 @@ public class FsPairtreeTest extends AbstractFsPairtreeTest {
     public void testNullHandlerCreate(final TestContext aContext) {
         try {
             myPairtree.create(null);
-            aContext.fail(getI18n(MessageCodes.PT_DEBUG_044));
+            aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_044));
         } catch (final NullPointerException details) {
             // Expected
         }
@@ -48,7 +46,7 @@ public class FsPairtreeTest extends AbstractFsPairtreeTest {
     public void testNullHandlerDelete(final TestContext aContext) {
         try {
             myPairtree.delete(null);
-            aContext.fail(getI18n(MessageCodes.PT_DEBUG_044));
+            aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_044));
         } catch (final NullPointerException details) {
             // Expected
         }
@@ -63,24 +61,24 @@ public class FsPairtreeTest extends AbstractFsPairtreeTest {
         myPairtree.create(createResult -> {
             if (createResult.succeeded()) {
                 final boolean result = myFileSystem.existsBlocking(myPairtree.toString());
-                aContext.assertEquals(true, result, getI18n(MessageCodes.PT_DEBUG_031, myPairtree));
+                aContext.assertEquals(true, result, LOGGER.getMessage(MessageCodes.PT_DEBUG_031, myPairtree));
 
                 // Then, test ability to delete
                 myPairtree.delete(deleteResult -> {
                     if (!deleteResult.succeeded()) {
-                        aContext.fail(getI18n(MessageCodes.PT_DEBUG_011, myPairtree));
+                        aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_011, myPairtree));
                     } else {
                         if (myFileSystem.existsBlocking(myPairtree.toString())) {
-                            aContext.fail(getI18n(MessageCodes.PT_DEBUG_015, myPairtree));
+                            aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_015, myPairtree));
                         } else if (myFileSystem.existsBlocking(versionFilePath)) {
-                            aContext.fail(getI18n(MessageCodes.PT_DEBUG_016, versionFilePath));
+                            aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_016, versionFilePath));
                         }
                     }
 
                     async.complete();
                 });
             } else {
-                aContext.fail(getI18n(MessageCodes.PT_DEBUG_015, myPairtree));
+                aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_015, myPairtree));
                 async.complete();
             }
         });
@@ -95,7 +93,7 @@ public class FsPairtreeTest extends AbstractFsPairtreeTest {
 
         myPairtree.create(result -> {
             if (result.succeeded()) {
-                aContext.fail(getI18n(MessageCodes.PT_DEBUG_014, myPairtree));
+                aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_014, myPairtree));
             }
 
             async.complete();
@@ -109,11 +107,11 @@ public class FsPairtreeTest extends AbstractFsPairtreeTest {
         myPairtree.create(result -> {
             if (result.succeeded()) {
                 final boolean exists = myFileSystem.existsBlocking(myPairtree.toString());
-                final String message = getI18n(MessageCodes.PT_DEBUG_010, myPairtree);
+                final String message = LOGGER.getMessage(MessageCodes.PT_DEBUG_010, myPairtree);
 
                 aContext.assertEquals(true, exists, message);
             } else {
-                aContext.fail(getI18n(MessageCodes.PT_DEBUG_029, myPairtree));
+                aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_029, myPairtree));
             }
 
             async.complete();
@@ -127,10 +125,10 @@ public class FsPairtreeTest extends AbstractFsPairtreeTest {
         myPairtree.exists(result -> {
             if (result.succeeded()) {
                 if (result.result()) {
-                    aContext.fail(getI18n(MessageCodes.PT_DEBUG_012, myPairtree));
+                    aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_012, myPairtree));
                 }
             } else {
-                aContext.fail(getI18n(MessageCodes.PT_DEBUG_030, myPairtree));
+                aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_030, myPairtree));
             }
 
             async.complete();
@@ -148,10 +146,10 @@ public class FsPairtreeTest extends AbstractFsPairtreeTest {
                 myPairtree.exists(existsResult -> {
                     if (existsResult.succeeded()) {
                         if (!existsResult.result()) {
-                            aContext.fail(getI18n(MessageCodes.PT_DEBUG_013, myPairtree));
+                            aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_013, myPairtree));
                         }
                     } else {
-                        aContext.fail(getI18n(MessageCodes.PT_DEBUG_030, myPairtree));
+                        aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_030, myPairtree));
                     }
 
                     async.complete();

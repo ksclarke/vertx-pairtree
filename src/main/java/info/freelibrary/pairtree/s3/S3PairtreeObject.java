@@ -3,7 +3,7 @@ package info.freelibrary.pairtree.s3;
 
 import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
 import static info.freelibrary.pairtree.Constants.PATH_SEP;
-import static info.freelibrary.pairtree.PairtreeRoot.PAIRTREE_ROOT;
+import static info.freelibrary.pairtree.Pairtree.PAIRTREE_ROOT;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -35,8 +35,6 @@ import io.vertx.core.buffer.Buffer;
 
 /**
  * An S3-backed Pairtree object implementation.
- *
- * @author <a href="mailto:ksclarke@ksclarke.io">Kevin S. Clarke</a>
  */
 public class S3PairtreeObject extends I18nObject implements PairtreeObject {
 
@@ -46,11 +44,20 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
     /** Creates a README file for an S3 Pairtree */
     private static final String README_FILE = "/README.txt";
 
+    /** A regular plus symbol */
+    private static final String UNENCODED_PLUS = "+";
+
+    /** A URL encoded plus symbol */
+    private static final String ENCODED_PLUS = "%2B";
+
     /** The client used to interact with the S3 Pairtree */
     private final S3Client myS3Client;
 
     /** The bucket in which the Pairtree resides */
     private final String myPairtreeBucket;
+
+    /** The path in the bucket to the Pairtree */
+    private final String myBucketPath;
 
     /** The Pairtree's prefix (optional) */
     private final String myPrefix;
@@ -68,6 +75,7 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
     public S3PairtreeObject(final S3Client aS3Client, final S3Pairtree aPairtree, final String aID) {
         super(BUNDLE_NAME);
 
+        myBucketPath = aPairtree.getBucketPath();
         myPairtreeBucket = aPairtree.getPath();
         myPrefix = aPairtree.getPrefix();
         myS3Client = aS3Client;
@@ -76,11 +84,11 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
 
     @Override
     public void exists(final Handler<AsyncResult<Boolean>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".exists()"));
+        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010));
 
         final Future<Boolean> future = Future.<Boolean>future().setHandler(aHandler);
 
-        myS3Client.head(myPairtreeBucket, getPath() + README_FILE, response -> {
+        myS3Client.head(myPairtreeBucket, myBucketPath + getPath() + README_FILE, response -> {
             final int statusCode = response.statusCode();
 
             if (statusCode == HTTP.OK) {
@@ -106,30 +114,30 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
 
     @Override
     public void create(final Handler<AsyncResult<Void>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".create()"));
+        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010));
 
         final Future<Void> future = Future.<Void>future().setHandler(aHandler);
 
-        myS3Client.put(myPairtreeBucket, getPath() + README_FILE, Buffer.buffer(myID), response -> {
+        myS3Client.put(myPairtreeBucket, myBucketPath + getPath() + README_FILE, Buffer.buffer(myID), response -> {
             final int statusCode = response.statusCode();
 
             if (statusCode == HTTP.OK) {
                 future.complete();
             } else {
                 final String statusMessage = response.statusMessage();
+
                 future.fail(getI18n(MessageCodes.PT_DEBUG_045, statusCode, getPath() + README_FILE, statusMessage));
             }
         });
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
     public void delete(final Handler<AsyncResult<Void>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".delete()"));
+        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010));
 
         final Future<Void> future = Future.<Void>future().setHandler(aHandler);
 
-        myS3Client.list(myPairtreeBucket, getPath(), listResponse -> {
+        myS3Client.list(myPairtreeBucket, myBucketPath + getPath(), listResponse -> {
             final int listStatusCode = listResponse.statusCode();
 
             if (listStatusCode == HTTP.OK) {
@@ -189,31 +197,43 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
         return myPrefix == null ? myID : myPrefix + PATH_SEP + myID;
     }
 
+    /**
+     * Gets the object path. If the path contains a '+' it will be URL encoded for interaction with S3's HTTP API.
+     *
+     * @return the path of the Pairtree object as it's found in S3
+     */
     @Override
     public String getPath() {
-        // Pairtree encodes colons to pluses so we need to pre-encode them as a workaround for an S3 bug
-        // Cf. https://forums.aws.amazon.com/thread.jspa?threadID=55746
-        final String awsID = myID.replace(':', '~');
-        return PAIRTREE_ROOT + PATH_SEP + PairtreeUtils.mapToPtPath(awsID) + PATH_SEP + PairtreeUtils.encodeID(awsID);
+        // We need to URL encode '+'s to work around an S3 bug
+        // (Cf. https://forums.aws.amazon.com/thread.jspa?threadID=55746)
+        return PAIRTREE_ROOT + PATH_SEP + PairtreeUtils.mapToPtPath(myID).replace(UNENCODED_PLUS, ENCODED_PLUS) +
+                PATH_SEP + PairtreeUtils.encodeID(myID).replace(UNENCODED_PLUS, ENCODED_PLUS);
     }
 
+    /**
+     * Gets the path of the requested object resource. If the path contains a '+' it will be URL encoded for
+     * interaction with S3's HTTP API.
+     *
+     * @param aResourcePath The Pairtree resource which the returned path should represent
+     * @return The path of the requested object resource as it's found in S3
+     */
     @Override
     public String getPath(final String aResourcePath) {
-        // We need to encode any pluses in our resource path as a workaround for an S3 bug [Better way?]
-        // Cf. https://forums.aws.amazon.com/thread.jspa?threadID=55746
-        final String awsPath = aResourcePath.replace('+', '~');
-        return awsPath.charAt(0) == '/' ? getPath() + awsPath : getPath() + PATH_SEP + awsPath;
+        // We need to URL encode '+'s to work around an S3 bug
+        // (Cf. https://forums.aws.amazon.com/thread.jspa?threadID=55746)
+        return aResourcePath.charAt(0) == '/' ? getPath() + aResourcePath.replace(UNENCODED_PLUS, ENCODED_PLUS)
+                : getPath() + PATH_SEP + aResourcePath.replace(UNENCODED_PLUS, ENCODED_PLUS);
     }
 
     @Override
     public void put(final String aPath, final Buffer aBuffer, final Handler<AsyncResult<Void>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".put()"));
+        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010));
 
         final Future<Void> future = Future.<Void>future().setHandler(aHandler);
 
         LOGGER.debug(MessageCodes.PT_DEBUG_057, aPath);
 
-        myS3Client.put(myPairtreeBucket, getPath(aPath), aBuffer, response -> {
+        myS3Client.put(myPairtreeBucket, myBucketPath + getPath(aPath), aBuffer, response -> {
             final int statusCode = response.statusCode();
 
             if (statusCode == HTTP.OK) {
@@ -233,13 +253,13 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
 
     @Override
     public void get(final String aPath, final Handler<AsyncResult<Buffer>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".get()"));
+        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010));
 
         final Future<Buffer> future = Future.<Buffer>future().setHandler(aHandler);
 
         LOGGER.debug(MessageCodes.PT_DEBUG_058, aPath);
 
-        myS3Client.get(myPairtreeBucket, getPath(aPath), response -> {
+        myS3Client.get(myPairtreeBucket, myBucketPath + getPath(aPath), response -> {
             final int statusCode = response.statusCode();
 
             if (statusCode == HTTP.OK) {
@@ -255,13 +275,13 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
 
     @Override
     public void find(final String aPath, final Handler<AsyncResult<Boolean>> aHandler) {
-        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010, getClass().getSimpleName(), ".find()"));
+        Objects.requireNonNull(aHandler, getI18n(MessageCodes.PT_010));
 
         final Future<Boolean> future = Future.<Boolean>future().setHandler(aHandler);
 
         LOGGER.debug(MessageCodes.PT_DEBUG_059, aPath, myPairtreeBucket, getPath(aPath));
 
-        myS3Client.head(myPairtreeBucket, getPath(aPath), response -> {
+        myS3Client.head(myPairtreeBucket, myBucketPath + getPath(aPath), response -> {
             final int statusCode = response.statusCode();
 
             if (statusCode == HTTP.OK) {
