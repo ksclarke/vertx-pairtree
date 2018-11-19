@@ -102,6 +102,13 @@ public interface Pairtree {
     void create(Handler<AsyncResult<Void>> aHandler);
 
     /**
+     * Creates the Pairtree root file system only if needed. This is a way to make sure it exists before using it.
+     *
+     * @param aHandler A {@link io.vertx.core.Handler} with an {@link io.vertx.core.AsyncResult}
+     */
+    void createIfNeeded(Handler<AsyncResult<Void>> aHandler);
+
+    /**
      * Deletes the Pairtree.
      *
      * @param aHandler A {@link io.vertx.core.Handler} with an {@link io.vertx.core.AsyncResult}
