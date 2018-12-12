@@ -43,13 +43,13 @@ public abstract class AbstractPairtree extends I18nObject implements Pairtree {
     }
 
     @Override
-    public abstract void create(final Handler<AsyncResult<Void>> aHandler);
+    public abstract void create(Handler<AsyncResult<Void>> aHandler);
 
     @Override
-    public abstract void delete(final Handler<AsyncResult<Void>> aHandler);
+    public abstract void delete(Handler<AsyncResult<Void>> aHandler);
 
     @Override
-    public abstract void exists(final Handler<AsyncResult<Boolean>> aHandler);
+    public abstract void exists(Handler<AsyncResult<Boolean>> aHandler);
 
     @Override
     public void createIfNeeded(final Handler<AsyncResult<Void>> aHandler) {

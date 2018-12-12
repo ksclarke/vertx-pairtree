@@ -45,7 +45,9 @@ package info.freelibrary.pairtree;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import org.junit.BeforeClass;
+import java.io.File;
+
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -56,9 +58,34 @@ public class PairtreeUtilsTest {
     /**
      * Sets up the Pairtree path separator for the tests.
      */
-    @BeforeClass
-    public static void setUp() {
+    @Before
+    public void setUp() {
         PairtreeUtils.setSeparator('/');
+        PairtreeUtils.setShortyLength(2);
+    }
+
+    @Test
+    public void testGetShortyLength() {
+        assertEquals(2, PairtreeUtils.getShortyLength());
+    }
+
+    @Test
+    public void testSetShortyLength() {
+        PairtreeUtils.setShortyLength(3);
+        assertEquals(3, PairtreeUtils.getShortyLength());
+    }
+
+    @Test
+    public void testGetSeparator() {
+        final Character character= new Character(File.separatorChar);
+        assertEquals(character, PairtreeUtils.getSeparator());
+    }
+
+    @Test
+    public void testSetSeparator() {
+        final Character character= new Character('-');
+        PairtreeUtils.setSeparator(character);
+        assertEquals(character, PairtreeUtils.getSeparator());
     }
 
     /**
@@ -69,6 +96,7 @@ public class PairtreeUtilsTest {
         assertEquals("ab/cd", PairtreeUtils.mapToPtPath("abcd"));
         assertEquals("ab/cd/ef/g", PairtreeUtils.mapToPtPath("abcdefg"));
         assertEquals("12/-9/86/xy/4", PairtreeUtils.mapToPtPath("12-986xy4"));
+        assertEquals("", PairtreeUtils.mapToPtPath(""));
 
         assertEquals("13/03/0_/45/xq/v_/79/38/42/49/5", PairtreeUtils.mapToPtPath(null, "13030_45xqv_793842495",
                 null));
@@ -82,6 +110,7 @@ public class PairtreeUtilsTest {
                 "13030_45xqv_793842495", "793842495"));
         assertEquals("/data/13/03/0_/45/xq/v_/79/38/42/49/5/ark+=13030=xt12t3", PairtreeUtils.mapToPtPath("/data",
                 "13030_45xqv_793842495", "ark:/13030/xt12t3"));
+        assertEquals("/data/13/03/0_/45/xq/v_/79/38/42/49/5", PairtreeUtils.mapToPtPath("/data", "13030_45xqv_793842495"));
     }
 
     /**

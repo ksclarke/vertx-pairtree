@@ -3,12 +3,15 @@ package info.freelibrary.pairtree.fs;
 
 import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import info.freelibrary.pairtree.MessageCodes;
+import info.freelibrary.pairtree.PairtreeException;
+import info.freelibrary.pairtree.PairtreeFactory;
 import info.freelibrary.util.Logger;
 import info.freelibrary.util.LoggerFactory;
 
@@ -30,6 +33,29 @@ public class FsPairtreeTest extends AbstractFsPairtreeTest {
         } catch (final NullPointerException details) {
             // Expected
         }
+    }
+
+    @Test
+    public void hasNoPrefix(final TestContext aContext) {
+        aContext.assertFalse(myPairtree.hasPrefix());
+    }
+
+    @Test
+    public void hasPrefix(final TestContext aContext) throws PairtreeException {
+        myPairtree = new PairtreeFactory(myVertx).getPrefixedPairtree("asdf", new File(myPairtree.getPath()));
+        aContext.assertTrue(myPairtree.hasPrefix());
+    }
+
+    @Test
+    public void hasNullPrefix(final TestContext aContext) throws PairtreeException {
+        myPairtree = new PairtreeFactory(myVertx).getPrefixedPairtree(null, new File(myPairtree.getPath()));
+        aContext.assertFalse(myPairtree.hasPrefix());
+    }
+
+    @Test
+    public void hasEmptyPrefix(final TestContext aContext) throws PairtreeException {
+        myPairtree = new PairtreeFactory(myVertx).getPrefixedPairtree("", new File(myPairtree.getPath()));
+        aContext.assertFalse(myPairtree.hasPrefix());
     }
 
     @Test
@@ -97,6 +123,49 @@ public class FsPairtreeTest extends AbstractFsPairtreeTest {
             }
 
             async.complete();
+        });
+    }
+
+    @Test
+    public void testPairtreeCreationIfNeeded(final TestContext aContext) {
+        final Async async = aContext.async();
+
+        myPairtree.createIfNeeded(result -> {
+            if (result.succeeded()) {
+                final boolean exists = myFileSystem.existsBlocking(myPairtree.toString());
+                final String message = LOGGER.getMessage(MessageCodes.PT_DEBUG_010, myPairtree);
+
+                aContext.assertEquals(true, exists, message);
+            } else {
+                aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_029, myPairtree));
+            }
+
+            async.complete();
+        });
+    }
+
+    @Test
+    public void testExistingPairtreeCreationIfNeeded(final TestContext aContext) {
+        final Async async = aContext.async();
+
+        myPairtree.create(createHandler -> {
+            if (createHandler.succeeded()) {
+                myPairtree.createIfNeeded(createIfNeededHandler -> {
+                    if (createIfNeededHandler.succeeded()) {
+                        final boolean exists = myFileSystem.existsBlocking(myPairtree.toString());
+                        final String message = LOGGER.getMessage(MessageCodes.PT_DEBUG_010, myPairtree);
+
+                        aContext.assertEquals(true, exists, message);
+                    } else {
+                        aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_029, myPairtree));
+                    }
+
+                    async.complete();
+                });
+            } else {
+                aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_029, myPairtree));
+                async.complete();
+            }
         });
     }
 

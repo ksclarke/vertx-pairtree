@@ -196,8 +196,7 @@ public final class PairtreeUtils {
      * @throws InvalidPathException If there is trouble mapping the path
      */
     public static String mapToID(final String aBasePath, final String aPtPath) throws InvalidPathException {
-        final String newPath = removeBasePath(aBasePath, aPtPath);
-        return mapToID(newPath);
+        return mapToID(removeBasePath(aBasePath, aPtPath));
     }
 
     /**
@@ -304,8 +303,10 @@ public final class PairtreeUtils {
     private static String concat(final String... aPathsVarargs) {
         final String path;
 
-        if (aPathsVarargs == null || aPathsVarargs.length == 0) {
-            path = null;
+        Objects.requireNonNull(aPathsVarargs);
+
+        if (aPathsVarargs.length == 0) {
+            path = "";
         } else {
             final StringBuffer pathBuf = new StringBuffer();
 

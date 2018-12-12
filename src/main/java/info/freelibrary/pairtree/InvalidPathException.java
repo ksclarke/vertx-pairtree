@@ -1,6 +1,3 @@
-/**
- * Licensed under the GNU LGPL v.2.1 or later.
- */
 
 package info.freelibrary.pairtree;
 
@@ -40,8 +37,8 @@ public class InvalidPathException extends PairtreeException {
      * @param aMessage An exception message
      * @param aCause An upstream exception
      */
-    public InvalidPathException(final String aMessage, final Exception aCause) {
-        super(aMessage, aCause);
+    public InvalidPathException(final Exception aCause, final String aMessage) {
+        super(aCause, aMessage);
     }
 
     /**
@@ -52,7 +49,8 @@ public class InvalidPathException extends PairtreeException {
      * @param aCause An upstream exception
      * @param aDetailsVarargs Additional details to insert into the message
      */
-    public InvalidPathException(final String aMessage, final Exception aCause, final String... aDetailsVarargs) {
-        super(aMessage, aDetailsVarargs, aCause);
+    public InvalidPathException(final Exception aCause, final String aMessage, final Object... aDetailsVarargs) {
+        super(aCause, aMessage, aDetailsVarargs);
     }
+
 }
