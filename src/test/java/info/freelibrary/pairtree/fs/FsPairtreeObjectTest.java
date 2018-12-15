@@ -10,7 +10,9 @@ import org.junit.runner.RunWith;
 import info.freelibrary.pairtree.Constants;
 import info.freelibrary.pairtree.MessageCodes;
 import info.freelibrary.pairtree.PairtreeException;
+import info.freelibrary.pairtree.PairtreeFactory;
 import info.freelibrary.pairtree.PairtreeObject;
+import info.freelibrary.pairtree.PairtreeUtils;
 import info.freelibrary.util.Logger;
 import info.freelibrary.util.LoggerFactory;
 
@@ -44,6 +46,120 @@ public class FsPairtreeObjectTest extends AbstractFsPairtreeTest {
                         if (!myFileSystem.existsBlocking(ptObj.getPath())) {
                             aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_028, ptObj));
                         }
+                    } else {
+                        aContext.fail(createPtObjResult.cause());
+                    }
+
+                    async.complete();
+                });
+            } else {
+                aContext.fail(createPtResult.cause());
+                async.complete();
+            }
+        });
+    }
+
+    @Test
+    public void testGetID(final TestContext aContext) {
+        final Async async = aContext.async();
+
+        myPairtree.create(createPtResult -> {
+            if (createPtResult.succeeded()) {
+                final PairtreeObject ptObj = myPairtree.getObject(TEST_OBJECT_NAME);
+
+                ptObj.create(createPtObjResult -> {
+                    if (createPtObjResult.succeeded()) {
+                        aContext.assertEquals(TEST_OBJECT_NAME, ptObj.getID());
+                    } else {
+                        aContext.fail(createPtObjResult.cause());
+                    }
+
+                    async.complete();
+                });
+            } else {
+                aContext.fail(createPtResult.cause());
+                async.complete();
+            }
+        });
+    }
+
+    @Test
+    public void testFind(final TestContext aContext) {
+        final Async async = aContext.async();
+
+        myPairtree.create(createPtResult -> {
+            if (createPtResult.succeeded()) {
+                final PairtreeObject ptObj = myPairtree.getObject(TEST_OBJECT_NAME);
+
+                ptObj.create(createPtObjResult -> {
+                    if (createPtObjResult.succeeded()) {
+                        ptObj.find("found", findHandler -> {
+                            if (findHandler.succeeded()) {
+                                if (findHandler.result()) {
+                                    aContext.fail("Found something that doesn't exist");
+                                } else {
+                                    async.complete();
+                                }
+                            } else {
+                                aContext.fail(findHandler.cause());
+                            }
+                        });
+                    } else {
+                        aContext.fail(createPtObjResult.cause());
+                    }
+                });
+            } else {
+                aContext.fail(createPtResult.cause());
+                async.complete();
+            }
+        });
+    }
+
+    @Test
+    public void testGetPath(final TestContext aContext) throws PairtreeException {
+        final Async async = aContext.async();
+
+        myPairtree.create(createPtResult -> {
+            if (createPtResult.succeeded()) {
+                final PairtreeObject ptObj = myPairtree.getObject(TEST_OBJECT_NAME);
+
+                ptObj.create(createPtObjResult -> {
+                    if (createPtObjResult.succeeded()) {
+                        final String resourceName = "asdf";
+                        final String objPath = PairtreeUtils.mapToPtPath(TEST_OBJECT_NAME);
+                        final String found = ptObj.getPath(resourceName);
+                        final String ptPath = myPairtree.getPath();
+                        final String expected = Paths.get(ptPath, objPath, TEST_OBJECT_NAME, resourceName).toString();
+
+                        aContext.assertEquals(expected, found);
+
+                        async.complete();
+                    } else {
+                        aContext.fail(createPtObjResult.cause());
+                    }
+                });
+            } else {
+                aContext.fail(createPtResult.cause());
+                async.complete();
+            }
+        });
+    }
+
+    @Test
+    public void testGetPrefixedID(final TestContext aContext) throws PairtreeException {
+        final Async async = aContext.async();
+        final String prefix = "asdf";
+
+        // Use a prefixed Pairtree
+        myPairtree = new PairtreeFactory(myVertx).getPrefixedPairtree(prefix, new File(myPairtree.getPath()));
+
+        myPairtree.create(createPtResult -> {
+            if (createPtResult.succeeded()) {
+                final PairtreeObject ptObj = myPairtree.getObject(TEST_OBJECT_NAME);
+
+                ptObj.create(createPtObjResult -> {
+                    if (createPtObjResult.succeeded()) {
+                        aContext.assertEquals(prefix + "/" + TEST_OBJECT_NAME, ptObj.getID());
                     } else {
                         aContext.fail(createPtObjResult.cause());
                     }
