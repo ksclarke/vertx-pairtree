@@ -11,7 +11,7 @@ import info.freelibrary.util.I18nRuntimeException;
 public class PairtreeRuntimeException extends I18nRuntimeException {
 
     /**
-     * The <code>serialVersionUID</code> for <code>PairtreeException</code>.
+     * The <code>serialVersionUID</code> for <code>PairtreeRuntimeException</code>.
      */
     private static final long serialVersionUID = -3816513744343100056L;
 
@@ -41,8 +41,8 @@ public class PairtreeRuntimeException extends I18nRuntimeException {
      * @param aMessage An exception message
      * @param aCause An upstream exception
      */
-    public PairtreeRuntimeException(final String aMessage, final Exception aCause) {
-        super(BUNDLE_NAME, aMessage, aCause);
+    public PairtreeRuntimeException(final Exception aCause, final String aMessage) {
+        super(aCause, BUNDLE_NAME, aMessage);
     }
 
     /**
@@ -53,7 +53,8 @@ public class PairtreeRuntimeException extends I18nRuntimeException {
      * @param aCause An upstream exception
      * @param aMoreDetails Additional details to insert into the message
      */
-    public PairtreeRuntimeException(final String aMessage, final Exception aCause, final String... aMoreDetails) {
-        super(BUNDLE_NAME, aMessage, aMoreDetails, aCause);
+    public PairtreeRuntimeException(final Exception aCause, final String aMessage, final Object... aMoreDetails) {
+        super(aCause, BUNDLE_NAME, aMessage, aMoreDetails);
     }
+
 }

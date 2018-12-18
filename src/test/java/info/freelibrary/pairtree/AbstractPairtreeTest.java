@@ -43,7 +43,6 @@ public abstract class AbstractPairtreeTest {
      */
     @Before
     public void setUp(final TestContext aContext) {
-        LOGGER.debug("Initializing Vert.x");
         myVertx = Vertx.vertx();
     }
 
@@ -54,7 +53,7 @@ public abstract class AbstractPairtreeTest {
      */
     @After
     public void tearDown(final TestContext aContext) {
-        LOGGER.debug("Shutting down Vert.x");
+        // Subclasses will do tear down
     }
 
     /**

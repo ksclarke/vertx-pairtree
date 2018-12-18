@@ -2,6 +2,7 @@
 package info.freelibrary.pairtree;
 
 import java.util.List;
+import java.util.Optional;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -34,7 +35,7 @@ public interface Pairtree {
      *
      * @return The Pairtree prefix
      */
-    String getPrefix();
+    Optional<String> getPrefix();
 
     /**
      * Returns whether the Pairtree is using a prefix.
@@ -100,6 +101,13 @@ public interface Pairtree {
      * @param aHandler A {@link io.vertx.core.Handler} with an {@link io.vertx.core.AsyncResult}
      */
     void create(Handler<AsyncResult<Void>> aHandler);
+
+    /**
+     * Creates the Pairtree root file system only if needed. This is a way to make sure it exists before using it.
+     *
+     * @param aHandler A {@link io.vertx.core.Handler} with an {@link io.vertx.core.AsyncResult}
+     */
+    void createIfNeeded(Handler<AsyncResult<Void>> aHandler);
 
     /**
      * Deletes the Pairtree.

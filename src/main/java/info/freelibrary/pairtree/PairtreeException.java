@@ -39,8 +39,8 @@ public class PairtreeException extends I18nException {
      * @param aMessage An exception message
      * @param aCause An upstream exception
      */
-    public PairtreeException(final String aMessage, final Exception aCause) {
-        super(Constants.BUNDLE_NAME, aMessage, aCause);
+    public PairtreeException(final Exception aCause, final String aMessage) {
+        super(aCause, Constants.BUNDLE_NAME, aMessage);
     }
 
     /**
@@ -51,7 +51,8 @@ public class PairtreeException extends I18nException {
      * @param aCause An upstream exception
      * @param aDetailsVarargs Additional details to insert into the message
      */
-    public PairtreeException(final String aMessage, final Exception aCause, final String... aDetailsVarargs) {
-        super(Constants.BUNDLE_NAME, aMessage, aDetailsVarargs, aCause);
+    public PairtreeException(final Exception aCause, final String aMessage, final Object... aDetailsVarargs) {
+        super(aCause, Constants.BUNDLE_NAME, aMessage, aDetailsVarargs);
     }
+
 }

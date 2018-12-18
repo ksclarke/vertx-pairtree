@@ -63,9 +63,6 @@ public class S3Pairtree extends AbstractPairtree {
     /** The S3 client to use for the Pairtree's operations */
     private final S3Client myS3Client;
 
-    /** The Pairtree's prefix */
-    private final Optional<String> myPrefix;
-
     /**
      * Creates S3Pairtree using the supplied S3 bucket, access key and secret key.
      *

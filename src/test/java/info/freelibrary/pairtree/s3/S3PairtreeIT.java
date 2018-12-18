@@ -6,6 +6,10 @@ import static info.freelibrary.pairtree.Pairtree.PAIRTREE_PREFIX;
 import static info.freelibrary.pairtree.Pairtree.PAIRTREE_VERSION;
 import static info.freelibrary.pairtree.Pairtree.PT_VERSION_NUM;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,8 +18,8 @@ import com.amazonaws.regions.Region;
 import com.amazonaws.regions.RegionUtils;
 
 import info.freelibrary.pairtree.MessageCodes;
-import info.freelibrary.pairtree.PairtreeFactory;
 import info.freelibrary.pairtree.Pairtree;
+import info.freelibrary.pairtree.PairtreeFactory;
 import info.freelibrary.util.Logger;
 import info.freelibrary.util.LoggerFactory;
 
@@ -57,6 +61,40 @@ public class S3PairtreeIT extends AbstractS3IT {
     }
 
     @Test
+    public final void testConstructor1(final TestContext aContext) {
+        myPairtree = new PairtreeFactory(myVertx).getPairtree(myTestBucket, myAccessKey, mySecretKey);
+    }
+
+    @Test
+    public final void testConstructor2(final TestContext aContext) {
+        myPairtree = new PairtreeFactory(myVertx).getPairtree(myTestBucket, "mypath", myAccessKey, mySecretKey);
+    }
+
+    @Test
+    public final void testConstructor3(final TestContext aContext) {
+        myPairtree = new PairtreeFactory(myVertx).getPrefixedPairtree("prefix", myTestBucket, "mypath", myAccessKey,
+                mySecretKey);
+    }
+
+    @Test
+    public final void testConstructor4(final TestContext aContext) {
+        myPairtree = new PairtreeFactory(myVertx).getPrefixedPairtree("prefix", myTestBucket, myAccessKey,
+                mySecretKey);
+    }
+
+    @Test
+    public final void testConstructor5(final TestContext aContext) {
+        myPairtree = new PairtreeFactory(myVertx).getPrefixedPairtree("prefix", myTestBucket, myAccessKey,
+                mySecretKey, RegionUtils.getRegion(myEndpoint));
+    }
+
+    @Test
+    public final void testConstructor6(final TestContext aContext) {
+        myPairtree = new PairtreeFactory(myVertx).getPrefixedPairtree("prefix", myTestBucket, "mypath", myAccessKey,
+                mySecretKey, RegionUtils.getRegion(myEndpoint));
+    }
+
+    @Test
     public final void testExists(final TestContext aContext) {
         final Async async = aContext.async();
 
@@ -90,6 +128,66 @@ public class S3PairtreeIT extends AbstractS3IT {
     }
 
     @Test
+    public final void testGetS3Client(final TestContext aContext) {
+        final Async async = aContext.async();
+        final S3Client s3Client = ((S3Pairtree) myPairtree).getS3Client();
+
+        aContext.assertNotNull(s3Client);
+
+        async.complete();
+    }
+
+    @Test
+    public final void testExistedPrefixed(final TestContext aContext) {
+        final Async async = aContext.async();
+
+        // Create a prefixed Pairtree
+        myPairtree = new PairtreeFactory(myVertx).getPrefixedPairtree("prefix", myTestBucket, myAccessKey,
+                mySecretKey);
+
+        myPairtree.create(createHandler -> {
+            if (createHandler.succeeded()) {
+                myPairtree.exists(existsHandler -> {
+                    if (existsHandler.succeeded()) {
+                        if (existsHandler.result()) {
+                            async.complete();
+                        } else {
+                            aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_013, myPairtree.getPath()));
+                        }
+                    } else {
+                        aContext.fail(existsHandler.cause());
+                    }
+                });
+            } else {
+                aContext.fail(createHandler.cause());
+            }
+        });
+    }
+
+    @Test
+    public final void testCreatePrefixed(final TestContext aContext) {
+        final Async async = aContext.async();
+
+        // Create a prefixed Pairtree
+        myPairtree = new PairtreeFactory(myVertx).getPrefixedPairtree("prefix", myTestBucket, myAccessKey,
+                mySecretKey);
+
+        myPairtree.create(result -> {
+            if (result.succeeded()) {
+                aContext.assertTrue(myS3Client.doesObjectExist(myTestBucket, myPairtree.getVersionFilePath()));
+
+                if (myPairtree.hasPrefix()) {
+                    aContext.assertTrue(myS3Client.doesObjectExist(myTestBucket, myPairtree.getPrefixFilePath()));
+                }
+            } else {
+                aContext.fail(result.cause());
+            }
+
+            async.complete();
+        });
+    }
+
+    @Test
     public final void testCreate(final TestContext aContext) {
         final Async async = aContext.async();
 
@@ -105,6 +203,22 @@ public class S3PairtreeIT extends AbstractS3IT {
             }
 
             async.complete();
+        });
+    }
+
+    @Test
+    public final void testGetObjects(final TestContext aContext) {
+        final Async async = aContext.async();
+        final List<String> ids = Arrays.asList(new String[] { UUID.randomUUID().toString(), UUID.randomUUID()
+                .toString() });
+
+        myPairtree.create(result -> {
+            if (result.succeeded()) {
+                aContext.assertEquals(2, myPairtree.getObjects(ids).size());
+                async.complete();
+            } else {
+                aContext.fail(result.cause());
+            }
         });
     }
 

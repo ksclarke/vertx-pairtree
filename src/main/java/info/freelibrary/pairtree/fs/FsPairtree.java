@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import info.freelibrary.pairtree.AbstractPairtree;
 import info.freelibrary.pairtree.MessageCodes;
@@ -63,9 +64,10 @@ public class FsPairtree extends AbstractPairtree {
         myFileSystem = aVertx.fileSystem();
 
         if (aPairtreePrefix == null) {
+            myPrefix = Optional.empty();
             LOGGER.debug(MessageCodes.PT_DEBUG_001, aDirPath);
         } else {
-            myPrefix = aPairtreePrefix;
+            myPrefix = Optional.of(aPairtreePrefix);
             LOGGER.debug(MessageCodes.PT_DEBUG_002, aDirPath, aPairtreePrefix);
         }
     }
@@ -241,7 +243,7 @@ public class FsPairtree extends AbstractPairtree {
 
         myFileSystem.delete(getVersionFilePath(), result -> {
             if (result.succeeded()) {
-                if (myPrefix != null && myPrefix.length() > 0) {
+                if (hasPrefix()) {
                     deletePrefix(aFuture);
                 } else {
                     aFuture.complete();
@@ -289,7 +291,7 @@ public class FsPairtree extends AbstractPairtree {
 
         myFileSystem.writeFile(getVersionFilePath(), Buffer.buffer(specNote.toString()), result -> {
             if (result.succeeded()) {
-                if (myPrefix != null && myPrefix.length() > 0) {
+                if (hasPrefix()) {
                     setPrefix(aFuture);
                 } else {
                     aFuture.complete();
@@ -310,7 +312,7 @@ public class FsPairtree extends AbstractPairtree {
             LOGGER.debug(MessageCodes.PT_DEBUG_033, myPath);
         }
 
-        myFileSystem.writeFile(getPrefixFilePath(), Buffer.buffer(myPrefix), result -> {
+        myFileSystem.writeFile(getPrefixFilePath(), Buffer.buffer(myPrefix.get()), result -> {
             if (result.succeeded()) {
                 aFuture.complete();
             } else {
