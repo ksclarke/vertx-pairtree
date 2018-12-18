@@ -128,6 +128,66 @@ public class S3PairtreeIT extends AbstractS3IT {
     }
 
     @Test
+    public final void testGetS3Client(final TestContext aContext) {
+        final Async async = aContext.async();
+        final S3Client s3Client = ((S3Pairtree) myPairtree).getS3Client();
+
+        aContext.assertNotNull(s3Client);
+
+        async.complete();
+    }
+
+    @Test
+    public final void testExistedPrefixed(final TestContext aContext) {
+        final Async async = aContext.async();
+
+        // Create a prefixed Pairtree
+        myPairtree = new PairtreeFactory(myVertx).getPrefixedPairtree("prefix", myTestBucket, myAccessKey,
+                mySecretKey);
+
+        myPairtree.create(createHandler -> {
+            if (createHandler.succeeded()) {
+                myPairtree.exists(existsHandler -> {
+                    if (existsHandler.succeeded()) {
+                        if (existsHandler.result()) {
+                            async.complete();
+                        } else {
+                            aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_013, myPairtree.getPath()));
+                        }
+                    } else {
+                        aContext.fail(existsHandler.cause());
+                    }
+                });
+            } else {
+                aContext.fail(createHandler.cause());
+            }
+        });
+    }
+
+    @Test
+    public final void testCreatePrefixed(final TestContext aContext) {
+        final Async async = aContext.async();
+
+        // Create a prefixed Pairtree
+        myPairtree = new PairtreeFactory(myVertx).getPrefixedPairtree("prefix", myTestBucket, myAccessKey,
+                mySecretKey);
+
+        myPairtree.create(result -> {
+            if (result.succeeded()) {
+                aContext.assertTrue(myS3Client.doesObjectExist(myTestBucket, myPairtree.getVersionFilePath()));
+
+                if (myPairtree.hasPrefix()) {
+                    aContext.assertTrue(myS3Client.doesObjectExist(myTestBucket, myPairtree.getPrefixFilePath()));
+                }
+            } else {
+                aContext.fail(result.cause());
+            }
+
+            async.complete();
+        });
+    }
+
+    @Test
     public final void testCreate(final TestContext aContext) {
         final Async async = aContext.async();
 

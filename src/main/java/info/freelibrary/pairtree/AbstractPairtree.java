@@ -1,6 +1,8 @@
 
 package info.freelibrary.pairtree;
 
+import java.util.Optional;
+
 import info.freelibrary.util.I18nObject;
 
 import io.vertx.core.AsyncResult;
@@ -12,8 +14,8 @@ import io.vertx.core.Handler;
  */
 public abstract class AbstractPairtree extends I18nObject implements Pairtree {
 
-    /** The Pairtree's prefix (optional) */
-    protected String myPrefix;
+    /** The Pairtree's prefix */
+    protected Optional<String> myPrefix;
 
     /**
      * Creates an abstract pairtree object.
@@ -23,13 +25,13 @@ public abstract class AbstractPairtree extends I18nObject implements Pairtree {
     }
 
     @Override
-    public String getPrefix() {
+    public Optional<String> getPrefix() {
         return myPrefix;
     }
 
     @Override
     public boolean hasPrefix() {
-        return myPrefix != null && myPrefix.length() > 0;
+        return myPrefix.isPresent() && myPrefix.get().length() > 0;
     }
 
     @Override

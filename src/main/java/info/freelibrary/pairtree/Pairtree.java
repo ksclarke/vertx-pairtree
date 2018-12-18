@@ -2,6 +2,7 @@
 package info.freelibrary.pairtree;
 
 import java.util.List;
+import java.util.Optional;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -34,7 +35,7 @@ public interface Pairtree {
      *
      * @return The Pairtree prefix
      */
-    String getPrefix();
+    Optional<String> getPrefix();
 
     /**
      * Returns whether the Pairtree is using a prefix.

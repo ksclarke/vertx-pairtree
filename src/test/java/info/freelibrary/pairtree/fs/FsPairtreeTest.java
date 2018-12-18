@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.junit.Test;
@@ -253,7 +254,7 @@ public class FsPairtreeTest extends AbstractFsPairtreeTest {
         final String prefix = "asdf";
 
         myPairtree = new PairtreeFactory(myVertx).getPrefixedPairtree(prefix, new File(myPairtree.getPath()));
-        aContext.assertEquals(prefix, myPairtree.getPrefix());
+        aContext.assertEquals(Optional.of(prefix), myPairtree.getPrefix());
 
         myPairtree.create(handler -> {
             if (handler.succeeded()) {
@@ -270,7 +271,7 @@ public class FsPairtreeTest extends AbstractFsPairtreeTest {
         final String prefix = "asdf";
 
         myPairtree = new PairtreeFactory(myVertx).getPrefixedPairtree(prefix, new File(myPairtree.getPath()));
-        aContext.assertEquals(prefix, myPairtree.getPrefix());
+        aContext.assertEquals(Optional.of(prefix), myPairtree.getPrefix());
 
         myPairtree.create(createHandler -> {
             if (createHandler.succeeded()) {
@@ -293,7 +294,7 @@ public class FsPairtreeTest extends AbstractFsPairtreeTest {
         final String prefix = "asdf";
 
         myPairtree = new PairtreeFactory(myVertx).getPrefixedPairtree(prefix, new File(myPairtree.getPath()));
-        aContext.assertEquals(prefix, myPairtree.getPrefix());
+        aContext.assertEquals(Optional.of(prefix), myPairtree.getPrefix());
 
         myPairtree.create(createHandler -> {
             if (createHandler.succeeded()) {

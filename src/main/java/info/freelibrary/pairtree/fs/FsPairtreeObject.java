@@ -4,6 +4,7 @@ package info.freelibrary.pairtree.fs;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
+import java.util.Optional;
 
 import info.freelibrary.pairtree.Constants;
 import info.freelibrary.pairtree.MessageCodes;
@@ -33,7 +34,7 @@ public class FsPairtreeObject implements PairtreeObject {
     private final String myPairtreePath;
 
     /** The Pairtree's prefix (optional) */
-    private final String myPrefix;
+    private final Optional<String> myPrefix;
 
     /** The ID of this Pairtree */
     private final String myID;
@@ -54,10 +55,10 @@ public class FsPairtreeObject implements PairtreeObject {
         myPrefix = aPairtree.getPrefix();
         myFileSystem = aFileSystem;
 
-        if (myPrefix == null) {
+        if (!myPrefix.isPresent()) {
             myID = aID;
         } else {
-            myID = PairtreeUtils.removePrefix(myPrefix, aID);
+            myID = PairtreeUtils.removePrefix(myPrefix.get(), aID);
         }
     }
 
@@ -114,7 +115,7 @@ public class FsPairtreeObject implements PairtreeObject {
 
     @Override
     public String getID() {
-        return myPrefix == null ? myID : Paths.get(myPrefix, myID).toString();
+        return !myPrefix.isPresent() ? myID : Paths.get(myPrefix.get(), myID).toString();
     }
 
     @Override

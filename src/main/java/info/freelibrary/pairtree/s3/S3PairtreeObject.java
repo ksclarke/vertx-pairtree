@@ -10,6 +10,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -60,7 +61,7 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
     private final String myBucketPath;
 
     /** The Pairtree's prefix (optional) */
-    private final String myPrefix;
+    private final Optional<String> myPrefix;
 
     /** The Pairtree's ID */
     private final String myID;
@@ -194,7 +195,7 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
 
     @Override
     public String getID() {
-        return myPrefix == null ? myID : myPrefix + PATH_SEP + myID;
+        return !myPrefix.isPresent() ? myID : myPrefix.get() + PATH_SEP + myID;
     }
 
     /**
