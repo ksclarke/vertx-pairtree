@@ -237,7 +237,7 @@
   <!-- S3 integration tests can be run if an AWS/S3 access_key and private_key are supplied -->
   <profiles>
     <profile>
-      <id>s3_it</id>
+      <id>s3it</id>
       <build>
         <plugins>
           <plugin>

@@ -10,15 +10,15 @@ To check out and build the project, type on the command line:
     cd vertx-pairtree
     mvn install
 
-This will run the build and the unit tests for the file system back end. Right now, the only tests for the S3 back end are integration tests. To run a build with them, you will need to put the following properties in your [settings.xml file](https://maven.apache.org/settings.html) and run the build with the `s3_it` profile:
+This will run the build and the unit tests for the file system back end. Right now, the only tests for the S3 back end are integration tests. To run a build with them, you will need to put the following properties in your [settings.xml file](https://maven.apache.org/settings.html) and run the build with the `s3it` profile:
 
     <vertx.pairtree.bucket>YOUR_S3_BUCKET_NAME</vertx.pairtree.bucket>
     <vertx.pairtree.access_key>YOUR_ACCESS_KEY</vertx.pairtree.access_key>
     <vertx.pairtree.secret_key>YOUR_SECRET_KEY</vertx.pairtree.secret_key>
 
-Or, you can supply the required properties on the command line (with the same `s3_it` profile) when you build the project:
+Or, you can supply the required properties on the command line (with the same `s3it` profile) when you build the project:
 
-    mvn install -Ps3_it -Dvertx.pairtree.bucket=YOUR_S3_BUCKET_NAME \
+    mvn install -Ps3it -Dvertx.pairtree.bucket=YOUR_S3_BUCKET_NAME \
       -Dvertx.pairtree.access_key=YOUR_ACCESS_KEY \
       -Dvertx.pairtree.secret_key=YOUR_SECRET_KEY
 
@@ -28,7 +28,7 @@ You can name the S3 bucket whatever you want (and change its system property to 
 
 If you want to put your test S3 bucket in a region other than the standard us-east-1, you will also need to supply a `vertx.pairtree.region` argument. For example:
 
-    mvn install -Ps3_it -Dvertx.pairtree.bucket=YOUR_S3_BUCKET_NAME \
+    mvn install -Ps3it -Dvertx.pairtree.bucket=YOUR_S3_BUCKET_NAME \
       -Dvertx.pairtree.access_key=YOUR_ACCESS_KEY \
       -Dvertx.pairtree.secret_key=YOUR_SECRET_KEY \
       -Dvertx.pairtree.region="us-west-2"
