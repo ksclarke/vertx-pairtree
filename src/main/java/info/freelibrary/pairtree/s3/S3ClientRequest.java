@@ -59,7 +59,7 @@ import io.vertx.core.http.StreamPriority;
 /**
  * An S3 client request implementation of <code>HttpClientRequest</code>.
  */
-@SuppressWarnings({ "PMD.ExcessivePublicCount", "PMD.TooManyMethods" })
+@SuppressWarnings({ "PMD.ExcessivePublicCount", "PMD.TooManyMethods", "PMD.AvoidDuplicateLiterals" })
 public class S3ClientRequest implements HttpClientRequest {
 
     /** Hash-based message authentication code used for signing AWS requests */
