@@ -24,7 +24,7 @@ Or, you can supply the required properties on the command line (with the same `s
 
 The YOUR_S3_BUCKET_NAME, YOUR_ACCESS_KEY and YOUR_SECRET_KEY values obviously need to be replaced with real values. Within AWS' Identity and Access Management service you can configure a user that has permission to perform actions on the S3 bucket you've created for this purpose. For an example of the IAM inline user policy for an S3 bucket, consult the [example JSON file](https://github.com/ksclarke/freelib-utils/blob/master/src/test/resources/sample-iam-policy.json) in the project's `src/test/resources` directory.
 
-You can name the S3 bucket whatever you want (and change its system property to match), but make sure the bucket is only used for these integration tests. The tests will delete all the contents of the bucket as a part of the test tear down.
+You can name the S3 bucket whatever you want (and change its system property to match), but make sure the bucket is only used for these integration tests. The tests will delete all the contents of the bucket as a part of the test tear down. When these tests are run in Travis, a JDK name is appended onto the S3 bucket name so that the tests can be run concurrently. These buckets also need to be created ahead of time. Travis will not try to create them.
 
 If you want to put your test S3 bucket in a region other than the standard us-east-1, you will also need to supply a `vertx.pairtree.region` argument. For example:
 
