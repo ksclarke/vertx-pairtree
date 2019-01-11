@@ -49,9 +49,9 @@
 
     <!-- Dependency versions -->
     <freelib.utils.version>0.8.9</freelib.utils.version>
-    <aws.sdk.version>1.11.428</aws.sdk.version>
-    <vertx.version>3.5.4</vertx.version>
-    <jackson.version>2.9.7</jackson.version>
+    <aws.sdk.version>1.11.478</aws.sdk.version>
+    <vertx.version>3.6.2</vertx.version>
+    <jackson.version>2.9.8</jackson.version>
 
     <!-- Plugin versions -->
     <vertx.hot.plugin.version>2.1.0</vertx.hot.plugin.version>
@@ -237,7 +237,7 @@
   <!-- S3 integration tests can be run if an AWS/S3 access_key and private_key are supplied -->
   <profiles>
     <profile>
-      <id>s3_it</id>
+      <id>s3it</id>
       <build>
         <plugins>
           <plugin>

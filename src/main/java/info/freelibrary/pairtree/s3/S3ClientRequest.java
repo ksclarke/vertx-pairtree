@@ -54,11 +54,12 @@ import io.vertx.core.http.HttpClientResponse;
 import io.vertx.core.http.HttpConnection;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpVersion;
+import io.vertx.core.http.StreamPriority;
 
 /**
  * An S3 client request implementation of <code>HttpClientRequest</code>.
  */
-@SuppressWarnings({ "PMD.ExcessivePublicCount", "PMD.TooManyMethods" })
+@SuppressWarnings({ "PMD.ExcessivePublicCount", "PMD.TooManyMethods", "PMD.AvoidDuplicateLiterals" })
 public class S3ClientRequest implements HttpClientRequest {
 
     /** Hash-based message authentication code used for signing AWS requests */
@@ -173,6 +174,8 @@ public class S3ClientRequest implements HttpClientRequest {
     }
 
     @Override
+    @Deprecated
+    @SuppressWarnings("MissingDeprecated")
     public HttpClientRequest handler(final Handler<HttpClientResponse> aHandler) {
         return myRequest.handler(aHandler);
     }
@@ -203,16 +206,22 @@ public class S3ClientRequest implements HttpClientRequest {
     }
 
     @Override
+    @Deprecated
+    @SuppressWarnings("MissingDeprecated")
     public HttpClientRequest pause() {
         return myRequest.pause();
     }
 
     @Override
+    @Deprecated
+    @SuppressWarnings("MissingDeprecated")
     public HttpClientRequest resume() {
         return myRequest.resume();
     }
 
     @Override
+    @Deprecated
+    @SuppressWarnings("MissingDeprecated")
     public HttpClientRequest endHandler(final Handler<Void> aEndHandler) {
         return myRequest.endHandler(aEndHandler);
     }
@@ -496,6 +505,18 @@ public class S3ClientRequest implements HttpClientRequest {
     @Override
     public HttpClientRequest writeCustomFrame(final int aType, final int aFlagsInt, final Buffer aPayload) {
         return myRequest.writeCustomFrame(aType, aFlagsInt, aPayload);
+    }
+
+    @Override
+    @Deprecated
+    @SuppressWarnings("MissingDeprecated")
+    public HttpClientRequest fetch(final long aAmount) {
+        return myRequest.fetch(aAmount);
+    }
+
+    @Override
+    public StreamPriority getStreamPriority() {
+        return myRequest.getStreamPriority();
     }
 
 }
