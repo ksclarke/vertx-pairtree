@@ -166,10 +166,6 @@
       </plugin>
       <plugin>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <configuration>
-          <!-- An issue with vertx-hot prevents us from using this (https://github.com/dazraf/vertx-hot/issues/39) -->
-          <skip>true</skip>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>com.gavinmogan</groupId>
