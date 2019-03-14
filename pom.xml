@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>vertx-pairtree</artifactId>
   <packaging>jar</packaging>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.0</version>
   <name>Vert.x Pairtree</name>
   <description>A Pairtree library for Vert.x</description>
   <url>http://projects.freelibrary.info/vertx-pairtree</url>
@@ -42,10 +41,10 @@
 
   <properties>
     <!-- These values, needed by integration tests, can be supplied via command line or settings.xml file -->
-    <vertx.pairtree.bucket/>
-    <vertx.pairtree.access_key/>
-    <vertx.pairtree.secret_key/>
-    <vertx.pairtree.region/>
+    <vertx.pairtree.bucket />
+    <vertx.pairtree.access_key />
+    <vertx.pairtree.secret_key />
+    <vertx.pairtree.region />
 
     <!-- Dependency versions -->
     <freelib.utils.version>0.8.9</freelib.utils.version>
