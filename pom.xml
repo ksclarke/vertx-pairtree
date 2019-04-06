@@ -42,16 +42,17 @@
 
   <properties>
     <!-- These values, needed by integration tests, can be supplied via command line or settings.xml file -->
-    <vertx.pairtree.bucket/>
-    <vertx.pairtree.access_key/>
-    <vertx.pairtree.secret_key/>
-    <vertx.pairtree.region/>
+    <vertx.s3.bucket/>
+    <vertx.s3.access_key/>
+    <vertx.s3.secret_key/>
+    <vertx.s3.region/>
 
     <!-- Dependency versions -->
     <freelib.utils.version>0.8.9</freelib.utils.version>
     <aws.sdk.version>1.11.478</aws.sdk.version>
     <vertx.version>3.6.2</vertx.version>
     <jackson.version>2.9.8</jackson.version>
+    <vertx.s3.version>1.0.0-SNAPSHOT</vertx.s3.version>
 
     <!-- Plugin versions -->
     <codacy.plugin.version>1.0.2</codacy.plugin.version>
@@ -78,6 +79,11 @@
       <groupId>com.amazonaws</groupId>
       <artifactId>aws-java-sdk-s3</artifactId>
       <version>${aws.sdk.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>info.freelibrary</groupId>
+      <artifactId>vertx-super-s3</artifactId>
+      <version>${vertx.s3.version}</version>
     </dependency>
     <!-- Below dependencies are only used for testing -->
     <dependency>
@@ -229,10 +235,10 @@
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
               <systemPropertyVariables>
-                <vertx.pairtree.bucket>${vertx.pairtree.bucket}</vertx.pairtree.bucket>
-                <vertx.pairtree.access_key>${vertx.pairtree.access_key}</vertx.pairtree.access_key>
-                <vertx.pairtree.secret_key>${vertx.pairtree.secret_key}</vertx.pairtree.secret_key>
-                <vertx.pairtree.region>${vertx.pairtree.region}</vertx.pairtree.region>
+                <vertx.s3.bucket>${vertx.s3.bucket}</vertx.s3.bucket>
+                <vertx.s3.access_key>${vertx.s3.access_key}</vertx.s3.access_key>
+                <vertx.s3.secret_key>${vertx.s3.secret_key}</vertx.s3.secret_key>
+                <vertx.s3.region>${vertx.s3.region}</vertx.s3.region>
                 <vertx.port>${vertx.port}</vertx.port>
               </systemPropertyVariables>
               <argLine>${jacoco.agent.arg}</argLine>

@@ -1,16 +1,9 @@
 language: java
 
-# Cf. https://github.com/travis-ci/travis-ci/issues/2317
-# os:
-#   - linux
-#   - osx
-
 jdk:
   - oraclejdk8
   - oraclejdk11
   - openjdk8
-  - openjdk9
-  - openjdk10
   - openjdk11
 
 env:
@@ -24,7 +17,7 @@ env:
 # Overridden because parent project uses maven.test.skip instead of skipTests
 install: mvn install -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -B -V
 
-script: mvn -Ps3it install -Dvertx.pairtree.bucket="${VERTX_PAIRTREE_BUCKET}-${TRAVIS_JDK_VERSION}" -Dvertx.pairtree.access_key="${VERTX_PAIRTREE_ACCESS_KEY}" -Dvertx.pairtree.secret_key="${VERTX_PAIRTREE_SECRET_KEY}" pmd:pmd pmd:check
+script: mvn -Ps3it install -Dvertx.s3.bucket="${VERTX_PAIRTREE_BUCKET}-${TRAVIS_JDK_VERSION}" -Dvertx.s3.access_key="${VERTX_PAIRTREE_ACCESS_KEY}" -Dvertx.s3.secret_key="${VERTX_PAIRTREE_SECRET_KEY}" pmd:pmd pmd:check
 
 after_success: mvn com.gavinmogan:codacy-maven-plugin:coverage -DcoverageReportFile=target/site/jacoco/jacoco.xml -DprojectToken="${PROJECT_TOKEN}" -DapiToken="${API_TOKEN}"
 
@@ -37,13 +30,11 @@ notifications:
     recipients:
     - ksclarke@ksclarke.io
     on_failure: change
-    on_success: never
+    on_success: change
   irc:
     channels:
     - irc.freenode.org#freelibrary
     on_failure: always
     on_success: always
-  slack:
-    secure: eMZgS79kzSH6opY2sSJhrYdTg0jLB/JzLEvQFcn6xoDtek3/WjWWg4+M8sYv/qPqwzY3jeJ0vxd8SIwcgBJkgOHVJqvmqxWV49/F8EOENaDU+oWo5vUUh8GvM1e+B/4wZd14PbD6w9m4qs1gIAUcPECE21p0KDtvN/VYnH+96LI=
 
 sudo: false

@@ -48,11 +48,8 @@ public abstract class AbstractS3IT extends AbstractPairtreeTest {
     /** S3 bucket used in the tests */
     protected static String myTestBucket;
 
-    /** AWS region in which S3 bucket lives */
-    protected static String myRegionName;
-
-    /** S3 endpoint for S3 bucket */
-    protected static String myEndpoint;
+    /** S3 bucket region used in the tests */
+    protected static Region myRegion;
 
     /** Byte array for resource contents */
     protected static byte[] myResource;
@@ -67,24 +64,21 @@ public abstract class AbstractS3IT extends AbstractPairtreeTest {
      */
     @BeforeClass
     public static void setUpBeforeClass(final TestContext aContext) {
-        final Region region;
+        final String endpoint = StringUtils.trimToNull(System.getProperty("vertx.s3.region"));
+
+        myTestBucket = System.getProperty("vertx.s3.bucket", "vertx-pairtree-tests");
+        myAccessKey = System.getProperty("vertx.s3.access_key", "YOUR_ACCESS_KEY");
+        mySecretKey = System.getProperty("vertx.s3.secret_key", "YOUR_SECRET_KEY");
 
         try {
             myResource = IOUtils.readBytes(new FileInputStream(TEST_FILE));
-            myTestBucket = System.getProperty("vertx.pairtree.bucket", "vertx-pairtree-tests");
-            myAccessKey = System.getProperty("vertx.pairtree.access_key", "YOUR_ACCESS_KEY");
-            mySecretKey = System.getProperty("vertx.pairtree.secret_key", "YOUR_SECRET_KEY");
-            myEndpoint = StringUtils.trimToNull(System.getProperty("vertx.pairtree.region"));
 
             // We use "us-east-1" as the default region
-            if (myEndpoint != null) {
-                region = RegionUtils.getRegion(myEndpoint);
+            if (endpoint != null) {
+                myRegion = RegionUtils.getRegion(endpoint);
             } else {
-                region = RegionUtils.getRegion("us-east-1");
+                myRegion = RegionUtils.getRegion("us-east-1");
             }
-
-            myRegionName = region.getName();
-            myEndpoint = "s3." + myRegionName + '.' + region.getDomain();
         } catch (final IOException details) {
             aContext.fail(details.getMessage());
         }
@@ -102,8 +96,10 @@ public abstract class AbstractS3IT extends AbstractPairtreeTest {
         // Initialize the S3 client we use for test set up and tear down
         final AmazonS3ClientBuilder builder = AmazonS3ClientBuilder.standard().withCredentials(
                 new AWSStaticCredentialsProvider(new BasicAWSCredentials(myAccessKey, mySecretKey)));
+        final String endpoint = myRegion.getServiceEndpoint("s3");
+        final String regionName = myRegion.getName();
 
-        builder.setEndpointConfiguration(new EndpointConfiguration(myEndpoint, myRegionName));
+        builder.setEndpointConfiguration(new EndpointConfiguration(endpoint, regionName));
         myS3Client = builder.build();
     }
 

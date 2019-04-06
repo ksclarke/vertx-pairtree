@@ -14,9 +14,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.amazonaws.regions.Region;
-import com.amazonaws.regions.RegionUtils;
-
 import info.freelibrary.pairtree.MessageCodes;
 import info.freelibrary.pairtree.Pairtree;
 import info.freelibrary.pairtree.PairtreeFactory;
@@ -47,12 +44,11 @@ public class S3PairtreeIT extends AbstractS3IT {
         super.setUp(aContext);
 
         LOGGER.debug(MessageCodes.PT_DEBUG_001, "s3:///" + myTestBucket);
-        LOGGER.debug("Using AWS region: {}", myRegionName);
+        LOGGER.debug("Using AWS region: {}", myRegion.getName());
 
         final PairtreeFactory factory = new PairtreeFactory(myVertx);
-        final Region region = RegionUtils.getRegion(myEndpoint);
 
-        myPairtree = factory.getPairtree(myTestBucket, myAccessKey, mySecretKey, region);
+        myPairtree = factory.getPairtree(myTestBucket, myAccessKey, mySecretKey, myRegion);
     }
 
     @Test
@@ -85,13 +81,13 @@ public class S3PairtreeIT extends AbstractS3IT {
     @Test
     public final void testConstructor5(final TestContext aContext) {
         myPairtree = new PairtreeFactory(myVertx).getPrefixedPairtree("prefix", myTestBucket, myAccessKey,
-                mySecretKey, RegionUtils.getRegion(myEndpoint));
+                mySecretKey, myRegion);
     }
 
     @Test
     public final void testConstructor6(final TestContext aContext) {
         myPairtree = new PairtreeFactory(myVertx).getPrefixedPairtree("prefix", myTestBucket, "mypath", myAccessKey,
-                mySecretKey, RegionUtils.getRegion(myEndpoint));
+                mySecretKey, myRegion);
     }
 
     @Test

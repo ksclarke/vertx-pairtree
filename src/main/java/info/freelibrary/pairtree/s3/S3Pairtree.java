@@ -2,7 +2,6 @@
 package info.freelibrary.pairtree.s3;
 
 import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
-import static info.freelibrary.pairtree.Constants.PATH_SEP;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -23,6 +22,7 @@ import org.xml.sax.XMLReader;
 import com.amazonaws.regions.Region;
 
 import info.freelibrary.pairtree.AbstractPairtree;
+import info.freelibrary.pairtree.Constants;
 import info.freelibrary.pairtree.HTTP;
 import info.freelibrary.pairtree.MessageCodes;
 import info.freelibrary.pairtree.PairtreeObject;
@@ -201,8 +201,7 @@ public class S3Pairtree extends AbstractPairtree {
         Objects.requireNonNull(StringUtils.trimToNull(aSecretKey), getI18n(MessageCodes.PT_017));
 
         if (aRegion.isPresent()) {
-            // getName() returns the region name in the form "s3.us-east-1.amazonaws.com"
-            myS3Client = new S3Client(aVertx, aAccessKey, aSecretKey, aRegion.get().getName());
+            myS3Client = new S3Client(aVertx, aAccessKey, aSecretKey, aRegion.get().getServiceEndpoint("s3"));
         } else {
             myS3Client = new S3Client(aVertx, aAccessKey, aSecretKey);
         }
@@ -214,7 +213,7 @@ public class S3Pairtree extends AbstractPairtree {
             if (aBucketPath.get().charAt(0) == '/') {
                 myBucketPath = aBucketPath;
             } else {
-                myBucketPath = Optional.of(PATH_SEP + aBucketPath.get());
+                myBucketPath = Optional.of(Constants.PATH_SEP + aBucketPath.get());
             }
         } else {
             myBucketPath = aBucketPath;
@@ -386,7 +385,7 @@ public class S3Pairtree extends AbstractPairtree {
 
     @Override
     public String toString() {
-        return "s3://" + PATH_SEP + myBucket + getBucketPath() + PATH_SEP + PAIRTREE_ROOT;
+        return "s3://" + Constants.PATH_SEP + myBucket + getBucketPath() + Constants.PATH_SEP + PAIRTREE_ROOT;
     }
 
     @Override
@@ -408,14 +407,14 @@ public class S3Pairtree extends AbstractPairtree {
     public String getPrefixFilePath() {
         final String bucketPath = getBucketPath();
 
-        return "".equals(bucketPath) ? PAIRTREE_PREFIX : bucketPath + PATH_SEP + PAIRTREE_PREFIX;
+        return "".equals(bucketPath) ? PAIRTREE_PREFIX : bucketPath + Constants.PATH_SEP + PAIRTREE_PREFIX;
     }
 
     @Override
     public String getVersionFilePath() {
         final String bucketPath = getBucketPath();
 
-        return "".equals(bucketPath) ? getVersionFileName() : bucketPath + PATH_SEP + getVersionFileName();
+        return "".equals(bucketPath) ? getVersionFileName() : bucketPath + Constants.PATH_SEP + getVersionFileName();
     }
 
     /**

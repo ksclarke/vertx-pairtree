@@ -12,8 +12,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.amazonaws.AmazonClientException;
-import com.amazonaws.regions.Region;
-import com.amazonaws.regions.RegionUtils;
 
 import info.freelibrary.pairtree.MessageCodes;
 import info.freelibrary.pairtree.Pairtree;
@@ -62,9 +60,8 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
         LOGGER.debug(MessageCodes.PT_DEBUG_001, "s3:///" + myTestBucket);
 
         final PairtreeFactory factory = new PairtreeFactory(myVertx);
-        final Region region = RegionUtils.getRegion(myEndpoint);
 
-        myPairtree = factory.getPairtree(myTestBucket, myAccessKey, mySecretKey, region);
+        myPairtree = factory.getPairtree(myTestBucket, myAccessKey, mySecretKey, myRegion);
 
         // Create a test ID for each test run
         myUID = randomUUID().toString();
@@ -87,7 +84,7 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
             }
 
             async.complete();
-        }, myTestBucket, myAccessKey, mySecretKey, myEndpoint, myUID);
+        }, myTestBucket, myAccessKey, mySecretKey, myRegion, myUID);
     }
 
     @Test
@@ -141,7 +138,7 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
             }
 
             async.complete();
-        }, myTestBucket, myAccessKey, mySecretKey, myEndpoint, myUID);
+        }, myTestBucket, myAccessKey, mySecretKey, myRegion, myUID);
     }
 
     @Test
