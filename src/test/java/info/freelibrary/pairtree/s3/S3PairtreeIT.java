@@ -19,6 +19,7 @@ import info.freelibrary.pairtree.Pairtree;
 import info.freelibrary.pairtree.PairtreeFactory;
 import info.freelibrary.util.Logger;
 import info.freelibrary.util.LoggerFactory;
+import info.freelibrary.vertx.s3.S3Client;
 
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;

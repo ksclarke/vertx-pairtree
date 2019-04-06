@@ -29,6 +29,7 @@ import info.freelibrary.pairtree.PairtreeObject;
 import info.freelibrary.util.Logger;
 import info.freelibrary.util.LoggerFactory;
 import info.freelibrary.util.StringUtils;
+import info.freelibrary.vertx.s3.S3Client;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
