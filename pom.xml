@@ -51,7 +51,7 @@
     <freelib.utils.version>0.8.9</freelib.utils.version>
     <aws.sdk.version>1.11.478</aws.sdk.version>
     <vertx.version>3.6.2</vertx.version>
-    <jackson.version>2.9.8</jackson.version>
+    <jackson.version>2.9.9</jackson.version>
 
     <!-- Plugin versions -->
     <vertx.hot.plugin.version>2.1.0</vertx.hot.plugin.version>
