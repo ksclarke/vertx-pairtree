@@ -10,7 +10,6 @@ import org.junit.Before;
 import org.junit.runner.RunWith;
 
 import com.amazonaws.regions.Region;
-import com.amazonaws.regions.RegionUtils;
 
 import info.freelibrary.util.Logger;
 
@@ -106,12 +105,11 @@ public abstract class AbstractPairtreeTest {
      * @param aID A Pairtree object ID
      */
     protected void createTestS3PairtreeObject(final Handler<AsyncResult<PairtreeObject>> aHandler,
-            final String aBucket, final String aAccessKey, final String aSecretKey, final String aEndpoint,
+            final String aBucket, final String aAccessKey, final String aSecretKey, final Region aRegion,
             final String aID) throws PairtreeException {
         Objects.requireNonNull(aHandler, LOGGER.getMessage(MessageCodes.PT_010));
 
-        final Region region = RegionUtils.getRegion(aEndpoint);
-        final Pairtree root = new PairtreeFactory(myVertx).getPairtree(aBucket, aAccessKey, aSecretKey, region);
+        final Pairtree root = new PairtreeFactory(myVertx).getPairtree(aBucket, aAccessKey, aSecretKey, aRegion);
         final Future<PairtreeObject> future = Future.<PairtreeObject>future().setHandler(aHandler);
 
         root.create(createPtResult -> {

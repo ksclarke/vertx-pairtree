@@ -42,19 +42,19 @@
 
   <properties>
     <!-- These values, needed by integration tests, can be supplied via command line or settings.xml file -->
-    <vertx.pairtree.bucket/>
-    <vertx.pairtree.access_key/>
-    <vertx.pairtree.secret_key/>
-    <vertx.pairtree.region/>
+    <vertx.s3.bucket/>
+    <vertx.s3.access_key/>
+    <vertx.s3.secret_key/>
+    <vertx.s3.region/>
 
     <!-- Dependency versions -->
-    <freelib.utils.version>0.8.9</freelib.utils.version>
-    <aws.sdk.version>1.11.478</aws.sdk.version>
-    <vertx.version>3.6.2</vertx.version>
+    <freelib.utils.version>0.8.10</freelib.utils.version>
+    <aws.sdk.version>1.11.572</aws.sdk.version>
+    <vertx.version>3.7.1</vertx.version>
     <jackson.version>2.9.9</jackson.version>
+    <vertx.s3.version>1.0.0</vertx.s3.version>
 
     <!-- Plugin versions -->
-    <vertx.hot.plugin.version>2.1.0</vertx.hot.plugin.version>
     <codacy.plugin.version>1.0.2</codacy.plugin.version>
   </properties>
 
@@ -79,6 +79,11 @@
       <groupId>com.amazonaws</groupId>
       <artifactId>aws-java-sdk-s3</artifactId>
       <version>${aws.sdk.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>info.freelibrary</groupId>
+      <artifactId>vertx-super-s3</artifactId>
+      <version>${vertx.s3.version}</version>
     </dependency>
     <!-- Below dependencies are only used for testing -->
     <dependency>
@@ -125,17 +130,6 @@
         <artifactId>maven-pmd-plugin</artifactId>
       </plugin>
       <plugin>
-        <groupId>io.dazraf</groupId>
-        <artifactId>vertx-hot-maven-plugin</artifactId>
-        <version>${vertx.hot.plugin.version}</version>
-        <configuration>
-          <verticleReference>info.freelibrary.pairtree.PairtreeVerticle</verticleReference>
-          <systemPropertyVariables>
-            <vertx.logger-delegate-factory-class-name>io.vertx.core.logging.SLF4JLogDelegateFactory</vertx.logger-delegate-factory-class-name>
-          </systemPropertyVariables>
-        </configuration>
-      </plugin>
-      <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>
         <dependencies>
           <dependency>
@@ -159,7 +153,6 @@
           <links>
             <link>https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/</link>
             <link>https://vertx.io/docs/apidocs/</link>
-            <link>https://docs.oracle.com/javase/8/docs/api/</link>
           </links>
           <sourcepath>src/main/java:src/main/generated</sourcepath>
         </configuration>
@@ -178,10 +171,6 @@
       </plugin>
       <plugin>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <configuration>
-          <!-- An issue with vertx-hot prevents us from using this (https://github.com/dazraf/vertx-hot/issues/39) -->
-          <skip>true</skip>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>com.gavinmogan</groupId>
@@ -245,10 +234,10 @@
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
               <systemPropertyVariables>
-                <vertx.pairtree.bucket>${vertx.pairtree.bucket}</vertx.pairtree.bucket>
-                <vertx.pairtree.access_key>${vertx.pairtree.access_key}</vertx.pairtree.access_key>
-                <vertx.pairtree.secret_key>${vertx.pairtree.secret_key}</vertx.pairtree.secret_key>
-                <vertx.pairtree.region>${vertx.pairtree.region}</vertx.pairtree.region>
+                <vertx.s3.bucket>${vertx.s3.bucket}</vertx.s3.bucket>
+                <vertx.s3.access_key>${vertx.s3.access_key}</vertx.s3.access_key>
+                <vertx.s3.secret_key>${vertx.s3.secret_key}</vertx.s3.secret_key>
+                <vertx.s3.region>${vertx.s3.region}</vertx.s3.region>
                 <vertx.port>${vertx.port}</vertx.port>
               </systemPropertyVariables>
               <argLine>${jacoco.agent.arg}</argLine>
@@ -275,7 +264,7 @@
   <parent>
     <artifactId>freelib-parent</artifactId>
     <groupId>info.freelibrary</groupId>
-    <version>0.3.4</version>
+    <version>3.6.4</version>
   </parent>
 
 </project>
