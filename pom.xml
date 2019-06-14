@@ -48,11 +48,11 @@
     <vertx.s3.region/>
 
     <!-- Dependency versions -->
-    <freelib.utils.version>0.8.9</freelib.utils.version>
-    <aws.sdk.version>1.11.478</aws.sdk.version>
-    <vertx.version>3.6.2</vertx.version>
-    <jackson.version>2.9.8</jackson.version>
-    <vertx.s3.version>1.0.0-SNAPSHOT</vertx.s3.version>
+    <freelib.utils.version>0.8.10</freelib.utils.version>
+    <aws.sdk.version>1.11.572</aws.sdk.version>
+    <vertx.version>3.7.1</vertx.version>
+    <jackson.version>2.9.9</jackson.version>
+    <vertx.s3.version>1.0.0</vertx.s3.version>
 
     <!-- Plugin versions -->
     <codacy.plugin.version>1.0.2</codacy.plugin.version>
@@ -153,7 +153,6 @@
           <links>
             <link>https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/</link>
             <link>https://vertx.io/docs/apidocs/</link>
-            <link>https://docs.oracle.com/javase/8/docs/api/</link>
           </links>
           <sourcepath>src/main/java:src/main/generated</sourcepath>
         </configuration>
@@ -265,7 +264,7 @@
   <parent>
     <artifactId>freelib-parent</artifactId>
     <groupId>info.freelibrary</groupId>
-    <version>0.3.4</version>
+    <version>3.6.4</version>
   </parent>
 
 </project>
