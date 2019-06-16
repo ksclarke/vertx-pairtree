@@ -35,6 +35,11 @@ after_success:
   - >
     src/main/tools/travis/deploy
 
+# Cache Maven packages
+cache:
+  directories:
+  - $HOME/.m2
+
 # The only branch we build on is master; all other builds are done on PRs to master
 branches:
   only:
