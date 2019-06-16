@@ -1,8 +1,6 @@
 language: java
 
 jdk:
-  - oraclejdk8
-  - oraclejdk11
   - openjdk8
   - openjdk11
 
@@ -14,16 +12,34 @@ env:
     - secure: "ssYHf8fr4OTDii/VjCn1ji4hlIdwxxTGFr8kDnO6TdgG2wA6xTGZA+w+yr20hlK8KANU3381wkL0vtzxZJ+egsZkQA4ohy2Sntz3egx5dDL/OhvqaP7QtXaW3T+OP9KHvOCWzFKF0XZrlvp7XIf89ox8z/m3blElnU0mfYu6rQF0F+Ye2L9hhQOLEl/6X84rqnT2ez94me9l8dsdgOr2f5MBV0JhlFPhgGZvWZp1kZC+Pze55eIboKhUcK64B1PpPHeldzUsDcLaCATu3PAekJK/Vndmd4M5iank6fOiYw24uGY5mmCG92c1L0zUNjhg2uFxMvzlbxph89GWM8Yyu8kavk/btEp6GTM7Nl0e48/4jxXAydBLsrtKLak5xIihY2nkoH9mrQpUtZmjIe+9Kvt7yNW4SbwsTjTfIwIkeDGpzwvSTdpMrkHYbD9FGz/6fIKHY0+d6u8DPdl7QjRBe0pvVk2e/Y5jvB/OTP7ETHKetPT+B1yQX5Zp/X/xMKiZv4nVR9smB2Nd0+y6OVnc0l3FtS78Mnq7xYItpo6t2IvMsBxpzWdS9MkAJZJ5DvT6NPvS6CWSugHytL9pZQFZKEtb5gJeFc4hm2O5w/W6uk5f6HuwzS4zLZnqUB4UUt/MVE9vdZSAsEbo/em2VLXgTIcnVnf9maXjJ+sRvKGS9AY="
     - secure: "WLNW2qzMGV10vHzZOrxeHmTkWE6bb0VgSVG6HUxaqDlJ947OzHL0eCc7De4anhsZrGY9217eex0VK2N6YpFul2O8Ohx/2x3cq5byJOkJn/AhLAvWaua8ed9xLLjDs2NjDdy6vt+i7UJLlhwc64saZ9dk8bf7TJaeAu4B3/NBFofTYIbs3KXSVzJhTGRDzkdJquIMA5CqI04lPNkGgYZI6gFqUjiOE5mwD/Z/nzQbQ9dxhbMSaRCiNwUvpM622KxrY7MD2hXQ0Cyfgs0EUXQneZuKEt0TWQHtucXdCiy7JMH/Cgt/f5c/rCQEqfl1zz4vECZe3CP7RDpvwRiHGsKI71t8LqO4Bm/GPK912z5AgHo6R8HFCq2Hi9JpRwKRL/Hd+dgirhXaO507ErEzIK14kGywzYcvFBbOeK+GKiV4rSiNwot7ttnAWwNm++0iROvdMD/1tK23QnI7H/9WPkut3tQW2OLoXvwwD20r5o5WWflet9EMn8jl4shXvo4TXFhfTEu1+n97X/pViRZ5BtYGdcTj8cFCXOHGbobj/9+PdJw5zlIXxAU8Id2opty3VQYv3wf4711bqADzoXjJx9lRtZSCrR8GSB18bZoNIKclsSuonmb85OAQ1HWVYQUro258O8ES0jMKKXvak6UqE4Nw7ZLSv0XYVhpRH0ATmpL3QAs="
 
+before_install:
+  - >
+    openssl aes-256-cbc -K $encrypted_bca22cbb3d79_key -iv $encrypted_bca22cbb3d79_iv \
+      -in build-key.gpg.enc -out src/main/resources/build-key.gpg -d
+
 # Overridden because parent project uses maven.test.skip instead of skipTests
-install: mvn install -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -B -V
+install:
+  - mvn install -q -Dmaven.test.skip -Dmaven.javadoc.skip -B -V
 
-script: mvn -Ps3it install -Dvertx.s3.bucket="${VERTX_PAIRTREE_BUCKET}-${TRAVIS_JDK_VERSION}" -Dvertx.s3.access_key="${VERTX_PAIRTREE_ACCESS_KEY}" -Dvertx.s3.secret_key="${VERTX_PAIRTREE_SECRET_KEY}" pmd:pmd pmd:check
+script:
+  - >
+    mvn -Ps3it install -Dvertx.s3.bucket="${VERTX_PAIRTREE_BUCKET}-${TRAVIS_JDK_VERSION}" \
+      -Dvertx.s3.access_key="${VERTX_PAIRTREE_ACCESS_KEY}" -Dvertx.s3.secret_key="${VERTX_PAIRTREE_SECRET_KEY}" \
+      pmd:pmd pmd:check
 
-after_success: mvn com.gavinmogan:codacy-maven-plugin:coverage -DcoverageReportFile=target/site/jacoco/jacoco.xml -DprojectToken="${PROJECT_TOKEN}" -DapiToken="${API_TOKEN}"
+after_success:
+  - >
+    mvn com.gavinmogan:codacy-maven-plugin:coverage -DcoverageReportFile=target/site/jacoco/jacoco.xml \
+      -DprojectToken="${PROJECT_TOKEN}" -DapiToken="${API_TOKEN}"
+  - >
+    chmod -R 755 src/main/tools/travis
+  - >
+    src/main/tools/travis/deploy
 
-cache:
-  directories:
-  - $HOME/.m2
+# The only branch we build on is master; all other builds are done on PRs to master
+branches:
+  only:
+  - master
 
 notifications:
   email:
@@ -31,10 +47,5 @@ notifications:
     - ksclarke@ksclarke.io
     on_failure: change
     on_success: change
-  irc:
-    channels:
-    - irc.freenode.org#freelibrary
-    on_failure: always
-    on_success: always
 
 sudo: false
