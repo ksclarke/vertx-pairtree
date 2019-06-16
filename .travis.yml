@@ -15,7 +15,7 @@ env:
 before_install:
   - >
     openssl aes-256-cbc -K $encrypted_bca22cbb3d79_key -iv $encrypted_bca22cbb3d79_iv \
-      -in build-key.gpg.enc -out src/main/resources/build-key.gpg -d
+      -in src/main/resources/build-key.gpg.enc -out src/main/resources/build-key.gpg -d
 
 # Overridden because parent project uses maven.test.skip instead of skipTests
 install:
