@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
+
+<!--<![CDATA[
+  To process this file outside of a full build, run:
+    mvn info.freelibrary:freelib-utils:generate-codes -DmessageFiles=src/main/resources/pairtree_messages.xml
+  Bash shell users can run the shorter form:
+    mvn info.freelibrary:freelib-utils:generate-codes -DmessageFiles=$(find src -name *_messages.xml)
+]]>-->
+
   <entry key="message-class-name">info.freelibrary.pairtree.MessageCodes</entry>
 
   <!-- Messages to be stored in the MessageCodes class -->
@@ -90,5 +98,6 @@
   <entry key="PT-DEBUG-059">Finding Pairtree object resource '{}' in '{}' [{}]</entry>
   <entry key="PT-DEBUG-060">{} deployed: {}</entry>
   <entry key="PT-DEBUG-061">Pairtree server started at port {}</entry>
+  <entry key="PT-DEBUG-062">Found environmental AWS profile: {}</entry>
 
 </properties>
