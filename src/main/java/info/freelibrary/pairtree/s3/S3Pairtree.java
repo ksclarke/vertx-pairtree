@@ -260,7 +260,6 @@ public class S3Pairtree extends AbstractPairtree {
 
         if (aRegion.isPresent()) {
             final String region = aRegion.get().getServiceEndpoint(S3_SERVICE_ENDPOINT);
-
             myS3Client = new S3Client(aVertx, aAccessKey, aSecretKey, region);
         } else {
             myS3Client = new S3Client(aVertx, aAccessKey, aSecretKey);

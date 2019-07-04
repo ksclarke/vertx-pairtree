@@ -99,5 +99,6 @@
   <entry key="PT-DEBUG-060">{} deployed: {}</entry>
   <entry key="PT-DEBUG-061">Pairtree server started at port {}</entry>
   <entry key="PT-DEBUG-062">Found environmental AWS profile: {}</entry>
+  <entry key="PT-DEBUG-063">Environmental variable AWS_PROFILE was not supplied as expected</entry>
 
 </properties>

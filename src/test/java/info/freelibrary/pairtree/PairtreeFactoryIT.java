@@ -2,6 +2,7 @@
 package info.freelibrary.pairtree;
 
 import org.junit.After;
+import org.junit.AssumptionViolatedException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,10 +33,6 @@ public class PairtreeFactoryIT {
     private static final String TEST_PROFILE = "vertx-s3";
 
     private static final String AWS_PROFILE = "AWS_PROFILE";
-
-    private static final String AWS_ACCESS_KEY = "AWS_ACCESS_KEY";
-
-    private static final String AWS_SECRET_KEY = "AWS_SECRET_KEY";
 
     private static final String PT_PREFIX = "my_prefix";
 
@@ -126,6 +123,11 @@ public class PairtreeFactoryIT {
     public void testGetPairtreeFactoryWithENVProfile(final TestContext aContext) throws PairtreeException {
         final String profileName = System.getenv(AWS_PROFILE);
 
+        if (profileName == null) {
+            LOGGER.warn(MessageCodes.PT_DEBUG_063);
+            throw new AssumptionViolatedException(LOGGER.getMessage(MessageCodes.PT_DEBUG_063));
+        }
+
         LOGGER.debug(MessageCodes.PT_DEBUG_062, profileName);
 
         myPairtree = new PairtreeFactory(myVertx).getPairtree(myTestBucket);
@@ -141,6 +143,11 @@ public class PairtreeFactoryIT {
     @Test
     public void testGetPairtreeFactoryWithENVProfileAndPrefix(final TestContext aContext) throws PairtreeException {
         final String profileName = System.getenv(AWS_PROFILE);
+
+        if (profileName == null) {
+            LOGGER.warn(MessageCodes.PT_DEBUG_063);
+            throw new AssumptionViolatedException(LOGGER.getMessage(MessageCodes.PT_DEBUG_063));
+        }
 
         LOGGER.debug(MessageCodes.PT_DEBUG_062, profileName);
 

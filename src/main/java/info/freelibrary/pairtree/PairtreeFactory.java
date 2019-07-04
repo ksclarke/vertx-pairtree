@@ -12,6 +12,8 @@ import com.amazonaws.regions.RegionUtils;
 import info.freelibrary.pairtree.fs.FsPairtree;
 import info.freelibrary.pairtree.s3.S3Pairtree;
 import info.freelibrary.pairtree.s3.S3Profile;
+import info.freelibrary.util.Logger;
+import info.freelibrary.util.LoggerFactory;
 import info.freelibrary.util.StringUtils;
 
 import io.vertx.core.Vertx;
@@ -20,6 +22,8 @@ import io.vertx.core.Vertx;
  * A factory which can be used to create pairtree objects.
  */
 public final class PairtreeFactory {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PairtreeFactory.class, Constants.BUNDLE_NAME);
 
     private static final String AWS_PROFILE = "AWS_PROFILE";
 
@@ -106,7 +110,7 @@ public final class PairtreeFactory {
         if (region != null) {
             myRegion = Optional.ofNullable(RegionUtils.getRegion(region));
         } else {
-            region = System.getProperty("vertx.s3.region");
+            region = StringUtils.trimToNull(System.getProperty("vertx.s3.region"));
             myRegion = region != null ? Optional.ofNullable(RegionUtils.getRegion(region)) : Optional.empty();
         }
 
