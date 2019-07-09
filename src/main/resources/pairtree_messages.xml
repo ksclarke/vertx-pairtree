@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
+
+<!--<![CDATA[
+  To process this file outside of a full build, run:
+    mvn info.freelibrary:freelib-utils:generate-codes -DmessageFiles=src/main/resources/pairtree_messages.xml
+  Bash shell users can run the shorter form:
+    mvn info.freelibrary:freelib-utils:generate-codes -DmessageFiles=$(find src -name *_messages.xml)
+]]>-->
+
   <entry key="message-class-name">info.freelibrary.pairtree.MessageCodes</entry>
 
   <!-- Messages to be stored in the MessageCodes class -->
@@ -27,6 +35,7 @@
   <entry key="PT-021">No environmental credentials found</entry>
   <entry key="PT-022">Requested Pairtree location cannot be null</entry>
   <entry key="PT-023">Pairtree location must be a directory and must be writeable: {}</entry>
+  <entry key="PT-024">AWS_PROFILE supplied but there is no AWS credentials file</entry>
   
   <!-- Debugging messages -->
   <entry key="PT-DEBUG-001">Initializing Pairtree in '{}'</entry>
@@ -90,5 +99,9 @@
   <entry key="PT-DEBUG-059">Finding Pairtree object resource '{}' in '{}' [{}]</entry>
   <entry key="PT-DEBUG-060">{} deployed: {}</entry>
   <entry key="PT-DEBUG-061">Pairtree server started at port {}</entry>
+  <entry key="PT-DEBUG-062">Found environmental AWS profile: {}</entry>
+  <entry key="PT-DEBUG-063">Environmental variable AWS_PROFILE was not supplied as expected</entry>
+  <entry key="PT-DEBUG-064">Tests require the ~/.aws/credentials file but it cannot be found</entry>
+  <entry key="PT-DEBUG-065">Using credentials profile from AWS_PROFILE environmental variable</entry>
 
 </properties>

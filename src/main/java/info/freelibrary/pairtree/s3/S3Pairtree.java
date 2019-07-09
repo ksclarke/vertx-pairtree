@@ -49,11 +49,11 @@ public class S3Pairtree extends AbstractPairtree {
     /** AWS secret key */
     public static final String AWS_SECRET_KEY = "AWS_SECRET_KEY";
 
-    /** AWS region for the S3 bucket */
-    public static final String AWS_REGION = "AWS_REGION";
-
     /** An S3 Pairtree logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(S3Pairtree.class, BUNDLE_NAME);
+
+    /** The S3 endpoint prefix */
+    private static final String S3_SERVICE_ENDPOINT = "s3";
 
     /** The Pairtree's S3 bucket */
     private final String myBucket;
@@ -74,6 +74,33 @@ public class S3Pairtree extends AbstractPairtree {
      */
     public S3Pairtree(final Vertx aVertx, final String aBucket, final String aAccessKey, final String aSecretKey) {
         this(Optional.empty(), aVertx, aBucket, Optional.empty(), aAccessKey, aSecretKey, Optional.empty());
+    }
+
+    /**
+     * Creates S3Pairtree using the supplied S3 bucket and credentials from the supplied AWS profile.
+     *
+     * @param aVertx A Vert.x instance with which to instantiate the <code>S3Client</code>
+     * @param aProfile An S3 profile with the appropriate credentials
+     * @param aBucket An S3 bucket in which to put the Pairtree
+     */
+    public S3Pairtree(final Vertx aVertx, final S3Profile aProfile, final String aBucket) {
+        myS3Client = new S3Client(aVertx, aProfile);
+        myBucketPath = Optional.empty();
+        myBucket = aBucket;
+    }
+
+    /**
+     * Creates S3Pairtree using the supplied S3 bucket and credentials from the supplied AWS profile.
+     *
+     * @param aVertx A Vert.x instance with which to instantiate the <code>S3Client</code>
+     * @param aProfile An S3 profile with the appropriate credentials
+     * @param aBucketPath A path within the bucket at which the Pairtree should be put
+     * @param aBucket An S3 bucket in which to put the Pairtree
+     */
+    public S3Pairtree(final Vertx aVertx, final S3Profile aProfile, final String aBucket, final String aBucketPath) {
+        myS3Client = new S3Client(aVertx, aProfile);
+        myBucketPath = Optional.of(aBucketPath);
+        myBucket = aBucket;
     }
 
     /**
@@ -102,6 +129,36 @@ public class S3Pairtree extends AbstractPairtree {
     public S3Pairtree(final Vertx aVertx, final String aBucket, final String aAccessKey, final String aSecretKey,
             final Region aEndpoint) {
         this(Optional.empty(), aVertx, aBucket, Optional.empty(), aAccessKey, aSecretKey, Optional.of(aEndpoint));
+    }
+
+    /**
+     * Creates S3Pairtree using the supplied S3 bucket and credentials from the supplied AWS profile.
+     *
+     * @param aVertx A Vert.x instance with which to instantiate the <code>S3Client</code>
+     * @param aProfile An S3 profile with the appropriate credentials
+     * @param aBucket An S3 bucket in which to put the Pairtree
+     * @param aRegion An S3 region in which to create the bucket
+     */
+    public S3Pairtree(final Vertx aVertx, final S3Profile aProfile, final String aBucket, final Region aRegion) {
+        myS3Client = new S3Client(aVertx, aProfile, aRegion.getServiceEndpoint(S3_SERVICE_ENDPOINT));
+        myBucketPath = Optional.empty();
+        myBucket = aBucket;
+    }
+
+    /**
+     * Creates S3Pairtree using the supplied S3 bucket and credentials from the supplied AWS profile.
+     *
+     * @param aVertx A Vert.x instance with which to instantiate the <code>S3Client</code>
+     * @param aProfile An S3 profile with the appropriate credentials
+     * @param aBucketPath A path within the bucket at which the Pairtree should be put
+     * @param aBucket An S3 bucket in which to put the Pairtree
+     * @param aRegion An S3 region in which to create the bucket
+     */
+    public S3Pairtree(final Vertx aVertx, final S3Profile aProfile, final String aBucket, final String aBucketPath,
+            final Region aRegion) {
+        myS3Client = new S3Client(aVertx, aProfile, aRegion.getServiceEndpoint(S3_SERVICE_ENDPOINT));
+        myBucketPath = Optional.of(aBucketPath);
+        myBucket = aBucket;
     }
 
     /**
@@ -202,7 +259,8 @@ public class S3Pairtree extends AbstractPairtree {
         Objects.requireNonNull(StringUtils.trimToNull(aSecretKey), getI18n(MessageCodes.PT_017));
 
         if (aRegion.isPresent()) {
-            myS3Client = new S3Client(aVertx, aAccessKey, aSecretKey, aRegion.get().getServiceEndpoint("s3"));
+            final String region = aRegion.get().getServiceEndpoint(S3_SERVICE_ENDPOINT);
+            myS3Client = new S3Client(aVertx, aAccessKey, aSecretKey, region);
         } else {
             myS3Client = new S3Client(aVertx, aAccessKey, aSecretKey);
         }
@@ -221,7 +279,7 @@ public class S3Pairtree extends AbstractPairtree {
         }
 
         if (myPrefix.isPresent()) {
-            LOGGER.debug(MessageCodes.PT_DEBUG_002, myBucket, myPrefix);
+            LOGGER.debug(MessageCodes.PT_DEBUG_002, myBucket, myPrefix.get());
         } else {
             LOGGER.debug(MessageCodes.PT_DEBUG_001, myBucket);
         }

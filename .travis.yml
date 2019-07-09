@@ -12,17 +12,22 @@ env:
     - secure: "WLNW2qzMGV10vHzZOrxeHmTkWE6bb0VgSVG6HUxaqDlJ947OzHL0eCc7De4anhsZrGY9217eex0VK2N6YpFul2O8Ohx/2x3cq5byJOkJn/AhLAvWaua8ed9xLLjDs2NjDdy6vt+i7UJLlhwc64saZ9dk8bf7TJaeAu4B3/NBFofTYIbs3KXSVzJhTGRDzkdJquIMA5CqI04lPNkGgYZI6gFqUjiOE5mwD/Z/nzQbQ9dxhbMSaRCiNwUvpM622KxrY7MD2hXQ0Cyfgs0EUXQneZuKEt0TWQHtucXdCiy7JMH/Cgt/f5c/rCQEqfl1zz4vECZe3CP7RDpvwRiHGsKI71t8LqO4Bm/GPK912z5AgHo6R8HFCq2Hi9JpRwKRL/Hd+dgirhXaO507ErEzIK14kGywzYcvFBbOeK+GKiV4rSiNwot7ttnAWwNm++0iROvdMD/1tK23QnI7H/9WPkut3tQW2OLoXvwwD20r5o5WWflet9EMn8jl4shXvo4TXFhfTEu1+n97X/pViRZ5BtYGdcTj8cFCXOHGbobj/9+PdJw5zlIXxAU8Id2opty3VQYv3wf4711bqADzoXjJx9lRtZSCrR8GSB18bZoNIKclsSuonmb85OAQ1HWVYQUro258O8ES0jMKKXvak6UqE4Nw7ZLSv0XYVhpRH0ATmpL3QAs="
 
 before_install:
+  - mkdir ~/.aws
+  - printf "[vertx-s3] \n" >> ~/.aws/credentials
+  - printf "aws_secret_access_key = $VERTX_PAIRTREE_SECRET_KEY \n" >> ~/.aws/credentials
+  - printf "aws_access_key_id = $VERTX_PAIRTREE_ACCESS_KEY \n" >> ~/.aws/credentials
   - >
     openssl aes-256-cbc -K $encrypted_bca22cbb3d79_key -iv $encrypted_bca22cbb3d79_iv \
       -in src/main/resources/build-key.gpg.enc -out src/main/resources/build-key.gpg -d
 
 # Overridden because parent project uses maven.test.skip instead of skipTests
 install:
-  - mvn install -q -Dmaven.test.skip -Dmaven.javadoc.skip -B -V
+  - >
+    mvn install -q -Dmaven.test.skip -Dmaven.javadoc.skip -B -V
 
 script:
   - >
-    mvn -Ps3it install -Dvertx.s3.bucket="${VERTX_PAIRTREE_BUCKET}-${TRAVIS_JDK_VERSION}" \
+    AWS_PROFILE=vertx-s3 mvn -Ps3it install -Dvertx.s3.bucket="${VERTX_PAIRTREE_BUCKET}-${TRAVIS_JDK_VERSION}" \
       -Dvertx.s3.access_key="${VERTX_PAIRTREE_ACCESS_KEY}" -Dvertx.s3.secret_key="${VERTX_PAIRTREE_SECRET_KEY}" \
       pmd:pmd pmd:check
 

@@ -2,14 +2,21 @@
 package info.freelibrary.pairtree;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.Optional;
 
+import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.RegionUtils;
 
 import info.freelibrary.pairtree.fs.FsPairtree;
 import info.freelibrary.pairtree.s3.S3Pairtree;
+import info.freelibrary.pairtree.s3.S3Profile;
+import info.freelibrary.util.Logger;
+import info.freelibrary.util.LoggerFactory;
 import info.freelibrary.util.StringUtils;
 
 import io.vertx.core.Vertx;
@@ -18,6 +25,12 @@ import io.vertx.core.Vertx;
  * A factory which can be used to create pairtree objects.
  */
 public final class PairtreeFactory {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PairtreeFactory.class, Constants.BUNDLE_NAME);
+
+    private static final String AWS_PROFILE = "AWS_PROFILE";
+
+    private static final String AWS_REGION = "AWS_REGION";
 
     private final Vertx myVertx;
 
@@ -28,32 +41,87 @@ public final class PairtreeFactory {
     private final Optional<Region> myRegion;
 
     /**
-     * Creates a Pairtree factory using a newly created Vert.x environment.
+     * Creates a Pairtree factory using a newly created Vert.x environment. The AWS_PROFILE ENV property is checked
+     * first for S3 credentials; if that doesn't exist, AWS_ACCESS_KEY and AWS_SECRET_KEY from the ENV and/or system
+     * properties are checked next (in that order, with the latter taking precedence). Region can also be set from the
+     * AWS_REGION ENV property.
      */
     public PairtreeFactory() {
         this(Vertx.vertx());
     }
 
     /**
-     * Creates a Pairtree factory using the supplied Vert.x environment.
+     * Creates a Pairtree factory using a newly created Vert.x environment and credentials from the supplied S3
+     * profile. If the supplied S3 profile is null, the system ENV is checked for the AWS_PROFILE property; if that
+     * isn't found, AWS_ACCESS_KEY and AWS_SECRET_KEY from the ENV and/or system properties are checked next (in that
+     * order, with the latter taking precedence). Region can also be set from the AWS_REGION ENV property.
+     *
+     * @param aProfile An S3 profile
+     */
+    public PairtreeFactory(final S3Profile aProfile) {
+        this(Vertx.vertx(), aProfile);
+    }
+
+    /**
+     * Creates a Pairtree factory using the supplied Vert.x environment. The AWS_PROFILE ENV property is checked
+     * first; if that doesn't exist, AWS_ACCESS_KEY and AWS_SECRET_KEY from the ENV and/or system properties are
+     * checked next (in that order, with the latter taking precedence). Region can also be set from the AWS_REGION ENV
+     * property.
      *
      * @param aVertx A Vert.x environment
      */
     public PairtreeFactory(final Vertx aVertx) {
-        final String accessKey = StringUtils.trimToNull(System.getenv(S3Pairtree.AWS_ACCESS_KEY));
-        final String secretKey = StringUtils.trimToNull(System.getenv(S3Pairtree.AWS_SECRET_KEY));
+        this(aVertx, null);
+    }
 
-        String region = StringUtils.trimToNull(System.getenv(S3Pairtree.AWS_REGION));
+    /**
+     * Creates a Pairtree factory using the supplied Vert.x environment and credentials from the supplied profile. If
+     * an S3 profile isn't explicitly supplied, AWS_PROFILE from the ENV is checked first; if that isn't found
+     * AWS_ACCESS_KEY and AWS_SECRET_KEY from the ENV and then system properties are checked next (with the latter
+     * taking precedence). Region can also be set from the AWS_REGION system ENV property.
+     *
+     * @param aVertx A Vert.x instance
+     * @param aProfile An S3 profile
+     */
+    public PairtreeFactory(final Vertx aVertx, final S3Profile aProfile) {
+        final String profileName = StringUtils.trimToNull(System.getenv(AWS_PROFILE));
+        final Path credsFilePath = Paths.get(System.getProperty("user.home"), ".aws/credentials");
+        final boolean credsFileFound = Files.exists(credsFilePath);
 
-        myAccessKey = accessKey == null ? Optional.ofNullable(System.getProperty(S3Pairtree.AWS_ACCESS_KEY))
-                : Optional.ofNullable(accessKey);
-        mySecretKey = secretKey == null ? Optional.ofNullable(System.getProperty(S3Pairtree.AWS_SECRET_KEY))
-                : Optional.ofNullable(secretKey);
+        if ((profileName != null || aProfile != null) && !credsFileFound) {
+            LOGGER.warn(MessageCodes.PT_024);
+        }
+
+        if (aProfile != null && credsFileFound) {
+            final AWSCredentials creds = aProfile.getCredentials();
+
+            myAccessKey = Optional.ofNullable(creds.getAWSAccessKeyId());
+            mySecretKey = Optional.ofNullable(creds.getAWSSecretKey());
+        } else if (profileName != null && credsFileFound) {
+            final S3Profile profile = new S3Profile(profileName);
+            final AWSCredentials creds = profile.getCredentials();
+
+            LOGGER.debug(MessageCodes.PT_DEBUG_065);
+
+            myAccessKey = Optional.ofNullable(creds.getAWSAccessKeyId());
+            mySecretKey = Optional.ofNullable(creds.getAWSSecretKey());
+        } else {
+            final String accessKey = StringUtils.trimToNull(System.getenv(S3Pairtree.AWS_ACCESS_KEY));
+            final String secretKey = StringUtils.trimToNull(System.getenv(S3Pairtree.AWS_SECRET_KEY));
+
+            myAccessKey = accessKey == null ? Optional.ofNullable(System.getProperty(S3Pairtree.AWS_ACCESS_KEY))
+                    : Optional.ofNullable(accessKey);
+            mySecretKey = secretKey == null ? Optional.ofNullable(System.getProperty(S3Pairtree.AWS_SECRET_KEY))
+                    : Optional.ofNullable(secretKey);
+        }
+
+        // Set the region from ENV first, then system properties
+        String region = StringUtils.trimToNull(System.getenv(AWS_REGION));
 
         if (region != null) {
             myRegion = Optional.ofNullable(RegionUtils.getRegion(region));
         } else {
-            region = System.getProperty(S3Pairtree.AWS_REGION);
+            region = StringUtils.trimToNull(System.getProperty("vertx.s3.region"));
             myRegion = region != null ? Optional.ofNullable(RegionUtils.getRegion(region)) : Optional.empty();
         }
 
@@ -292,6 +360,13 @@ public final class PairtreeFactory {
         return new S3Pairtree(aPrefix, myVertx, aBucket, aBucketPath, aAccessKey, aSecretKey, aRegion);
     }
 
+    /**
+     * Get directory's absolute path, checking that the File represents a directory and is write-able.
+     *
+     * @param aDirectory A file system directory
+     * @return The absolute path of the supplied file system directory
+     * @throws PairtreeException An exception if the file system directory can't be used
+     */
     private static String getDirPath(final File aDirectory) throws PairtreeException {
         Objects.requireNonNull(aDirectory, MessageCodes.PT_022);
 
