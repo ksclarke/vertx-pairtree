@@ -2,6 +2,9 @@
 package info.freelibrary.pairtree;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -82,15 +85,23 @@ public final class PairtreeFactory {
      */
     public PairtreeFactory(final Vertx aVertx, final S3Profile aProfile) {
         final String profileName = StringUtils.trimToNull(System.getenv(AWS_PROFILE));
+        final Path credsFilePath = Paths.get(System.getProperty("user.home"), ".aws/credentials");
+        final boolean credsFileFound = Files.exists(credsFilePath);
 
-        if (aProfile != null) {
+        if ((profileName != null || aProfile != null) && !credsFileFound) {
+            LOGGER.warn(MessageCodes.PT_024);
+        }
+
+        if (aProfile != null && credsFileFound) {
             final AWSCredentials creds = aProfile.getCredentials();
 
             myAccessKey = Optional.ofNullable(creds.getAWSAccessKeyId());
             mySecretKey = Optional.ofNullable(creds.getAWSSecretKey());
-        } else if (profileName != null) {
+        } else if (profileName != null && credsFileFound) {
             final S3Profile profile = new S3Profile(profileName);
             final AWSCredentials creds = profile.getCredentials();
+
+            LOGGER.debug(MessageCodes.PT_DEBUG_065);
 
             myAccessKey = Optional.ofNullable(creds.getAWSAccessKeyId());
             mySecretKey = Optional.ofNullable(creds.getAWSSecretKey());

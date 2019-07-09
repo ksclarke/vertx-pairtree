@@ -279,7 +279,7 @@ public class S3Pairtree extends AbstractPairtree {
         }
 
         if (myPrefix.isPresent()) {
-            LOGGER.debug(MessageCodes.PT_DEBUG_002, myBucket, myPrefix);
+            LOGGER.debug(MessageCodes.PT_DEBUG_002, myBucket, myPrefix.get());
         } else {
             LOGGER.debug(MessageCodes.PT_DEBUG_001, myBucket);
         }

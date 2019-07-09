@@ -10,7 +10,7 @@ To check out and build the project, type on the command line:
     cd vertx-pairtree
     mvn install
 
-This will run the build and the unit tests for the file system back end. Right now, the only tests for the S3 back end are integration tests. To run a build with them, you will need to put the following properties in your [settings.xml file](https://maven.apache.org/settings.html) and run the build with the `s3it` profile:
+This will run the build and the unit tests for the file system back end. Right now, the only tests for the S3 back-end are integration tests. To run a build with them, you will need to put the following properties in your [settings.xml file](https://maven.apache.org/settings.html) and run the build with the `s3it` profile:
 
     <vertx.s3.bucket>YOUR_S3_BUCKET_NAME</vertx.s3.bucket>
     <vertx.s3.access_key>YOUR_ACCESS_KEY</vertx.s3.access_key>

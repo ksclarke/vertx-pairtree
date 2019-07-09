@@ -1,7 +1,12 @@
 
 package info.freelibrary.pairtree;
 
-import org.junit.After;
+import static org.junit.Assert.assertEquals;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,7 +22,6 @@ import info.freelibrary.util.StringUtils;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
-import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 
@@ -28,6 +32,8 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 public class PairtreeFactoryIT {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PairtreeFactoryIT.class, Constants.BUNDLE_NAME);
+
+    private static final Path CREDS_FILE_PATH = Paths.get(System.getProperty("user.home"), ".aws/credentials");
 
     /** The test profile used for testing */
     private static final String TEST_PROFILE = "vertx-s3";
@@ -66,56 +72,32 @@ public class PairtreeFactoryIT {
         }
     }
 
-    /**
-     * Tear down test resources.
-     */
-    @After
-    public void tearDown(final TestContext aContext) throws Exception {
-        final Async asyncTask = aContext.async();
-
-        // Clean up any resources we created
-        if (myPairtree != null) {
-            myPairtree.exists(existsCheck -> {
-                if (existsCheck.succeeded()) {
-                    if (existsCheck.result()) {
-                        myPairtree.delete(deletion -> {
-                            if (deletion.succeeded()) {
-                                asyncTask.complete();
-                            } else {
-                                aContext.fail(deletion.cause());
-                            }
-                        });
-                    } else {
-                        asyncTask.complete();
-                    }
-                } else {
-                    asyncTask.complete();
-                }
-            });
-        } else {
-            asyncTask.complete();
-        }
-    }
-
     @Test
     public void testGetPairtreeS3Profile(final TestContext aContext) throws PairtreeException {
+        checkCredentialsFile();
+
         myPairtree = new PairtreeFactory(new S3Profile(TEST_PROFILE)).getPairtree(myTestBucket);
     }
 
     @Test
     public void testGetPairtreeBucketPath(final TestContext aContext) throws PairtreeException {
+        checkCredentialsFile();
+
         myPairtree = new PairtreeFactory(myVertx, new S3Profile(TEST_PROFILE)).getPairtree(myTestBucket, "fake_path");
     }
 
     @Test
     public void testGetPrefixedPairtreeBucketPath(final TestContext aContext) throws PairtreeException {
-        final PairtreeFactory ptFactory = new PairtreeFactory(myVertx, new S3Profile(TEST_PROFILE));
+        checkCredentialsFile();
 
-        myPairtree = ptFactory.getPrefixedPairtree(PT_PREFIX, myTestBucket, "fake_path");
+        myPairtree = new PairtreeFactory(myVertx, new S3Profile(TEST_PROFILE)).getPrefixedPairtree(PT_PREFIX,
+                myTestBucket, "fake_path");
     }
 
     @Test
     public void testGetPairtreeFactoryWithProfile(final TestContext aContext) throws PairtreeException {
+        checkCredentialsFile();
+
         myPairtree = new PairtreeFactory(myVertx, new S3Profile(TEST_PROFILE)).getPairtree(myTestBucket);
     }
 
@@ -123,35 +105,54 @@ public class PairtreeFactoryIT {
     public void testGetPairtreeFactoryWithENVProfile(final TestContext aContext) throws PairtreeException {
         final String profileName = System.getenv(AWS_PROFILE);
 
-        if (profileName == null) {
-            LOGGER.warn(MessageCodes.PT_DEBUG_063);
-            throw new AssumptionViolatedException(LOGGER.getMessage(MessageCodes.PT_DEBUG_063));
-        }
-
+        checkProfileName(profileName);
         LOGGER.debug(MessageCodes.PT_DEBUG_062, profileName);
 
+        assertEquals(TEST_PROFILE, profileName);
         myPairtree = new PairtreeFactory(myVertx).getPairtree(myTestBucket);
     }
 
     @Test
     public void testGetPairtreeFactoryWithProfileAndPrefix(final TestContext aContext) throws PairtreeException {
-        final PairtreeFactory ptFactory = new PairtreeFactory(myVertx, new S3Profile(TEST_PROFILE));
+        final S3Profile testProfile = new S3Profile(TEST_PROFILE);
 
-        myPairtree = ptFactory.getPrefixedPairtree(PT_PREFIX, myTestBucket);
+        checkCredentialsFile();
+
+        myPairtree = new PairtreeFactory(myVertx, testProfile).getPrefixedPairtree(PT_PREFIX, myTestBucket);
     }
 
     @Test
     public void testGetPairtreeFactoryWithENVProfileAndPrefix(final TestContext aContext) throws PairtreeException {
         final String profileName = System.getenv(AWS_PROFILE);
 
-        if (profileName == null) {
-            LOGGER.warn(MessageCodes.PT_DEBUG_063);
-            throw new AssumptionViolatedException(LOGGER.getMessage(MessageCodes.PT_DEBUG_063));
-        }
-
+        checkProfileName(profileName);
         LOGGER.debug(MessageCodes.PT_DEBUG_062, profileName);
 
+        assertEquals(TEST_PROFILE, profileName);
         myPairtree = new PairtreeFactory(myVertx).getPrefixedPairtree(PT_PREFIX, myTestBucket);
     }
 
+    /**
+     * Skip some tests if the testing environment isn't properly set up.
+     *
+     * @param aProfileName An AWS profile name
+     */
+    private void checkProfileName(final String aProfileName) {
+        if (aProfileName == null) {
+            LOGGER.warn(MessageCodes.PT_DEBUG_063);
+            throw new AssumptionViolatedException(LOGGER.getMessage(MessageCodes.PT_DEBUG_063));
+        } else if (!Files.exists(CREDS_FILE_PATH)) {
+            throw new AssumptionViolatedException(LOGGER.getMessage(MessageCodes.PT_DEBUG_064));
+        }
+    }
+
+    /**
+     * Skip some tests if the testing environment isn't properly set up.
+     */
+    private void checkCredentialsFile() {
+        if (!Files.exists(CREDS_FILE_PATH)) {
+            LOGGER.warn(MessageCodes.PT_DEBUG_064);
+            throw new AssumptionViolatedException(LOGGER.getMessage(MessageCodes.PT_DEBUG_063));
+        }
+    }
 }
