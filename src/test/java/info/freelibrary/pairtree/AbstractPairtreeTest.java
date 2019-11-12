@@ -29,9 +29,6 @@ public abstract class AbstractPairtreeTest {
     /** The name of a test object */
     protected static final String TEST_OBJECT_NAME = UUID.randomUUID().toString();
 
-    /** The logger for the test */
-    protected final Logger LOGGER = getLogger();
-
     /** The connection to the Vertx framework */
     protected Vertx myVertx;
 
@@ -73,7 +70,7 @@ public abstract class AbstractPairtreeTest {
      */
     protected void createTestFsPairtreeObject(final Handler<AsyncResult<PairtreeObject>> aHandler, final File aFile,
             final String aID) throws PairtreeException {
-        Objects.requireNonNull(aHandler, LOGGER.getMessage(MessageCodes.PT_010));
+        Objects.requireNonNull(aHandler, getLogger().getMessage(MessageCodes.PT_010));
 
         final Pairtree root = new PairtreeFactory(myVertx).getPairtree(aFile);
         final Future<PairtreeObject> future = Future.<PairtreeObject>future().setHandler(aHandler);
@@ -107,7 +104,7 @@ public abstract class AbstractPairtreeTest {
     protected void createTestS3PairtreeObject(final Handler<AsyncResult<PairtreeObject>> aHandler,
             final String aBucket, final String aAccessKey, final String aSecretKey, final Region aRegion,
             final String aID) throws PairtreeException {
-        Objects.requireNonNull(aHandler, LOGGER.getMessage(MessageCodes.PT_010));
+        Objects.requireNonNull(aHandler, getLogger().getMessage(MessageCodes.PT_010));
 
         final Pairtree root = new PairtreeFactory(myVertx).getPairtree(aBucket, aAccessKey, aSecretKey, aRegion);
         final Future<PairtreeObject> future = Future.<PairtreeObject>future().setHandler(aHandler);

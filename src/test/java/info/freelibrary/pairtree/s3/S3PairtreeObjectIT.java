@@ -38,6 +38,12 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
     /** A path for a secondary test object */
     private static final String GREEN_BLUE_GIF = "green+blue.gif";
 
+    private static final String SLASH = "/";
+
+    private static final String S3 = "s3:///";
+
+    private static final String ARK = "ark:/99999/88888888";
+
     /** The Pairtree being tested */
     private Pairtree myPairtree;
 
@@ -57,7 +63,7 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
     public void setUp(final TestContext aContext) {
         super.setUp(aContext);
 
-        LOGGER.debug(MessageCodes.PT_DEBUG_001, "s3:///" + myTestBucket);
+        getLogger().debug(MessageCodes.PT_DEBUG_001, S3 + myTestBucket);
 
         final PairtreeFactory factory = new PairtreeFactory(myVertx);
 
@@ -65,7 +71,7 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
 
         // Create a test ID for each test run
         myUID = randomUUID().toString();
-        myS3Path = PAIRTREE_ROOT + "/" + PairtreeUtils.mapToPtPath(myUID) + "/" + myUID;
+        myS3Path = PAIRTREE_ROOT + SLASH + PairtreeUtils.mapToPtPath(myUID) + SLASH + myUID;
     }
 
     @Test
@@ -104,15 +110,15 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
     public final void testCreateWithPlus(final TestContext aContext) {
         final Async async = aContext.async();
 
-        myPairtree.getObject("ark:/99999/88888888").create(result -> {
+        myPairtree.getObject(ARK).create(result -> {
             if (result.succeeded()) {
-                final String ptPath = PairtreeUtils.mapToPtPath("ark:/99999/88888888");
-                final StringJoiner objectPath = new StringJoiner("/");
+                final String ptPath = PairtreeUtils.mapToPtPath(ARK);
+                final StringJoiner objectPath = new StringJoiner(SLASH);
 
                 objectPath.add(PAIRTREE_ROOT).add(ptPath).add("ark+=99999=88888888/README.txt");
 
                 if (!myS3Client.doesObjectExist(myTestBucket, objectPath.toString())) {
-                    aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_050));
+                    aContext.fail(getLogger().getMessage(MessageCodes.PT_DEBUG_050));
                 }
             } else {
                 aContext.fail(result.cause());
@@ -153,12 +159,12 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
 
     @Test
     public final void testGetPathString(final TestContext aContext) {
-        aContext.assertEquals(myS3Path + "/" + GREEN_GIF, myPairtree.getObject(myUID).getPath(GREEN_GIF));
+        aContext.assertEquals(myS3Path + SLASH + GREEN_GIF, myPairtree.getObject(myUID).getPath(GREEN_GIF));
     }
 
     @Test
     public final void testGetPathStringStartsWithSlash(final TestContext aContext) {
-        aContext.assertEquals(myS3Path + "/" + GREEN_GIF, myPairtree.getObject(myUID).getPath(GREEN_GIF));
+        aContext.assertEquals(myS3Path + SLASH + GREEN_GIF, myPairtree.getObject(myUID).getPath(GREEN_GIF));
     }
 
     @Test
@@ -166,7 +172,7 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
         // The S3 path has a URL encoded '+' because of this S3 bug that will probably never be fixed:
         // https://forums.aws.amazon.com/thread.jspa?threadID=55746
         // It appears normal in S3 or in the resource name once it's copied down to a file system
-        aContext.assertEquals(myS3Path + "/" + GREEN_BLUE_GIF, myPairtree.getObject(myUID).getPath(GREEN_BLUE_GIF)
+        aContext.assertEquals(myS3Path + SLASH + GREEN_BLUE_GIF, myPairtree.getObject(myUID).getPath(GREEN_BLUE_GIF)
                 .replace("%2B", "+"));
     }
 
@@ -190,7 +196,7 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
         myPairtree.getObject(myUID).put("ark+=99999=99999999.gif", Buffer.buffer(myResource), result -> {
             if (result.succeeded()) {
                 if (!myS3Client.doesObjectExist(myTestBucket, myS3Path + "/ark+=99999=99999999.gif")) {
-                    aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_051));
+                    aContext.fail(getLogger().getMessage(MessageCodes.PT_DEBUG_051));
                 }
             } else {
                 aContext.fail(result.cause());
@@ -205,7 +211,7 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
         final Async async = aContext.async();
 
         try {
-            myS3Client.putObject(myTestBucket, myS3Path + "/" + GREEN_GIF, TEST_FILE);
+            myS3Client.putObject(myTestBucket, myS3Path + SLASH + GREEN_GIF, TEST_FILE);
 
             myPairtree.getObject(myUID).get(GREEN_GIF, result -> {
                 if (!result.succeeded()) {
@@ -225,9 +231,9 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
         final Async async = aContext.async();
 
         try {
-            myS3Client.putObject(myTestBucket, myS3Path + "/" + GREEN_BLUE_GIF, TEST_FILE);
+            myS3Client.putObject(myTestBucket, myS3Path + SLASH + GREEN_BLUE_GIF, TEST_FILE);
 
-            myPairtree.getObject(myUID).get("green+blue.gif", result -> {
+            myPairtree.getObject(myUID).get(GREEN_BLUE_GIF, result -> {
                 if (!result.succeeded()) {
                     aContext.fail(result.cause());
                 }
@@ -245,9 +251,9 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
         final Async async = aContext.async();
 
         try {
-            myS3Client.putObject(myTestBucket, myS3Path + "/" + GREEN_BLUE_GIF, TEST_FILE);
+            myS3Client.putObject(myTestBucket, myS3Path + SLASH + GREEN_BLUE_GIF, TEST_FILE);
 
-            myPairtree.getObject(myUID).find("green+blue.gif", result -> {
+            myPairtree.getObject(myUID).find(GREEN_BLUE_GIF, result -> {
                 if (!result.succeeded()) {
                     aContext.fail(result.cause());
                 }
@@ -265,7 +271,7 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
         final Async async = aContext.async();
 
         try {
-            myS3Client.putObject(myTestBucket, myS3Path + "/" + GREEN_GIF, TEST_FILE);
+            myS3Client.putObject(myTestBucket, myS3Path + SLASH + GREEN_GIF, TEST_FILE);
 
             myPairtree.getObject(myUID).find(GREEN_GIF, result -> {
                 if (!result.succeeded()) {

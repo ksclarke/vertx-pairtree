@@ -51,11 +51,11 @@
     <skipUnitTests>false</skipUnitTests>
 
     <!-- Dependency versions -->
-    <freelib.utils.version>0.8.10</freelib.utils.version>
-    <aws.sdk.version>1.11.572</aws.sdk.version>
-    <vertx.version>3.7.1</vertx.version>
-    <jackson.version>2.9.9.1</jackson.version>
-    <vertx.s3.version>1.0.0</vertx.s3.version>
+    <freelib.utils.version>1.0.1</freelib.utils.version>
+    <freelib.maven.version>0.0.3</freelib.maven.version>
+    <aws.sdk.version>1.11.645</aws.sdk.version>
+    <vertx.version>3.8.3</vertx.version>
+    <vertx.s3.version>1.2.1</vertx.s3.version>
     <mockito.version>2.28.2</mockito.version>
 
     <!-- Plug-in versions -->
@@ -68,11 +68,6 @@
       <groupId>info.freelibrary</groupId>
       <artifactId>freelib-utils</artifactId>
       <version>${freelib.utils.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <version>${jackson.version}</version>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
@@ -119,8 +114,8 @@
       <!-- Generate our MessageCodes class from the messages resource file -->
       <plugin>
         <groupId>info.freelibrary</groupId>
-        <artifactId>freelib-utils</artifactId>
-        <version>${freelib.utils.version}</version>
+        <artifactId>freelib-maven-plugins</artifactId>
+        <version>${freelib.maven.version}</version>
         <executions>
           <execution>
             <phase>process-resources</phase>
@@ -149,19 +144,10 @@
           </dependency>
         </dependencies>
         <configuration>
-          <stylesheetfile>javadocs.css</stylesheetfile>
-          <nonavbar>true</nonavbar>
           <show>public</show>
-          <nosince>true</nosince>
-          <notimestamp>true</notimestamp>
-          <bottom> </bottom>
           <detectLinks>false</detectLinks>
-          <additionalJOptions>
-            <additionalJOption>-J-Dhttp.agent=maven-javadoc-plugin-${project.name}</additionalJOption>
-            <!-- <additionalJOption>-html5</additionalJOption> -->
-          </additionalJOptions>
           <links>
-            <link>https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/</link>
+            <link>https://google.github.io/guava/releases/23.0/api/docs/</link>
             <link>https://vertx.io/docs/apidocs/</link>
           </links>
           <sourcepath>src/main/java:src/main/generated</sourcepath>
@@ -183,11 +169,6 @@
         <artifactId>maven-enforcer-plugin</artifactId>
       </plugin>
       <plugin>
-        <groupId>com.gavinmogan</groupId>
-        <artifactId>codacy-maven-plugin</artifactId>
-        <version>${codacy.plugin.version}</version>
-      </plugin>
-      <plugin>
         <artifactId>maven-dependency-plugin</artifactId>
       </plugin>
       <plugin>
@@ -206,12 +187,8 @@
         </configuration>
       </plugin>
       <plugin>
-        <groupId>br.com.ingenieux</groupId>
+        <groupId>org.jbake</groupId>
         <artifactId>jbake-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.jacoco</groupId>
-        <artifactId>jacoco-maven-plugin</artifactId>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -289,7 +266,7 @@
   <parent>
     <artifactId>freelib-parent</artifactId>
     <groupId>info.freelibrary</groupId>
-    <version>3.6.4</version>
+    <version>3.7.7</version>
   </parent>
 
 </project>

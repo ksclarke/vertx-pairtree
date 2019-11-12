@@ -31,6 +31,14 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 @RunWith(VertxUnitRunner.class)
 public class S3PairtreeIT extends AbstractS3IT {
 
+    private static final String S3 = "s3:///";
+
+    private static final String ASDF = "asdf";
+
+    private static final String MY_PATH = "mypath";
+
+    private static final String PREFIX = "prefix";
+
     /** The Pairtree that's being tested */
     private Pairtree myPairtree;
 
@@ -44,8 +52,8 @@ public class S3PairtreeIT extends AbstractS3IT {
     public void setUp(final TestContext aContext) {
         super.setUp(aContext);
 
-        LOGGER.debug(MessageCodes.PT_DEBUG_001, "s3:///" + myTestBucket);
-        LOGGER.debug("Using AWS region: {}", myRegion.getName());
+        getLogger().debug(MessageCodes.PT_DEBUG_001, S3 + myTestBucket);
+        getLogger().debug("Using AWS region: {}", myRegion.getName());
 
         final PairtreeFactory factory = new PairtreeFactory(myVertx);
 
@@ -54,7 +62,7 @@ public class S3PairtreeIT extends AbstractS3IT {
 
     @Test
     public final void testGetObject(final TestContext aContext) {
-        aContext.assertEquals(myPairtree.getObject("asdf").getID(), "asdf");
+        aContext.assertEquals(myPairtree.getObject(ASDF).getID(), ASDF);
     }
 
     @Test
@@ -64,30 +72,29 @@ public class S3PairtreeIT extends AbstractS3IT {
 
     @Test
     public final void testConstructor2(final TestContext aContext) {
-        myPairtree = new PairtreeFactory(myVertx).getPairtree(myTestBucket, "mypath", myAccessKey, mySecretKey);
+        myPairtree = new PairtreeFactory(myVertx).getPairtree(myTestBucket, MY_PATH, myAccessKey, mySecretKey);
     }
 
     @Test
     public final void testConstructor3(final TestContext aContext) {
-        myPairtree = new PairtreeFactory(myVertx).getPrefixedPairtree("prefix", myTestBucket, "mypath", myAccessKey,
+        myPairtree = new PairtreeFactory(myVertx).getPrefixedPairtree(PREFIX, myTestBucket, MY_PATH, myAccessKey,
                 mySecretKey);
     }
 
     @Test
     public final void testConstructor4(final TestContext aContext) {
-        myPairtree = new PairtreeFactory(myVertx).getPrefixedPairtree("prefix", myTestBucket, myAccessKey,
-                mySecretKey);
+        myPairtree = new PairtreeFactory(myVertx).getPrefixedPairtree(PREFIX, myTestBucket, myAccessKey, mySecretKey);
     }
 
     @Test
     public final void testConstructor5(final TestContext aContext) {
-        myPairtree = new PairtreeFactory(myVertx).getPrefixedPairtree("prefix", myTestBucket, myAccessKey,
-                mySecretKey, myRegion);
+        myPairtree = new PairtreeFactory(myVertx).getPrefixedPairtree(PREFIX, myTestBucket, myAccessKey, mySecretKey,
+                myRegion);
     }
 
     @Test
     public final void testConstructor6(final TestContext aContext) {
-        myPairtree = new PairtreeFactory(myVertx).getPrefixedPairtree("prefix", myTestBucket, "mypath", myAccessKey,
+        myPairtree = new PairtreeFactory(myVertx).getPrefixedPairtree(PREFIX, myTestBucket, MY_PATH, myAccessKey,
                 mySecretKey, myRegion);
     }
 
@@ -100,12 +107,12 @@ public class S3PairtreeIT extends AbstractS3IT {
                 final boolean prefixFile = myS3Client.doesObjectExist(myTestBucket, myPairtree.getPrefixFilePath());
                 final boolean versionFile = myS3Client.doesObjectExist(myTestBucket, myPairtree.getVersionFilePath());
 
-                aContext.assertTrue(versionFile, LOGGER.getMessage(MessageCodes.PT_DEBUG_055));
+                aContext.assertTrue(versionFile, getLogger().getMessage(MessageCodes.PT_DEBUG_055));
 
                 if (myPairtree.hasPrefix()) {
-                    aContext.assertTrue(prefixFile, LOGGER.getMessage(MessageCodes.PT_DEBUG_054));
+                    aContext.assertTrue(prefixFile, getLogger().getMessage(MessageCodes.PT_DEBUG_054));
                 } else {
-                    aContext.assertFalse(prefixFile, LOGGER.getMessage(MessageCodes.PT_DEBUG_052));
+                    aContext.assertFalse(prefixFile, getLogger().getMessage(MessageCodes.PT_DEBUG_052));
                 }
 
                 myPairtree.exists(existsResults -> {
@@ -139,8 +146,7 @@ public class S3PairtreeIT extends AbstractS3IT {
         final Async async = aContext.async();
 
         // Create a prefixed Pairtree
-        myPairtree = new PairtreeFactory(myVertx).getPrefixedPairtree("prefix", myTestBucket, myAccessKey,
-                mySecretKey);
+        myPairtree = new PairtreeFactory(myVertx).getPrefixedPairtree(PREFIX, myTestBucket, myAccessKey, mySecretKey);
 
         myPairtree.create(createHandler -> {
             if (createHandler.succeeded()) {
@@ -149,7 +155,7 @@ public class S3PairtreeIT extends AbstractS3IT {
                         if (existsHandler.result()) {
                             async.complete();
                         } else {
-                            aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_013, myPairtree.getPath()));
+                            aContext.fail(getLogger().getMessage(MessageCodes.PT_DEBUG_013, myPairtree.getPath()));
                         }
                     } else {
                         aContext.fail(existsHandler.cause());
@@ -166,8 +172,7 @@ public class S3PairtreeIT extends AbstractS3IT {
         final Async async = aContext.async();
 
         // Create a prefixed Pairtree
-        myPairtree = new PairtreeFactory(myVertx).getPrefixedPairtree("prefix", myTestBucket, myAccessKey,
-                mySecretKey);
+        myPairtree = new PairtreeFactory(myVertx).getPrefixedPairtree(PREFIX, myTestBucket, myAccessKey, mySecretKey);
 
         myPairtree.create(result -> {
             if (result.succeeded()) {
@@ -228,12 +233,12 @@ public class S3PairtreeIT extends AbstractS3IT {
                 final boolean prefixFile = myS3Client.doesObjectExist(myTestBucket, myPairtree.getPrefixFilePath());
                 final boolean versionFile = myS3Client.doesObjectExist(myTestBucket, myPairtree.getVersionFilePath());
 
-                aContext.assertTrue(versionFile, LOGGER.getMessage(MessageCodes.PT_DEBUG_055));
+                aContext.assertTrue(versionFile, getLogger().getMessage(MessageCodes.PT_DEBUG_055));
 
                 if (myPairtree.hasPrefix()) {
-                    aContext.assertTrue(prefixFile, LOGGER.getMessage(MessageCodes.PT_DEBUG_054));
+                    aContext.assertTrue(prefixFile, getLogger().getMessage(MessageCodes.PT_DEBUG_054));
                 } else {
-                    aContext.assertFalse(prefixFile, LOGGER.getMessage(MessageCodes.PT_DEBUG_052));
+                    aContext.assertFalse(prefixFile, getLogger().getMessage(MessageCodes.PT_DEBUG_052));
                 }
 
                 // Now delete the Pairtree we just created
@@ -244,13 +249,13 @@ public class S3PairtreeIT extends AbstractS3IT {
                         final String versionFilePath = myPairtree.getVersionFilePath();
                         final boolean vfpExists = myS3Client.doesObjectExist(myTestBucket, versionFilePath);
 
-                        aContext.assertFalse(vfpExists, LOGGER.getMessage(MessageCodes.PT_DEBUG_053));
+                        aContext.assertFalse(vfpExists, getLogger().getMessage(MessageCodes.PT_DEBUG_053));
 
                         if (myPairtree.hasPrefix()) {
                             final String prefixFilePath = myPairtree.getPrefixFilePath();
                             final boolean pfpExists = myS3Client.doesObjectExist(myTestBucket, prefixFilePath);
 
-                            aContext.assertFalse(pfpExists, LOGGER.getMessage(MessageCodes.PT_DEBUG_052));
+                            aContext.assertFalse(pfpExists, getLogger().getMessage(MessageCodes.PT_DEBUG_052));
                         }
                     }
 
@@ -265,7 +270,7 @@ public class S3PairtreeIT extends AbstractS3IT {
 
     @Test
     public final void testToString(final TestContext aContext) {
-        aContext.assertEquals("s3:///" + myTestBucket + "/pairtree_root", myPairtree.toString());
+        aContext.assertEquals(S3 + myTestBucket + "/pairtree_root", myPairtree.toString());
     }
 
     @Test
