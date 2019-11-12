@@ -5,7 +5,7 @@
 
   <artifactId>vertx-pairtree</artifactId>
   <packaging>jar</packaging>
-  <version>1.0.1</version>
+  <version>1.0.2-SNAPSHOT</version>
   <name>Vert.x Pairtree</name>
   <description>A Pairtree library for Vert.x</description>
   <url>http://projects.freelibrary.info/vertx-pairtree</url>
