@@ -78,8 +78,8 @@ public abstract class AbstractFsPairtreeTest extends AbstractPairtreeTest {
      * @param aDirPath A path to the directory to be created
      */
     protected void createDir(final String aDirPath) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(LOGGER.getMessage(MessageCodes.PT_DEBUG_040, aDirPath));
+        if (getLogger().isDebugEnabled()) {
+            getLogger().debug(getLogger().getMessage(MessageCodes.PT_DEBUG_040, aDirPath));
         }
 
         myFileSystem.mkdirsBlocking(aDirPath);
@@ -94,8 +94,8 @@ public abstract class AbstractFsPairtreeTest extends AbstractPairtreeTest {
         final Path path = Paths.get(aFilePath);
         final String file = path.toString();
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(LOGGER.getMessage(MessageCodes.PT_DEBUG_041, file));
+        if (getLogger().isDebugEnabled()) {
+            getLogger().debug(getLogger().getMessage(MessageCodes.PT_DEBUG_041, file));
         }
 
         createDir(path.getParent().toString());
@@ -111,8 +111,8 @@ public abstract class AbstractFsPairtreeTest extends AbstractPairtreeTest {
         final Path path = Paths.get(aFilePath);
         final String file = path.toString();
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(LOGGER.getMessage(MessageCodes.PT_DEBUG_042, file, aContentValue));
+        if (getLogger().isDebugEnabled()) {
+            getLogger().debug(getLogger().getMessage(MessageCodes.PT_DEBUG_042, file, aContentValue));
         }
 
         createDir(path.getParent().toString());

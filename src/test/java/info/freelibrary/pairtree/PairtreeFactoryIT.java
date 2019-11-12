@@ -42,6 +42,8 @@ public class PairtreeFactoryIT {
 
     private static final String PT_PREFIX = "my_prefix";
 
+    private static final String FAKE_PATH = "fake_path";
+
     /** The connection to the Vertx framework */
     private Vertx myVertx;
 
@@ -83,7 +85,7 @@ public class PairtreeFactoryIT {
     public void testGetPairtreeBucketPath(final TestContext aContext) throws PairtreeException {
         checkCredentialsFile();
 
-        myPairtree = new PairtreeFactory(myVertx, new S3Profile(TEST_PROFILE)).getPairtree(myTestBucket, "fake_path");
+        myPairtree = new PairtreeFactory(myVertx, new S3Profile(TEST_PROFILE)).getPairtree(myTestBucket, FAKE_PATH);
     }
 
     @Test
@@ -91,7 +93,7 @@ public class PairtreeFactoryIT {
         checkCredentialsFile();
 
         myPairtree = new PairtreeFactory(myVertx, new S3Profile(TEST_PROFILE)).getPrefixedPairtree(PT_PREFIX,
-                myTestBucket, "fake_path");
+                myTestBucket, FAKE_PATH);
     }
 
     @Test

@@ -338,7 +338,6 @@ public final class PairtreeUtils {
      * @param aPrefix A Pairtree prefix
      * @param aID An ID
      * @return The ID without the Pairtree prefix prepended to it
-     * @throws PairtreeRuntimeException If the supplied prefix or ID is null
      */
     public static String removePrefix(final String aPrefix, final String aID) {
         Objects.requireNonNull(aPrefix, LOGGER.getMessage(MessageCodes.PT_006));
@@ -361,7 +360,6 @@ public final class PairtreeUtils {
      * @param aBasePath A base path for a Pairtree path
      * @param aPtPath A Pairtree path
      * @return The Pairtree path without the base path
-     * @throws PairtreeRuntimeException If the supplied base path or Pairtree path are null
      */
     public static String removeBasePath(final String aBasePath, final String aPtPath) {
         Objects.requireNonNull(aBasePath, LOGGER.getMessage(MessageCodes.PT_007));
@@ -385,7 +383,6 @@ public final class PairtreeUtils {
      *
      * @param aID An idea to be cleaned
      * @return The cleaned ID for use in a Pairtree path
-     * @throws PairtreeRuntimeException If the supplied ID is null
      */
     @SuppressWarnings("checkstyle:BooleanExpressionComplexity")
     public static String encodeID(final String aID) {
@@ -404,8 +401,8 @@ public final class PairtreeUtils {
         for (final byte b : bytes) {
             final int i = b & 0xff;
 
-            if (i < 0x21 || i > 0x7e || i == 0x22 || i == 0x2a || i == 0x2b || i == 0x2c || i == 0x3c ||
-                    i == 0x3d || i == 0x3e || i == 0x3f || i == 0x5c || i == 0x5e || i == 0x7c) {
+            if (i < 0x21 || i > 0x7e || i == 0x22 || i == 0x2a || i == 0x2b || i == 0x2c || i == 0x3c || i == 0x3d ||
+                    i == 0x3e || i == 0x3f || i == 0x5c || i == 0x5e || i == 0x7c) {
                 // Encode
                 idBuffer.append(HEX_INDICATOR);
                 idBuffer.append(Integer.toHexString(i));

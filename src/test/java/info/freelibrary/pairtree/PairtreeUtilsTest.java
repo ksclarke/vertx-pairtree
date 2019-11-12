@@ -53,6 +53,7 @@ import org.junit.Test;
 /**
  * <code>PairtreeUtils</code> tests.
  */
+@SuppressWarnings("checkstyle:MultipleStringLiterals")
 public class PairtreeUtilsTest {
 
     /**
@@ -77,13 +78,13 @@ public class PairtreeUtilsTest {
 
     @Test
     public void testGetSeparator() {
-        final Character character= new Character(File.separatorChar);
+        final Character character = new Character(File.separatorChar);
         assertEquals(character, PairtreeUtils.getSeparator());
     }
 
     @Test
     public void testSetSeparator() {
-        final Character character= new Character('-');
+        final Character character = new Character('-');
         PairtreeUtils.setSeparator(character);
         assertEquals(character, PairtreeUtils.getSeparator());
     }
@@ -110,7 +111,8 @@ public class PairtreeUtilsTest {
                 "13030_45xqv_793842495", "793842495"));
         assertEquals("/data/13/03/0_/45/xq/v_/79/38/42/49/5/ark+=13030=xt12t3", PairtreeUtils.mapToPtPath("/data",
                 "13030_45xqv_793842495", "ark:/13030/xt12t3"));
-        assertEquals("/data/13/03/0_/45/xq/v_/79/38/42/49/5", PairtreeUtils.mapToPtPath("/data", "13030_45xqv_793842495"));
+        assertEquals("/data/13/03/0_/45/xq/v_/79/38/42/49/5", PairtreeUtils.mapToPtPath("/data",
+                "13030_45xqv_793842495"));
     }
 
     /**
@@ -151,7 +153,7 @@ public class PairtreeUtilsTest {
     /**
      * Tests getting the encapsulating directory from the supplied Pairtree path.
      *
-     * @throws InvalidPtPathException If the supplied path isn't a valid Pairtree path
+     * @throws InvalidPathException If the supplied path isn't a valid Pairtree path
      */
     @Test
     public void testGetEncapsulatingDir() throws InvalidPathException {
@@ -188,7 +190,7 @@ public class PairtreeUtilsTest {
     /**
      * Tests extracting an ID from a supplied Pairtree path.
      *
-     * @throws InvalidPtPathException If the supplied path isn't a valid Pairtree path.
+     * @throws InvalidPathException If the supplied path isn't a valid Pairtree path.
      */
     @Test
     public void testMapToId() throws InvalidPathException {
@@ -221,7 +223,7 @@ public class PairtreeUtilsTest {
      * Tests that an invalid Pairtree path isn't accepted when requesting the encapsulating directory; it fails if an
      * exception isn't thrown.
      *
-     * @throws InvalidPtPathException If the supplied path isn't a valid Pairtree path
+     * @throws InvalidPathException If the supplied path isn't a valid Pairtree path
      */
     @Test(expected = InvalidPathException.class)
     public void testInvalidGetEncapsulatingDir() throws InvalidPathException {
@@ -232,7 +234,7 @@ public class PairtreeUtilsTest {
     /**
      * Tests mapping a Pairtree path to an ID, with ID encoding.
      *
-     * @throws InvalidPtPathException If the supplied path isn't a valid Pairtree path
+     * @throws InvalidPathException If the supplied path isn't a valid Pairtree path
      */
     @Test
     public void testMapToIdWithIdEncoding() throws InvalidPathException {

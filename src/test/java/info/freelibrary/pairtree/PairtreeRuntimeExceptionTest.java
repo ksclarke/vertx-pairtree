@@ -34,7 +34,8 @@ public class PairtreeRuntimeExceptionTest {
 
     @Test
     public final void testPairtreeRuntimeExceptionStringExceptionStringArray() {
-        assertEquals(DETAILED_MESSAGE, new PairtreeRuntimeException(EXC, MessageCodes.PT_018, CODE, REASON).getMessage());
+        assertEquals(DETAILED_MESSAGE, new PairtreeRuntimeException(EXC, MessageCodes.PT_018, CODE, REASON)
+                .getMessage());
     }
 
 }

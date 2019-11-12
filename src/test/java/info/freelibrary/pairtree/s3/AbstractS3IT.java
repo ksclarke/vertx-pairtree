@@ -54,6 +54,14 @@ public abstract class AbstractS3IT extends AbstractPairtreeTest {
     /** Byte array for resource contents */
     protected static byte[] myResource;
 
+    private static final String YOUR_ACCESS_KEY = "YOUR_ACCESS_KEY";
+
+    private static final String YOUR_SECRET_KEY = "YOUR_SECRET_KEY";
+
+    private static final String S3_ACCESS_KEY = "vertx.s3.access_key";
+
+    private static final String S3_SECRET_KEY = "vertx.s3.secret_key";
+
     /** The S3 client used to setup some of the tests */
     protected AmazonS3 myS3Client;
 
@@ -67,8 +75,8 @@ public abstract class AbstractS3IT extends AbstractPairtreeTest {
         final String endpoint = StringUtils.trimToNull(System.getProperty("vertx.s3.region"));
 
         myTestBucket = System.getProperty("vertx.s3.bucket", "vertx-pairtree-tests");
-        myAccessKey = System.getProperty("vertx.s3.access_key", "YOUR_ACCESS_KEY");
-        mySecretKey = System.getProperty("vertx.s3.secret_key", "YOUR_SECRET_KEY");
+        myAccessKey = System.getProperty(S3_ACCESS_KEY, YOUR_ACCESS_KEY);
+        mySecretKey = System.getProperty(S3_SECRET_KEY, YOUR_SECRET_KEY);
 
         try {
             myResource = IOUtils.readBytes(new FileInputStream(TEST_FILE));
@@ -89,8 +97,8 @@ public abstract class AbstractS3IT extends AbstractPairtreeTest {
     public void setUp(final TestContext aContext) {
         super.setUp(aContext);
 
-        if (mySecretKey.equals("YOUR_SECRET_KEY") || myAccessKey.equals("YOUR_ACCESS_KEY")) {
-            aContext.fail(LOGGER.getMessage(MessageCodes.PT_DEBUG_049));
+        if (mySecretKey.equals(YOUR_SECRET_KEY) || myAccessKey.equals(YOUR_ACCESS_KEY)) {
+            aContext.fail(getLogger().getMessage(MessageCodes.PT_DEBUG_049));
         }
 
         // Initialize the S3 client we use for test set up and tear down
