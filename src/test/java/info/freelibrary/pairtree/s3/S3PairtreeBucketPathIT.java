@@ -2,9 +2,6 @@
 package info.freelibrary.pairtree.s3;
 
 import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
-import static info.freelibrary.pairtree.Pairtree.PAIRTREE_PREFIX;
-import static info.freelibrary.pairtree.Pairtree.PAIRTREE_VERSION;
-import static info.freelibrary.pairtree.Pairtree.PT_VERSION_NUM;
 
 import java.util.UUID;
 
@@ -12,11 +9,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import info.freelibrary.util.Logger;
+import info.freelibrary.util.LoggerFactory;
+
 import info.freelibrary.pairtree.MessageCodes;
 import info.freelibrary.pairtree.Pairtree;
 import info.freelibrary.pairtree.PairtreeFactory;
-import info.freelibrary.util.Logger;
-import info.freelibrary.util.LoggerFactory;
 
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
@@ -53,12 +51,22 @@ public class S3PairtreeBucketPathIT extends AbstractS3IT {
         myPairtree = factory.getPairtree(myTestBucket, BUCKET_PATH, myAccessKey, mySecretKey, myRegion);
     }
 
+    /**
+     * Tests getting an object from an S3 Pairtree.
+     *
+     * @param aContext A test context
+     */
     @Test
     public final void testGetObject(final TestContext aContext) {
         final String id = UUID.randomUUID().toString();
         aContext.assertEquals(myPairtree.getObject(id).getID(), id);
     }
 
+    /**
+     * Tests the existence of an S3 Pairtree.
+     *
+     * @param aContext A test context
+     */
     @Test
     public final void testExists(final TestContext aContext) {
         final Async async = aContext.async();
@@ -92,6 +100,11 @@ public class S3PairtreeBucketPathIT extends AbstractS3IT {
         });
     }
 
+    /**
+     * Tests creating an S3 Pairtree.
+     *
+     * @param aContext A test context
+     */
     @Test
     public final void testCreate(final TestContext aContext) {
         final Async async = aContext.async();
@@ -114,6 +127,11 @@ public class S3PairtreeBucketPathIT extends AbstractS3IT {
         });
     }
 
+    /**
+     * Tests deleting an S3 Pairtree.
+     *
+     * @param aContext A test context
+     */
     @Test
     public final void testDelete(final TestContext aContext) {
         final Async async = aContext.async();
@@ -158,29 +176,54 @@ public class S3PairtreeBucketPathIT extends AbstractS3IT {
         });
     }
 
+    /**
+     * Tests getting a string representation of an S3 Pairtree.
+     *
+     * @param aContext A test context
+     */
     @Test
     public final void testToString(final TestContext aContext) {
         aContext.assertEquals(S3 + myTestBucket + BUCKET_PATH + "/pairtree_root", myPairtree.toString());
     }
 
+    /**
+     * Tests getting an S3 Pairtree path.
+     *
+     * @param aContext A test context
+     */
     @Test
     public final void testGetPath(final TestContext aContext) {
         aContext.assertEquals(myTestBucket + BUCKET_PATH, myPairtree.getPath());
     }
 
+    /**
+     * Tests getting an S3 Pairtree prefix file's path.
+     *
+     * @param aContext A test context
+     */
     @Test
     public final void testGetPrefixFilePath(final TestContext aContext) {
-        aContext.assertEquals(BUCKET_PATH + '/' + PAIRTREE_PREFIX, myPairtree.getPrefixFilePath());
+        aContext.assertEquals(BUCKET_PATH + '/' + Pairtree.PREFIX, myPairtree.getPrefixFilePath());
     }
 
+    /**
+     * Tests getting an S3 Pairtree's version file path.
+     *
+     * @param aContext A test context
+     */
     @Test
     public final void testGetVersionFilePath(final TestContext aContext) {
-        final String expected = BUCKET_PATH + '/' + PAIRTREE_VERSION + PT_VERSION_NUM.replace('.', '_');
+        final String expected = BUCKET_PATH + '/' + Pairtree.VERSION + Pairtree.VERSION_NUM.replace('.', '_');
         aContext.assertEquals(expected, myPairtree.getVersionFilePath());
     }
 
+    /**
+     * Gets the logger used for testing.
+     *
+     * @return A test's logger
+     */
     @Override
-    public Logger getLogger() {
+    protected Logger getLogger() {
         return LoggerFactory.getLogger(S3PairtreeBucketPathIT.class, BUNDLE_NAME);
     }
 }

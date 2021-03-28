@@ -350,7 +350,7 @@ public class S3Pairtree extends AbstractPairtree {
 
         final Future<Void> future = Future.<Void>future().setHandler(aHandler);
         final StringBuilder specNote = new StringBuilder();
-        final String ptVersion = getI18n(MessageCodes.PT_011, PT_VERSION_NUM);
+        final String ptVersion = getI18n(MessageCodes.PT_011, VERSION_NUM);
 
         specNote.append(ptVersion).append(System.lineSeparator()).append(getI18n(MessageCodes.PT_012));
 
@@ -444,7 +444,7 @@ public class S3Pairtree extends AbstractPairtree {
 
     @Override
     public String toString() {
-        return "s3://" + Constants.PATH_SEP + myBucket + getBucketPath() + Constants.PATH_SEP + PAIRTREE_ROOT;
+        return "s3://" + Constants.PATH_SEP + myBucket + getBucketPath() + Constants.PATH_SEP + ROOT;
     }
 
     @Override
@@ -466,7 +466,7 @@ public class S3Pairtree extends AbstractPairtree {
     public String getPrefixFilePath() {
         final String bucketPath = getBucketPath();
 
-        return "".equals(bucketPath) ? PAIRTREE_PREFIX : bucketPath + Constants.PATH_SEP + PAIRTREE_PREFIX;
+        return "".equals(bucketPath) ? PREFIX : bucketPath + Constants.PATH_SEP + PREFIX;
     }
 
     @Override

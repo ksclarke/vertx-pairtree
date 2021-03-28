@@ -1,7 +1,7 @@
 
 package info.freelibrary.pairtree;
 
-import static info.freelibrary.pairtree.Pairtree.PAIRTREE_ROOT;
+import static info.freelibrary.pairtree.Pairtree.ROOT;
 import static java.util.UUID.randomUUID;
 
 import java.io.File;
@@ -42,6 +42,8 @@ public class PairtreeFactoryTest {
 
     /**
      * Setup for the tests.
+     *
+     * @param aContext A test context
      */
     @Before
     public void setUp(final TestContext aContext) throws Exception {
@@ -50,6 +52,8 @@ public class PairtreeFactoryTest {
 
     /**
      * Tear down test resources.
+     *
+     * @param aContext A test context
      */
     @After
     public void tearDown(final TestContext aContext) throws Exception {
@@ -79,15 +83,27 @@ public class PairtreeFactoryTest {
         }
     }
 
+    /**
+     * Tests getting a file system Pairtree implicitly.
+     *
+     * @param aContext A test context
+     * @throws PairtreeException If there is a problem retrieving the Pairtree
+     */
     @Test
     public void testGetPairtreeFsImplicitFactory(final TestContext aContext) throws PairtreeException {
         final String path = Paths.get(TMPDIR, randomUUID().toString()).toString();
 
         myPairtree = new PairtreeFactory(myVertx).getPairtree(new File(path));
 
-        aContext.assertEquals(Paths.get(path, PAIRTREE_ROOT).toString(), myPairtree.toString());
+        aContext.assertEquals(Paths.get(path, ROOT).toString(), myPairtree.toString());
     }
 
+    /**
+     * Tests getting a file system Pairtree from a supplied path.
+     *
+     * @param aContext A test context
+     * @throws PairtreeException If there is trouble getting the Pairtree.
+     */
     @Test
     public void testGetPairtreeFsDirPath(final TestContext aContext) throws PairtreeException {
         final Path path = Paths.get(TMPDIR, randomUUID().toString());
@@ -102,6 +118,12 @@ public class PairtreeFactoryTest {
         }
     }
 
+    /**
+     * Tests trying to get a Pairtree from a path that isn't writable.
+     *
+     * @param aContext A test context
+     * @throws PairtreeException If there is trouble getting the Pairtree
+     */
     @Test
     public void testGetPairtreeFsDirPathNotWriteable(final TestContext aContext) throws PairtreeException {
         final Path path = Paths.get(TMPDIR, randomUUID().toString());
@@ -118,31 +140,49 @@ public class PairtreeFactoryTest {
         }
     }
 
+    /**
+     * Tests getting a Pairtree from the factory without supplying a Vert.x instance.
+     *
+     * @param aContext A test context
+     * @throws PairtreeException If there is trouble getting the Pairtree from the factory
+     */
     @Test
     public void testGetPairtreeFsImplicitFactoryNoVertx(final TestContext aContext) throws PairtreeException {
         final String path = Paths.get(TMPDIR, randomUUID().toString()).toString();
 
         myPairtree = new PairtreeFactory().getPairtree(new File(path));
 
-        aContext.assertEquals(Paths.get(path, PAIRTREE_ROOT).toString(), myPairtree.toString());
+        aContext.assertEquals(Paths.get(path, ROOT).toString(), myPairtree.toString());
     }
 
+    /**
+     * Tests getting the Pairtree from the factory explicitly.
+     *
+     * @param aContext A test context
+     * @throws PairtreeException If there is trouble getting the Pairtree from the factory
+     */
     @Test
     public void testGetPairtreeFsExplicitFactory(final TestContext aContext) throws PairtreeException {
         final String path = Paths.get(TMPDIR, randomUUID().toString()).toString();
 
         myPairtree = new PairtreeFactory(myVertx).getPairtree(new File(path));
 
-        aContext.assertEquals(Paths.get(path, PAIRTREE_ROOT).toString(), myPairtree.toString());
+        aContext.assertEquals(Paths.get(path, ROOT).toString(), myPairtree.toString());
     }
 
+    /**
+     * Tests getting a Pairtree from the factory, explicitly, with a supplied Vert.x instance.
+     *
+     * @param aContext A test context
+     * @throws PairtreeException If there is trouble getting the Pairtree from the factory
+     */
     @Test
     public void testGetPairtreeFsExplicitFactoryNoVertx(final TestContext aContext) throws PairtreeException {
         final String path = Paths.get(TMPDIR, randomUUID().toString()).toString();
 
         myPairtree = new PairtreeFactory().getPairtree(new File(path));
 
-        aContext.assertEquals(Paths.get(path, PAIRTREE_ROOT).toString(), myPairtree.toString());
+        aContext.assertEquals(Paths.get(path, ROOT).toString(), myPairtree.toString());
     }
 
 }

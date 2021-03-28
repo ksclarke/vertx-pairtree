@@ -60,7 +60,7 @@ public class FsPairtree extends AbstractPairtree {
         Objects.requireNonNull(aVertx);
         Objects.requireNonNull(aDirPath);
 
-        myPath = Paths.get(aDirPath, PAIRTREE_ROOT).toString();
+        myPath = Paths.get(aDirPath, ROOT).toString();
         myFileSystem = aVertx.fileSystem();
 
         if (aPairtreePrefix == null) {
@@ -280,7 +280,7 @@ public class FsPairtree extends AbstractPairtree {
      */
     private void setVersion(final Future<Void> aFuture) {
         final StringBuilder specNote = new StringBuilder();
-        final String ptVersion = LOGGER.getMessage(MessageCodes.PT_011, PT_VERSION_NUM);
+        final String ptVersion = LOGGER.getMessage(MessageCodes.PT_011, VERSION_NUM);
         final String urlString = LOGGER.getMessage(MessageCodes.PT_012);
 
         specNote.append(ptVersion).append(System.lineSeparator()).append(urlString);

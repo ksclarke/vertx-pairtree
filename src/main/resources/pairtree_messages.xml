@@ -36,7 +36,7 @@
   <entry key="PT-022">Requested Pairtree location cannot be null</entry>
   <entry key="PT-023">Pairtree location must be a directory and must be writeable: {}</entry>
   <entry key="PT-024">AWS_PROFILE supplied but there is no AWS credentials file</entry>
-  
+
   <!-- Debugging messages -->
   <entry key="PT-DEBUG-001">Initializing Pairtree in '{}'</entry>
   <entry key="PT-DEBUG-002">Initializing Pairtree in '{}' using '{}' as the prefix</entry>

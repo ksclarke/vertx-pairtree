@@ -13,12 +13,13 @@ import java.util.UUID;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import info.freelibrary.util.Logger;
+import info.freelibrary.util.LoggerFactory;
+
 import info.freelibrary.pairtree.MessageCodes;
 import info.freelibrary.pairtree.PairtreeException;
 import info.freelibrary.pairtree.PairtreeFactory;
 import info.freelibrary.pairtree.PairtreeObject;
-import info.freelibrary.util.Logger;
-import info.freelibrary.util.LoggerFactory;
 
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
@@ -32,6 +33,11 @@ public class FsPairtreeTest extends AbstractFsPairtreeTest {
 
     private static final String ASDF = "asdf";
 
+    /**
+     * Tests that the exists method throws a NullPointerException when a null handler is supplied.
+     *
+     * @param aContext A test context
+     */
     @Test
     public void testNullHandlerExists(final TestContext aContext) {
         try {
@@ -42,29 +48,57 @@ public class FsPairtreeTest extends AbstractFsPairtreeTest {
         }
     }
 
+    /**
+     * Tests that a Pairtree without a prefix doesn't claim to have one.
+     *
+     * @param aContext A test context
+     */
     @Test
     public void hasNoPrefix(final TestContext aContext) {
         aContext.assertFalse(myPairtree.hasPrefix());
     }
 
+    /**
+     * Tests that a Pairtree with a prefix indicates it has one.
+     *
+     * @param aContext
+     * @throws PairtreeException
+     */
     @Test
     public void hasPrefix(final TestContext aContext) throws PairtreeException {
         myPairtree = new PairtreeFactory(myVertx).getPrefixedPairtree(ASDF, new File(myPairtree.getPath()));
         aContext.assertTrue(myPairtree.hasPrefix());
     }
 
+    /**
+     * Tests supplying a null for a prefix doesn't set a prefix.
+     *
+     * @param aContext A test context
+     * @throws PairtreeException If there is a problem reading the Pairtree
+     */
     @Test
     public void hasNullPrefix(final TestContext aContext) throws PairtreeException {
         myPairtree = new PairtreeFactory(myVertx).getPrefixedPairtree(null, new File(myPairtree.getPath()));
         aContext.assertFalse(myPairtree.hasPrefix());
     }
 
+    /**
+     * Tests supplying an empty prefix doesn't set a prefix.
+     *
+     * @param aContext A test context
+     * @throws PairtreeException If there is a problem reading the Pairtree
+     */
     @Test
     public void hasEmptyPrefix(final TestContext aContext) throws PairtreeException {
         myPairtree = new PairtreeFactory(myVertx).getPrefixedPairtree("", new File(myPairtree.getPath()));
         aContext.assertFalse(myPairtree.hasPrefix());
     }
 
+    /**
+     * Tests that supplying a null handler to a create throws a NullPointerException.
+     *
+     * @param aContext A test context
+     */
     @Test
     public void testNullHandlerCreate(final TestContext aContext) {
         try {
@@ -75,6 +109,11 @@ public class FsPairtreeTest extends AbstractFsPairtreeTest {
         }
     }
 
+    /**
+     * Tests that supplying a null handler to a delete throws a NullPointerException.
+     *
+     * @param aContext A test context
+     */
     @Test
     public void testNullHandlerDelete(final TestContext aContext) {
         try {
@@ -85,6 +124,11 @@ public class FsPairtreeTest extends AbstractFsPairtreeTest {
         }
     }
 
+    /**
+     * Tests deleting a file system Pairtree.
+     *
+     * @param aContext A test context
+     */
     @Test
     public void testPairtreeDeletion(final TestContext aContext) {
         final String versionFilePath = myPairtree.getVersionFileName();
@@ -117,6 +161,12 @@ public class FsPairtreeTest extends AbstractFsPairtreeTest {
         });
     }
 
+    /**
+     * Tests that one can't overwrite an existing file system Pairtree.
+     *
+     * @param aContext A test context
+     * @throws IOException If there is trouble reading or writing the Pairtree
+     */
     @Test
     public void testPairtreeCreationConflict(final TestContext aContext) throws IOException {
         final Async async = aContext.async();
@@ -133,6 +183,11 @@ public class FsPairtreeTest extends AbstractFsPairtreeTest {
         });
     }
 
+    /**
+     * Tests creating a Pairtree only if it's needed.
+     *
+     * @param aContext A test context
+     */
     @Test
     public void testPairtreeCreationIfNeeded(final TestContext aContext) {
         final Async async = aContext.async();
@@ -151,6 +206,11 @@ public class FsPairtreeTest extends AbstractFsPairtreeTest {
         });
     }
 
+    /**
+     * Tests creating a Pairtree only if it's needed when one already exists.
+     *
+     * @param aContext A test context
+     */
     @Test
     public void testExistingPairtreeCreationIfNeeded(final TestContext aContext) {
         final Async async = aContext.async();
@@ -176,6 +236,11 @@ public class FsPairtreeTest extends AbstractFsPairtreeTest {
         });
     }
 
+    /**
+     * Tests creation of a Pairtree on the file system.
+     *
+     * @param aContext A test context
+     */
     @Test
     public void testPairtreeCreation(final TestContext aContext) {
         final Async async = aContext.async();
@@ -194,6 +259,11 @@ public class FsPairtreeTest extends AbstractFsPairtreeTest {
         });
     }
 
+    /**
+     * Tests checking whether a Pairtree already exists.
+     *
+     * @param aContext A test context
+     */
     @Test
     public void testPairtreeExistsNot(final TestContext aContext) {
         final Async async = aContext.async();
@@ -211,6 +281,11 @@ public class FsPairtreeTest extends AbstractFsPairtreeTest {
         });
     }
 
+    /**
+     * Tests whether a file system Pairtree already exists.
+     *
+     * @param aContext A test context
+     */
     @Test
     public void testPairtreeExists(final TestContext aContext) {
         final Async async = aContext.async();
@@ -237,12 +312,16 @@ public class FsPairtreeTest extends AbstractFsPairtreeTest {
         });
     }
 
+    /**
+     * Tests getting file system Pairtree objects.
+     *
+     * @param aContext A test context
+     */
     @Test
     public void testGetObjects(final TestContext aContext) {
         final Async async = aContext.async();
 
-        final List<String> ids = Arrays.asList(new String[] { UUID.randomUUID().toString(), UUID.randomUUID()
-                .toString() });
+        final List<String> ids = Arrays.asList(UUID.randomUUID().toString(), UUID.randomUUID().toString());
         final List<PairtreeObject> list = myPairtree.getObjects(ids);
 
         aContext.assertEquals(2, list.size());
@@ -250,6 +329,12 @@ public class FsPairtreeTest extends AbstractFsPairtreeTest {
         async.complete();
     }
 
+    /**
+     * Tests setting Pairtree prefix.
+     *
+     * @param aContext A test context
+     * @throws PairtreeException If there was a problem setting the Pairtree's prefix
+     */
     @Test
     public void testSetPrefix(final TestContext aContext) throws PairtreeException {
         final Async async = aContext.async();
@@ -266,6 +351,12 @@ public class FsPairtreeTest extends AbstractFsPairtreeTest {
         });
     }
 
+    /**
+     * Tests deleting a prefixed Pairtree.
+     *
+     * @param aContext A test context
+     * @throws PairtreeException If there is a problem with deleting the file system Pairtree
+     */
     @Test
     public void testDeletePrefix(final TestContext aContext) throws PairtreeException {
         final Async async = aContext.async();
@@ -288,6 +379,12 @@ public class FsPairtreeTest extends AbstractFsPairtreeTest {
         });
     }
 
+    /**
+     * Tests checking whether a prefixed Pairtree exists on the file system.
+     *
+     * @param aContext A test context
+     * @throws PairtreeException If there is a problem with checking for the existence of a Pairtree
+     */
     @Test
     public void testCheckPrefix(final TestContext aContext) throws PairtreeException {
         final Async async = aContext.async();
@@ -299,7 +396,7 @@ public class FsPairtreeTest extends AbstractFsPairtreeTest {
             if (createHandler.succeeded()) {
                 myPairtree.exists(existsHandler -> {
                     if (existsHandler.succeeded()) {
-                        if (existsHandler.result().booleanValue()) {
+                        if (existsHandler.result()) {
                             async.complete();
                         } else {
                             aContext.fail();
@@ -314,6 +411,9 @@ public class FsPairtreeTest extends AbstractFsPairtreeTest {
         });
     }
 
+    /**
+     * Gets the logger used by these tests.
+     */
     @Override
     protected Logger getLogger() {
         return LoggerFactory.getLogger(FsPairtreeTest.class, BUNDLE_NAME);

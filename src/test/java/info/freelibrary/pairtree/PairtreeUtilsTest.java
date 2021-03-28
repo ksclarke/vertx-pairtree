@@ -51,7 +51,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * <code>PairtreeUtils</code> tests.
+ * Tests of the Pairtree utilities.
  */
 @SuppressWarnings("checkstyle:MultipleStringLiterals")
 public class PairtreeUtilsTest {
@@ -65,26 +65,37 @@ public class PairtreeUtilsTest {
         PairtreeUtils.setShortyLength(2);
     }
 
+    /**
+     * Tests getting the shorty length.
+     */
     @Test
     public void testGetShortyLength() {
         assertEquals(2, PairtreeUtils.getShortyLength());
     }
 
+    /**
+     * Tests getting the shorty length.
+     */
     @Test
     public void testSetShortyLength() {
         PairtreeUtils.setShortyLength(3);
         assertEquals(3, PairtreeUtils.getShortyLength());
     }
 
+    /**
+     * Tests getting the separator.
+     */
     @Test
     public void testGetSeparator() {
-        final Character character = new Character(File.separatorChar);
-        assertEquals(character, PairtreeUtils.getSeparator());
+        assertEquals(Character.valueOf(File.separatorChar), PairtreeUtils.getSeparator());
     }
 
+    /**
+     * Tests setting the separator.
+     */
     @Test
     public void testSetSeparator() {
-        final Character character = new Character('-');
+        final Character character = '-';
         PairtreeUtils.setSeparator(character);
         assertEquals(character, PairtreeUtils.getSeparator());
     }
@@ -99,20 +110,19 @@ public class PairtreeUtilsTest {
         assertEquals("12/-9/86/xy/4", PairtreeUtils.mapToPtPath("12-986xy4"));
         assertEquals("", PairtreeUtils.mapToPtPath(""));
 
-        assertEquals("13/03/0_/45/xq/v_/79/38/42/49/5", PairtreeUtils.mapToPtPath(null, "13030_45xqv_793842495",
-                null));
-        assertEquals("13/03/0_/45/xq/v_/79/38/42/49/5/793842495", PairtreeUtils.mapToPtPath(null,
-                "13030_45xqv_793842495", "793842495"));
-        assertEquals("/data/13/03/0_/45/xq/v_/79/38/42/49/5", PairtreeUtils.mapToPtPath("/data",
-                "13030_45xqv_793842495", null));
-        assertEquals("/data/13/03/0_/45/xq/v_/79/38/42/49/5", PairtreeUtils.mapToPtPath("/data/",
-                "13030_45xqv_793842495", null));
-        assertEquals("/data/13/03/0_/45/xq/v_/79/38/42/49/5/793842495", PairtreeUtils.mapToPtPath("/data",
-                "13030_45xqv_793842495", "793842495"));
-        assertEquals("/data/13/03/0_/45/xq/v_/79/38/42/49/5/ark+=13030=xt12t3", PairtreeUtils.mapToPtPath("/data",
-                "13030_45xqv_793842495", "ark:/13030/xt12t3"));
-        assertEquals("/data/13/03/0_/45/xq/v_/79/38/42/49/5", PairtreeUtils.mapToPtPath("/data",
-                "13030_45xqv_793842495"));
+        assertEquals("13/03/0_/45/xq/v_/79/38/42/49/5", PairtreeUtils.mapToPtPath(null, "13030_45xqv_793842495", null));
+        assertEquals("13/03/0_/45/xq/v_/79/38/42/49/5/793842495",
+            PairtreeUtils.mapToPtPath(null, "13030_45xqv_793842495", "793842495"));
+        assertEquals("/data/13/03/0_/45/xq/v_/79/38/42/49/5",
+            PairtreeUtils.mapToPtPath("/data", "13030_45xqv_793842495", null));
+        assertEquals("/data/13/03/0_/45/xq/v_/79/38/42/49/5",
+            PairtreeUtils.mapToPtPath("/data/", "13030_45xqv_793842495", null));
+        assertEquals("/data/13/03/0_/45/xq/v_/79/38/42/49/5/793842495",
+            PairtreeUtils.mapToPtPath("/data", "13030_45xqv_793842495", "793842495"));
+        assertEquals("/data/13/03/0_/45/xq/v_/79/38/42/49/5/ark+=13030=xt12t3",
+            PairtreeUtils.mapToPtPath("/data", "13030_45xqv_793842495", "ark:/13030/xt12t3"));
+        assertEquals("/data/13/03/0_/45/xq/v_/79/38/42/49/5",
+            PairtreeUtils.mapToPtPath("/data", "13030_45xqv_793842495"));
     }
 
     /**
@@ -121,8 +131,8 @@ public class PairtreeUtilsTest {
     @Test
     public void testEncodeID() {
         assertEquals("ark+=13030=xt12t3", PairtreeUtils.encodeID("ark:/13030/xt12t3"));
-        assertEquals("http+==n2t,info=urn+nbn+se+kb+repos-1", PairtreeUtils.encodeID(
-                "http://n2t.info/urn:nbn:se:kb:repos-1"));
+        assertEquals("http+==n2t,info=urn+nbn+se+kb+repos-1",
+            PairtreeUtils.encodeID("http://n2t.info/urn:nbn:se:kb:repos-1"));
         assertEquals("what-the-^2a@^3f#!^5e!^3f", PairtreeUtils.encodeID("what-the-*@?#!^!?"));
     }
 
@@ -132,8 +142,8 @@ public class PairtreeUtilsTest {
     @Test
     public void testDecodeID() {
         assertEquals("ark:/13030/xt12t3", PairtreeUtils.decodeID("ark+=13030=xt12t3"));
-        assertEquals("http://n2t.info/urn:nbn:se:kb:repos-1", PairtreeUtils.decodeID(
-                "http+==n2t,info=urn+nbn+se+kb+repos-1"));
+        assertEquals("http://n2t.info/urn:nbn:se:kb:repos-1",
+            PairtreeUtils.decodeID("http+==n2t,info=urn+nbn+se+kb+repos-1"));
         assertEquals("what-the-*@?#!^!?", PairtreeUtils.decodeID("what-the-^2a@^3f#!^5e!^3f"));
     }
 
@@ -144,8 +154,8 @@ public class PairtreeUtilsTest {
     public void testMapToPtPathWithIdCleaning() {
         assertEquals("ar/k+/=1/30/30/=x/t1/2t/3", PairtreeUtils.mapToPtPath("ark:/13030/xt12t3"));
 
-        assertEquals("ht/tp/+=/=n/2t/,i/nf/o=/ur/n+/nb/n+/se/+k/b+/re/po/s-/1", PairtreeUtils.mapToPtPath(
-                "http://n2t.info/urn:nbn:se:kb:repos-1"));
+        assertEquals("ht/tp/+=/=n/2t/,i/nf/o=/ur/n+/nb/n+/se/+k/b+/re/po/s-/1",
+            PairtreeUtils.mapToPtPath("http://n2t.info/urn:nbn:se:kb:repos-1"));
 
         assertEquals("wh/at/-t/he/-^/2a/@^/3f/#!/^5/e!/^3/f", PairtreeUtils.mapToPtPath("what-the-*@?#!^!?"));
     }
@@ -176,12 +186,15 @@ public class PairtreeUtilsTest {
         assertEquals("h", PairtreeUtils.getEncapsulatingDir("/data", "/data/ab/cd/ef/g/h"));
         assertEquals("h", PairtreeUtils.getEncapsulatingDir("/data/", "/data/ab/cd/ef/g/h"));
 
-        assertEquals("ark:/13030/xt12t3", PairtreeUtils.getEncapsulatingDir(
-                "ar/k+/=1/30/30/=x/t1/2t/3/ark+=13030=xt12t3"));
-        assertEquals("ark:/13030/xt12t3", PairtreeUtils.getEncapsulatingDir("/data",
-                "/data/ar/k+/=1/30/30/=x/t1/2t/3/ark+=13030=xt12t3"));
+        assertEquals("ark:/13030/xt12t3",
+            PairtreeUtils.getEncapsulatingDir("ar/k+/=1/30/30/=x/t1/2t/3/ark+=13030=xt12t3"));
+        assertEquals("ark:/13030/xt12t3",
+            PairtreeUtils.getEncapsulatingDir("/data", "/data/ar/k+/=1/30/30/=x/t1/2t/3/ark+=13030=xt12t3"));
     }
 
+    /**
+     * Tests removing the prefix.
+     */
     @Test
     public void testRemovePrefix() {
         assertEquals("xt12t3", PairtreeUtils.removePrefix("ark:/13030/", "ark:/13030/xt12t3"));
@@ -211,12 +224,10 @@ public class PairtreeUtilsTest {
 
         assertEquals("13030_45xqv_793842495", PairtreeUtils.mapToID("13/03/0_/45/xq/v_/79/38/42/49/5"));
         assertEquals("13030_45xqv_793842495", PairtreeUtils.mapToID("13/03/0_/45/xq/v_/79/38/42/49/5/793842495"));
-        assertEquals("13030_45xqv_793842495", PairtreeUtils.mapToID("/data",
-                "/data/13/03/0_/45/xq/v_/79/38/42/49/5"));
-        assertEquals("13030_45xqv_793842495", PairtreeUtils.mapToID("/data/",
-                "/data/13/03/0_/45/xq/v_/79/38/42/49/5"));
-        assertEquals("13030_45xqv_793842495", PairtreeUtils.mapToID("/data",
-                "/data/13/03/0_/45/xq/v_/79/38/42/49/5/793842495"));
+        assertEquals("13030_45xqv_793842495", PairtreeUtils.mapToID("/data", "/data/13/03/0_/45/xq/v_/79/38/42/49/5"));
+        assertEquals("13030_45xqv_793842495", PairtreeUtils.mapToID("/data/", "/data/13/03/0_/45/xq/v_/79/38/42/49/5"));
+        assertEquals("13030_45xqv_793842495",
+            PairtreeUtils.mapToID("/data", "/data/13/03/0_/45/xq/v_/79/38/42/49/5/793842495"));
     }
 
     /**

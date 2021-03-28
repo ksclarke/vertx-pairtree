@@ -36,12 +36,12 @@ public abstract class AbstractPairtree extends I18nObject implements Pairtree {
 
     @Override
     public String getVersionFileName() {
-        return PAIRTREE_VERSION + PT_VERSION_NUM.replace('.', '_');
+        return VERSION + VERSION_NUM.replace('.', '_');
     }
 
     @Override
     public String getPrefixFileName() {
-        return PAIRTREE_PREFIX;
+        return PREFIX;
     }
 
     @Override

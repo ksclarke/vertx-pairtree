@@ -15,10 +15,11 @@ import org.junit.runner.RunWith;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.RegionUtils;
 
-import info.freelibrary.pairtree.s3.S3Profile;
 import info.freelibrary.util.Logger;
 import info.freelibrary.util.LoggerFactory;
 import info.freelibrary.util.StringUtils;
+
+import info.freelibrary.pairtree.s3.S3Profile;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
@@ -58,6 +59,8 @@ public class PairtreeFactoryIT {
 
     /**
      * Setup for the tests.
+     *
+     * @param aContext A test context
      */
     @Before
     public void setUp(final TestContext aContext) throws Exception {
@@ -74,6 +77,12 @@ public class PairtreeFactoryIT {
         }
     }
 
+    /**
+     * Tests getting a Pairtree with an S3 profile.
+     *
+     * @param aContext A test context
+     * @throws PairtreeException If there is a problem getting the Pairtree
+     */
     @Test
     public void testGetPairtreeS3Profile(final TestContext aContext) throws PairtreeException {
         checkCredentialsFile();
@@ -81,6 +90,12 @@ public class PairtreeFactoryIT {
         myPairtree = new PairtreeFactory(new S3Profile(TEST_PROFILE)).getPairtree(myTestBucket);
     }
 
+    /**
+     * Tests getting a Pairtree with a bucket path.
+     *
+     * @param aContext A test context
+     * @throws PairtreeException If there is a problem getting the Pairtree
+     */
     @Test
     public void testGetPairtreeBucketPath(final TestContext aContext) throws PairtreeException {
         checkCredentialsFile();
@@ -88,14 +103,26 @@ public class PairtreeFactoryIT {
         myPairtree = new PairtreeFactory(myVertx, new S3Profile(TEST_PROFILE)).getPairtree(myTestBucket, FAKE_PATH);
     }
 
+    /**
+     * Gets a prefixed Pairtree with the supplied bucket path.
+     *
+     * @param aContext A test context
+     * @throws PairtreeException If there is a problem getting the Pairtree
+     */
     @Test
     public void testGetPrefixedPairtreeBucketPath(final TestContext aContext) throws PairtreeException {
         checkCredentialsFile();
 
         myPairtree = new PairtreeFactory(myVertx, new S3Profile(TEST_PROFILE)).getPrefixedPairtree(PT_PREFIX,
-                myTestBucket, FAKE_PATH);
+            myTestBucket, FAKE_PATH);
     }
 
+    /**
+     * Tests getting the Pairtree factory with a profile.
+     *
+     * @param aContext A test context
+     * @throws PairtreeException If there is a problem getting the Pairtree factory
+     */
     @Test
     public void testGetPairtreeFactoryWithProfile(final TestContext aContext) throws PairtreeException {
         checkCredentialsFile();
@@ -103,6 +130,12 @@ public class PairtreeFactoryIT {
         myPairtree = new PairtreeFactory(myVertx, new S3Profile(TEST_PROFILE)).getPairtree(myTestBucket);
     }
 
+    /**
+     * Tests getting the Pairtree factory with a profile name.
+     *
+     * @param aContext A test context
+     * @throws PairtreeException If there is a problem getting the Pairtree factory
+     */
     @Test
     public void testGetPairtreeFactoryWithENVProfile(final TestContext aContext) throws PairtreeException {
         final String profileName = System.getenv(AWS_PROFILE);
@@ -114,6 +147,12 @@ public class PairtreeFactoryIT {
         myPairtree = new PairtreeFactory(myVertx).getPairtree(myTestBucket);
     }
 
+    /**
+     * Tests getting a Pairtree factory with a profile and a prefix.
+     *
+     * @param aContext A test context
+     * @throws PairtreeException If there is a problem getting the Pairtree factory
+     */
     @Test
     public void testGetPairtreeFactoryWithProfileAndPrefix(final TestContext aContext) throws PairtreeException {
         final S3Profile testProfile = new S3Profile(TEST_PROFILE);
@@ -123,6 +162,12 @@ public class PairtreeFactoryIT {
         myPairtree = new PairtreeFactory(myVertx, testProfile).getPrefixedPairtree(PT_PREFIX, myTestBucket);
     }
 
+    /**
+     * Tests getting a Pairtree factory with a profile name and a prefix.
+     *
+     * @param aContext A test context
+     * @throws PairtreeException If there is trouble getting the Pairtree factory
+     */
     @Test
     public void testGetPairtreeFactoryWithENVProfileAndPrefix(final TestContext aContext) throws PairtreeException {
         final String profileName = System.getenv(AWS_PROFILE);

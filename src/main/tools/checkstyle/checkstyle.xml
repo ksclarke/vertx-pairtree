@@ -7,13 +7,17 @@
 <module name="Checker">
   <property name="severity" value="warning" />
   <module name="LineLength">
+    <property name="id" value="lineLengthChecker"/>
     <property name="max" value="120" />
+    <property name="fileExtensions" value="java, py, sh, txt" />
   </module>
   <module name="TreeWalker">
     <module name="RedundantImport" />
     <module name="RedundantModifier" />
     <module name="UnusedImports" />
-    <module name="AvoidStarImport" />
+    <module name="AvoidStarImport">
+      <property name="excludes" value="j2html.TagCreator,org.junit.Assert,com.google.common.base.Preconditions"/>
+    </module>
     <module name="ConstantName" />
     <module name="EqualsHashCode" />
     <module name="StringLiteralEquality" />
@@ -23,8 +27,9 @@
     <module name="InnerTypeLast" />
     <module name="UpperEll" />
     <module name="MemberName">
-      <property name="format" value="^(my|is|has)[A-Z][a-zA-Z0-9]*$" />
+      <property name="format" value="^(my|is|has)[A-Z0-9][a-zA-Z0-9]*$" />
     </module>
+    <!-- Below checks to make sure there are no stray main methods -->
     <module name="UncommentedMain" />
     <module name="UnnecessaryParentheses" />
     <module name="DeclarationOrder" />
@@ -39,18 +44,16 @@
     <module name="BooleanExpressionComplexity">
       <property name="max" value="4" />
     </module>
+    <module name="MissingJavadocMethod"/>
     <module name="JavadocType">
       <property name="excludeScope" value="anoninner" />
       <property name="scope" value="public" />
-      <property name="authorFormat" value="\S" />
       <property name="allowUnknownTags" value="true" />
     </module>
+    <module name="MissingJavadocType"/>
+    <module name="MissingJavadocPackage"/>
     <module name="JavadocMethod">
       <property name="scope" value="public" />
-      <property name="allowUndeclaredRTE" value="true" />
-      <property name="allowMissingParamTags" value="true" />
-      <property name="allowMissingThrowsTags" value="true" />
-      <property name="allowMissingReturnTag" value="true" />
     </module>
     <module name="NeedBraces" />
     <module name="LeftCurly" />
@@ -84,20 +87,20 @@
       <property name="onCommentFormat" value="END GENERATED CODE" />
     </module>
   </module>
-  <module name="SuppressionFilter">
-    <property name="file" value="/home/kevin/Workspace/vertx-pairtree/src/main/tools/checkstyle/checkstyle-suppressions.xml" />
-  </module>
   <module name="FileTabCharacter">
+    <property name="id" value="fileTabCharacterChecker"/>
     <property name="eachLine" value="true" />
-    <property name="fileExtensions" value="java,css,js,xml" />
+    <property name="fileExtensions" value="java,css,js,xml,xq,default,tmpl,properties" />
   </module>
   <module name="RegexpSingleline">
+    <property name="id" value="regexpSingleLineChecker"/>
     <property name="format" value="(?&lt;!\*)\s+$|\*\s\s+$" />
     <property name="message" value="Trailing whitespace" />
-    <property name="fileExtensions" value="java,css,js,xml" />
+    <property name="fileExtensions" value="java,css,js,xml,html,default,tmpl,properties" />
   </module>
   <module name="SuppressWarningsFilter" />
   <module name="NewlineAtEndOfFile">
-    <property name="fileExtensions" value="java,css,js,xml" />
+    <property name="id" value="newLineAtEndOfFileChecker"/>
+    <property name="fileExtensions" value="java,css,js,xml,html,default,tmpl,properties" />
   </module>
 </module>

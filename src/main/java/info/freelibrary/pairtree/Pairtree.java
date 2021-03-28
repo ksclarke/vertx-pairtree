@@ -12,23 +12,23 @@ import io.vertx.core.Handler;
  */
 public interface Pairtree {
 
-    /** Default Pairtree name */
-    String DEFAULT_PAIRTREE = "pairtree";
-
     /** Version of the Pairtree specification */
-    String PT_VERSION_NUM = "0.1";
+    String VERSION_NUM = "0.1";
 
     /** Default Pairtree prefix file name */
-    String PAIRTREE_PREFIX = "pairtree_prefix";
+    String PREFIX = "pairtree_prefix";
 
     /** Default Pairtree root directory name */
-    String PAIRTREE_ROOT = "pairtree_root";
+    String ROOT = "pairtree_root";
 
     /** Default Pairtree version file name */
-    String PAIRTREE_VERSION = "pairtree_version";
+    String VERSION = "pairtree_version";
 
     /** Default character set for the Pairtree */
     String DEFAULT_CHARSET = "UTF-8";
+
+    /** Default Pairtree name */
+    String DEFAULT_PAIRTREE = "pairtree";
 
     /**
      * Gets the Pairtree prefix.

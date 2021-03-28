@@ -2,7 +2,7 @@
 package info.freelibrary.pairtree.s3;
 
 import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
-import static info.freelibrary.pairtree.Pairtree.PAIRTREE_ROOT;
+import static info.freelibrary.pairtree.Pairtree.ROOT;
 import static java.util.UUID.randomUUID;
 
 import java.util.StringJoiner;
@@ -13,13 +13,14 @@ import org.junit.runner.RunWith;
 
 import com.amazonaws.AmazonClientException;
 
+import info.freelibrary.util.Logger;
+import info.freelibrary.util.LoggerFactory;
+
 import info.freelibrary.pairtree.MessageCodes;
 import info.freelibrary.pairtree.Pairtree;
 import info.freelibrary.pairtree.PairtreeException;
 import info.freelibrary.pairtree.PairtreeFactory;
 import info.freelibrary.pairtree.PairtreeUtils;
-import info.freelibrary.util.Logger;
-import info.freelibrary.util.LoggerFactory;
 
 import io.vertx.core.buffer.Buffer;
 import io.vertx.ext.unit.Async;
@@ -71,9 +72,15 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
 
         // Create a test ID for each test run
         myUID = randomUUID().toString();
-        myS3Path = PAIRTREE_ROOT + SLASH + PairtreeUtils.mapToPtPath(myUID) + SLASH + myUID;
+        myS3Path = ROOT + SLASH + PairtreeUtils.mapToPtPath(myUID) + SLASH + myUID;
     }
 
+    /**
+     * Tests whether an S3 Pairtree object exists.
+     *
+     * @param aContext A test context
+     * @throws PairtreeException If there is a problem checking whether the Pairtree object exists
+     */
     @Test
     public final void testExists(final TestContext aContext) throws PairtreeException {
         final Async async = aContext.async();
@@ -93,6 +100,11 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
         }, myTestBucket, myAccessKey, mySecretKey, myRegion, myUID);
     }
 
+    /**
+     * Tests creating an S3 Pairtree object
+     *
+     * @param aContext A test context
+     */
     @Test
     public final void testCreate(final TestContext aContext) {
         final Async async = aContext.async();
@@ -106,6 +118,11 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
         });
     }
 
+    /**
+     * Tests creating an S3 Pairtree object with a plus in the name.
+     *
+     * @param aContext A test context
+     */
     @Test
     public final void testCreateWithPlus(final TestContext aContext) {
         final Async async = aContext.async();
@@ -115,7 +132,7 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
                 final String ptPath = PairtreeUtils.mapToPtPath(ARK);
                 final StringJoiner objectPath = new StringJoiner(SLASH);
 
-                objectPath.add(PAIRTREE_ROOT).add(ptPath).add("ark+=99999=88888888/README.txt");
+                objectPath.add(ROOT).add(ptPath).add("ark+=99999=88888888/README.txt");
 
                 if (!myS3Client.doesObjectExist(myTestBucket, objectPath.toString())) {
                     aContext.fail(getLogger().getMessage(MessageCodes.PT_DEBUG_050));
@@ -128,6 +145,12 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
         });
     }
 
+    /**
+     * Tests deleting an S3 Pairtree object.
+     *
+     * @param aContext A test context
+     * @throws PairtreeException If there is a problem deleting the S3 Pairtree object
+     */
     @Test
     public final void testDelete(final TestContext aContext) throws PairtreeException {
         final Async async = aContext.async();
@@ -147,35 +170,65 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
         }, myTestBucket, myAccessKey, mySecretKey, myRegion, myUID);
     }
 
+    /**
+     * Tests getting the ID for an S3 Pairtree object.
+     *
+     * @param aContext A test context
+     */
     @Test
     public final void testGetID(final TestContext aContext) {
         aContext.assertEquals(myUID, myPairtree.getObject(myUID).getID());
     }
 
+    /**
+     * Tests getting the path for an S3 Pairtree object.
+     *
+     * @param aContext A test context
+     */
     @Test
     public final void testGetPath(final TestContext aContext) {
         aContext.assertEquals(myS3Path, myPairtree.getObject(myUID).getPath());
     }
 
+    /**
+     * Tests getting the path for an S3 Pairtree object.
+     *
+     * @param aContext A test context
+     */
     @Test
     public final void testGetPathString(final TestContext aContext) {
         aContext.assertEquals(myS3Path + SLASH + GREEN_GIF, myPairtree.getObject(myUID).getPath(GREEN_GIF));
     }
 
+    /**
+     * Tests getting the path for an S3 Pairtree object that has a slash in it.
+     *
+     * @param aContext A test context
+     */
     @Test
     public final void testGetPathStringStartsWithSlash(final TestContext aContext) {
         aContext.assertEquals(myS3Path + SLASH + GREEN_GIF, myPairtree.getObject(myUID).getPath(GREEN_GIF));
     }
 
+    /**
+     * Tests getting an S3 Pairtree path with a plus in it.
+     *
+     * @param aContext A test context
+     */
     @Test
     public final void testGetPathStringWithPlus(final TestContext aContext) {
         // The S3 path has a URL encoded '+' because of this S3 bug that will probably never be fixed:
         // https://forums.aws.amazon.com/thread.jspa?threadID=55746
         // It appears normal in S3 or in the resource name once it's copied down to a file system
-        aContext.assertEquals(myS3Path + SLASH + GREEN_BLUE_GIF, myPairtree.getObject(myUID).getPath(GREEN_BLUE_GIF)
-                .replace("%2B", "+"));
+        aContext.assertEquals(myS3Path + SLASH + GREEN_BLUE_GIF,
+            myPairtree.getObject(myUID).getPath(GREEN_BLUE_GIF).replace("%2B", "+"));
     }
 
+    /**
+     * Tests putting an S3 Pairtree object.
+     *
+     * @param aContext A test context
+     */
     @Test
     public final void testPut(final TestContext aContext) {
         final Async async = aContext.async();
@@ -189,6 +242,11 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
         });
     }
 
+    /**
+     * Tests putting an S3 Pairtree object that has a plus in its ID.
+     *
+     * @param aContext A test context
+     */
     @Test
     public final void testPutWithPlus(final TestContext aContext) {
         final Async async = aContext.async();
@@ -206,6 +264,11 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
         });
     }
 
+    /**
+     * Test getting an S3 Pairtree object.
+     *
+     * @param aContext A test context
+     */
     @Test
     public final void testGet(final TestContext aContext) {
         final Async async = aContext.async();
@@ -226,6 +289,11 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
         }
     }
 
+    /**
+     * Tests getting an S3 Pairtree object with a plus in its ID.
+     *
+     * @param aContext A test context
+     */
     @Test
     public final void testGetWithPlus(final TestContext aContext) {
         final Async async = aContext.async();
@@ -246,6 +314,11 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
         }
     }
 
+    /**
+     * Tests finding an S3 Pairtree object with a plus in it.
+     *
+     * @param aContext A test context
+     */
     @Test
     public final void testFindWithPlus(final TestContext aContext) {
         final Async async = aContext.async();
@@ -266,6 +339,11 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
         }
     }
 
+    /**
+     * Tests finding an S3 Pairtree object.
+     *
+     * @param aContext A test context
+     */
     @Test
     public final void testFind(final TestContext aContext) {
         final Async async = aContext.async();
@@ -286,8 +364,13 @@ public class S3PairtreeObjectIT extends AbstractS3IT {
         }
     }
 
+    /**
+     * Gets the logger used for testing.
+     *
+     * @return The logger used for testing
+     */
     @Override
-    public Logger getLogger() {
+    protected Logger getLogger() {
         return LoggerFactory.getLogger(S3PairtreeObjectIT.class, BUNDLE_NAME);
     }
 

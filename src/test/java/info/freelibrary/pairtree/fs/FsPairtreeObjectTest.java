@@ -7,14 +7,15 @@ import java.nio.file.Paths;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import info.freelibrary.util.Logger;
+import info.freelibrary.util.LoggerFactory;
+
 import info.freelibrary.pairtree.Constants;
 import info.freelibrary.pairtree.MessageCodes;
 import info.freelibrary.pairtree.PairtreeException;
 import info.freelibrary.pairtree.PairtreeFactory;
 import info.freelibrary.pairtree.PairtreeObject;
 import info.freelibrary.pairtree.PairtreeUtils;
-import info.freelibrary.util.Logger;
-import info.freelibrary.util.LoggerFactory;
 
 import io.vertx.core.buffer.Buffer;
 import io.vertx.ext.unit.Async;
@@ -35,6 +36,11 @@ public class FsPairtreeObjectTest extends AbstractFsPairtreeTest {
 
     private static final String ASDF = "asdf";
 
+    /**
+     * Tests creating a new file system Pairtree.
+     *
+     * @param aContext A test context
+     */
     @Test
     public void testCreate(final TestContext aContext) {
         final Async async = aContext.async();
@@ -61,6 +67,11 @@ public class FsPairtreeObjectTest extends AbstractFsPairtreeTest {
         });
     }
 
+    /**
+     * Tests getting a file system Pairtree object.
+     *
+     * @param aContext A test context
+     */
     @Test
     public void testGetID(final TestContext aContext) {
         final Async async = aContext.async();
@@ -85,6 +96,11 @@ public class FsPairtreeObjectTest extends AbstractFsPairtreeTest {
         });
     }
 
+    /**
+     * Tests finding an object in a file system Pairtree.
+     *
+     * @param aContext A test context
+     */
     @Test
     public void testFind(final TestContext aContext) {
         final Async async = aContext.async();
@@ -117,6 +133,12 @@ public class FsPairtreeObjectTest extends AbstractFsPairtreeTest {
         });
     }
 
+    /**
+     * Tests getting a file system Pairtree path.
+     *
+     * @param aContext A test context
+     * @throws PairtreeException If there is a problem getting the file system Pairtree path
+     */
     @Test
     public void testGetPath(final TestContext aContext) throws PairtreeException {
         final Async async = aContext.async();
@@ -146,6 +168,12 @@ public class FsPairtreeObjectTest extends AbstractFsPairtreeTest {
         });
     }
 
+    /**
+     * Tests getting an object from a prefixed file system Pairtree.
+     *
+     * @param aContext A test context
+     * @throws PairtreeException If there is trouble getting the Pairtree object
+     */
     @Test
     public void testGetPrefixedID(final TestContext aContext) throws PairtreeException {
         final Async async = aContext.async();
@@ -173,6 +201,11 @@ public class FsPairtreeObjectTest extends AbstractFsPairtreeTest {
         });
     }
 
+    /**
+     * Tests whether a file system Pairtree object exists.
+     *
+     * @param aContext A test context
+     */
     @Test
     public void testExistsNot(final TestContext aContext) {
         final Async async = aContext.async();
@@ -201,6 +234,12 @@ public class FsPairtreeObjectTest extends AbstractFsPairtreeTest {
         });
     }
 
+    /**
+     * Tests whether a file system Pairtree object exists.
+     *
+     * @param aContext A test context
+     * @throws PairtreeException If there is trouble checking whether a Pairtree object exists
+     */
     @Test
     public void testExists(final TestContext aContext) throws PairtreeException {
         final Async async = aContext.async();
@@ -227,6 +266,12 @@ public class FsPairtreeObjectTest extends AbstractFsPairtreeTest {
         }, new File(myPairtree.getPath()), TEST_OBJECT_NAME);
     }
 
+    /**
+     * Tests deleting a file system Pairtree object.
+     *
+     * @param aContext A test context
+     * @throws PairtreeException If there is a problem deleting a file system Pairtree object
+     */
     @Test
     public void testDelete(final TestContext aContext) throws PairtreeException {
         final Async async = aContext.async();
@@ -253,6 +298,12 @@ public class FsPairtreeObjectTest extends AbstractFsPairtreeTest {
         }, new File(myPairtree.getPath()), TEST_OBJECT_NAME);
     }
 
+    /**
+     * Tests that null handlers throw a NullPointerException.
+     *
+     * @param aContext A test context
+     * @throws PairtreeException If there is trouble testing a null handler
+     */
     @Test
     public void testNullHandlerExists(final TestContext aContext) throws PairtreeException {
         final Async async = aContext.async();
@@ -273,6 +324,12 @@ public class FsPairtreeObjectTest extends AbstractFsPairtreeTest {
         }, new File(myPairtree.getPath()), TEST_OBJECT_NAME);
     }
 
+    /**
+     * Tests that null handlers throw a NullPointerException when trying to delete.
+     *
+     * @param aContext A test context
+     * @throws PairtreeException If there is a problem testing using a null handler when deleting an object
+     */
     @Test
     public void testNullHandlerDelete(final TestContext aContext) throws PairtreeException {
         final Async async = aContext.async();
@@ -293,6 +350,12 @@ public class FsPairtreeObjectTest extends AbstractFsPairtreeTest {
         }, new File(myPairtree.getPath()), TEST_OBJECT_NAME);
     }
 
+    /**
+     * Tests whether using a null handler causes a NullPointerException to be thrown.
+     *
+     * @param aContext A test context
+     * @throws PairtreeException If there is trouble testing a null handler when creating a Pairtree
+     */
     @Test
     public void testNullHandlerCreate(final TestContext aContext) throws PairtreeException {
         final Async async = aContext.async();
@@ -313,6 +376,12 @@ public class FsPairtreeObjectTest extends AbstractFsPairtreeTest {
         }, new File(myPairtree.getPath()), TEST_OBJECT_NAME);
     }
 
+    /**
+     * Tests getting an object from a file system Pairtree.
+     *
+     * @param aContext A test context
+     * @throws PairtreeException If there is a problem getting a file system Pairtree object
+     */
     @Test
     public void testGet(final TestContext aContext) throws PairtreeException {
         final Async async = aContext.async();
@@ -341,6 +410,12 @@ public class FsPairtreeObjectTest extends AbstractFsPairtreeTest {
         }, new File(myPairtree.getPath()), TEST_OBJECT_NAME);
     }
 
+    /**
+     * Tests putting an object into a file system Pairtree.
+     *
+     * @param aContext A test context
+     * @throws PairtreeException If there is a problem putting a file system Pairtree object
+     */
     @Test
     public void testPut(final TestContext aContext) throws PairtreeException {
         final Async async = aContext.async();
@@ -378,6 +453,11 @@ public class FsPairtreeObjectTest extends AbstractFsPairtreeTest {
         }, new File(myPairtree.getPath()), TEST_OBJECT_NAME);
     }
 
+    /**
+     * Returns the logger used for these tests.
+     *
+     * @return The logger used for these tests
+     */
     @Override
     protected Logger getLogger() {
         return LoggerFactory.getLogger(FsPairtreeObjectTest.class, Constants.BUNDLE_NAME);

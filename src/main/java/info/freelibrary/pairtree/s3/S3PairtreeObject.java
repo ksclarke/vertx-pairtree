@@ -3,7 +3,7 @@ package info.freelibrary.pairtree.s3;
 
 import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
 import static info.freelibrary.pairtree.Constants.PATH_SEP;
-import static info.freelibrary.pairtree.Pairtree.PAIRTREE_ROOT;
+import static info.freelibrary.pairtree.Pairtree.ROOT;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -208,7 +208,7 @@ public class S3PairtreeObject extends I18nObject implements PairtreeObject {
     public String getPath() {
         // We need to URL encode '+'s to work around an S3 bug
         // (Cf. https://forums.aws.amazon.com/thread.jspa?threadID=55746)
-        return PAIRTREE_ROOT + PATH_SEP + PairtreeUtils.mapToPtPath(myID).replace(UNENCODED_PLUS, ENCODED_PLUS) +
+        return ROOT + PATH_SEP + PairtreeUtils.mapToPtPath(myID).replace(UNENCODED_PLUS, ENCODED_PLUS) +
                 PATH_SEP + PairtreeUtils.encodeID(myID).replace(UNENCODED_PLUS, ENCODED_PLUS);
     }
 

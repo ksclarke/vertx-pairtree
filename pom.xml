@@ -5,7 +5,7 @@
 
   <artifactId>vertx-pairtree</artifactId>
   <packaging>jar</packaging>
-  <version>1.0.3-SNAPSHOT</version>
+  <version>${revision}</version>
   <name>Vert.x Pairtree</name>
   <description>A Pairtree library for Vert.x</description>
   <url>http://projects.freelibrary.info/vertx-pairtree</url>
@@ -51,8 +51,8 @@
     <skipUnitTests>false</skipUnitTests>
 
     <!-- Dependency versions -->
-    <freelib.utils.version>1.0.1</freelib.utils.version>
-    <freelib.maven.version>0.0.3</freelib.maven.version>
+    <freelib.utils.version>2.2.1</freelib.utils.version>
+    <freelib.maven.version>0.1.2</freelib.maven.version>
     <aws.sdk.version>1.11.645</aws.sdk.version>
     <vertx.version>3.8.3</vertx.version>
     <vertx.s3.version>1.2.1</vertx.s3.version>
@@ -115,7 +115,6 @@
       <plugin>
         <groupId>info.freelibrary</groupId>
         <artifactId>freelib-maven-plugins</artifactId>
-        <version>${freelib.maven.version}</version>
         <executions>
           <execution>
             <phase>process-resources</phase>
@@ -124,9 +123,6 @@
             </goals>
             <configuration>
               <generatedSourcesDirectory>${project.basedir}/src/main/generated</generatedSourcesDirectory>
-              <messageFiles>
-                <messageFile>src/main/resources/pairtree_messages.xml</messageFile>
-              </messageFiles>
             </configuration>
           </execution>
         </executions>
@@ -147,7 +143,6 @@
           <show>public</show>
           <detectLinks>false</detectLinks>
           <links>
-            <link>https://google.github.io/guava/releases/23.0/api/docs/</link>
             <link>https://vertx.io/docs/apidocs/</link>
           </links>
           <sourcepath>src/main/java:src/main/generated</sourcepath>
@@ -185,10 +180,6 @@
           <argLine>${jacoco.agent.arg}</argLine>
           <skip>${skipUnitTests}</skip>
         </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.jbake</groupId>
-        <artifactId>jbake-maven-plugin</artifactId>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -266,7 +257,7 @@
   <parent>
     <artifactId>freelib-parent</artifactId>
     <groupId>info.freelibrary</groupId>
-    <version>3.7.7</version>
+    <version>6.7.2</version>
   </parent>
 
 </project>
