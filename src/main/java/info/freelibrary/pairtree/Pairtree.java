@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 
 /**
@@ -91,23 +92,37 @@ public interface Pairtree {
     /**
      * Tests whether the Pairtree root exists.
      *
+     * @return A future with a boolean result or an exception
+     */
+    Future<Boolean> exists();
+
+    /**
+     * Tests whether the Pairtree root exists.
+     *
      * @param aHandler A {@link io.vertx.core.Handler} with an {@link io.vertx.core.AsyncResult}
      */
     void exists(Handler<AsyncResult<Boolean>> aHandler);
 
     /**
-     * Creates the Pairtree root file system.
+     * Creates a Pairtree root file system. It will succeed quietly if the root file system already exists.
+     *
+     * @return A future that either succeeded or that contains an exception
+     */
+    Future<Void> create();
+
+    /**
+     * Creates the Pairtree root file system. It will succeed quietly if the root file system already exists.
      *
      * @param aHandler A {@link io.vertx.core.Handler} with an {@link io.vertx.core.AsyncResult}
      */
     void create(Handler<AsyncResult<Void>> aHandler);
 
     /**
-     * Creates the Pairtree root file system only if needed. This is a way to make sure it exists before using it.
+     * Deletes the Pairtree.
      *
-     * @param aHandler A {@link io.vertx.core.Handler} with an {@link io.vertx.core.AsyncResult}
+     * @return A future that either succeeded or that contains an exception
      */
-    void createIfNeeded(Handler<AsyncResult<Void>> aHandler);
+    Future<Void> delete();
 
     /**
      * Deletes the Pairtree.

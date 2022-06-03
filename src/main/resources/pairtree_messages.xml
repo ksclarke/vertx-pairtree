@@ -27,8 +27,8 @@
   <entry key="PT-013">Didn't find expected Pairtree prefix file: {}</entry>
   <entry key="PT-014">Found unexpected Pairtree prefix file: {}</entry>
   <entry key="PT-015">S3 Pairtree bucket not supplied</entry>
-  <entry key="PT-016">S3 Pairtree access key not supplied</entry>
-  <entry key="PT-017">S3 Pairtree secret key not supplied</entry>
+  <entry key="PT-016">Unexpected content length: {}</entry>
+  <entry key="PT-017">Supplied S3ClientOptions cannot be null</entry>
   <entry key="PT-018">Response code: {} [{}]</entry>
   <entry key="PT-019">Content-Length was not an integer: {}</entry>
   <entry key="PT-020">Region for S3 Pairtree creation does not exist: {}</entry>

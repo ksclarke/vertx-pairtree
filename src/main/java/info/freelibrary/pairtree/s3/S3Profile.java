@@ -1,12 +1,12 @@
 
 package info.freelibrary.pairtree.s3;
 
-import info.freelibrary.vertx.s3.Profile;
+import info.freelibrary.vertx.s3.AwsProfile;
 
 /**
  * An S3 profile that should be used to get S3 credentials.
  */
-public class S3Profile extends Profile {
+public class S3Profile extends AwsProfile {
 
     /**
      * Creates a new S3 profile.

@@ -19,6 +19,7 @@ import info.freelibrary.vertx.s3.S3Client;
 import info.freelibrary.pairtree.MessageCodes;
 import info.freelibrary.pairtree.Pairtree;
 import info.freelibrary.pairtree.PairtreeFactory;
+import info.freelibrary.pairtree.s3.S3Pairtree;
 
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;

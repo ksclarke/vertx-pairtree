@@ -10,17 +10,18 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import info.freelibrary.pairtree.AbstractPairtree;
-import info.freelibrary.pairtree.MessageCodes;
-import info.freelibrary.pairtree.PairtreeException;
-import info.freelibrary.pairtree.PairtreeObject;
 import info.freelibrary.util.Logger;
 import info.freelibrary.util.LoggerFactory;
 import info.freelibrary.util.StringUtils;
 
+import info.freelibrary.pairtree.AbstractPairtree;
+import info.freelibrary.pairtree.MessageCodes;
+import info.freelibrary.pairtree.PairtreeException;
+import info.freelibrary.pairtree.PairtreeObject;
+
 import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.file.FileSystem;
@@ -96,17 +97,19 @@ public class FsPairtree extends AbstractPairtree {
     public void exists(final Handler<AsyncResult<Boolean>> aHandler) {
         Objects.requireNonNull(aHandler, LOGGER.getMessage(MessageCodes.PT_010));
 
-        final Future<Boolean> future = Future.<Boolean>future().setHandler(aHandler);
+        final Promise<Boolean> promise = Promise.<Boolean>promise();
+
+        promise.future().onComplete(aHandler);
 
         myFileSystem.exists(myPath, result -> {
             if (result.succeeded()) {
                 if (result.result()) {
-                    checkVersion(future);
+                    checkVersion(promise);
                 } else {
-                    future.complete(result.result());
+                    promise.complete(result.result());
                 }
             } else {
-                future.fail(result.cause());
+                promise.fail(result.cause());
             }
         });
     }
@@ -115,15 +118,17 @@ public class FsPairtree extends AbstractPairtree {
     public void create(final Handler<AsyncResult<Void>> aHandler) {
         Objects.requireNonNull(aHandler, LOGGER.getMessage(MessageCodes.PT_010));
 
-        final Future<Void> future = Future.<Void>future().setHandler(aHandler);
+        final Promise<Void> promise = Promise.<Void>promise();
+
+        promise.future().onComplete(aHandler);
 
         LOGGER.debug(MessageCodes.PT_DEBUG_004, myPath);
 
         myFileSystem.mkdirs(myPath, result -> {
             if (result.succeeded()) {
-                setVersion(future);
+                setVersion(promise);
             } else {
-                future.fail(result.cause());
+                promise.fail(result.cause());
             }
         });
     }
@@ -132,15 +137,17 @@ public class FsPairtree extends AbstractPairtree {
     public void delete(final Handler<AsyncResult<Void>> aHandler) {
         Objects.requireNonNull(aHandler, LOGGER.getMessage(MessageCodes.PT_010));
 
-        final Future<Void> future = Future.<Void>future().setHandler(aHandler);
+        final Promise<Void> promise = Promise.<Void>promise();
+
+        promise.future().onComplete(aHandler);
 
         LOGGER.debug(MessageCodes.PT_DEBUG_003, myPath);
 
         myFileSystem.deleteRecursive(myPath, true, result -> {
             if (result.succeeded()) {
-                deleteVersion(future);
+                deleteVersion(promise);
             } else {
-                future.fail(result.cause());
+                promise.fail(result.cause());
             }
         });
     }
@@ -170,9 +177,9 @@ public class FsPairtree extends AbstractPairtree {
     /**
      * Checks that Pairtree version file exists.
      *
-     * @param aFuture The result of an action that may, or may not, have occurred yet.
+     * @param aPromise The result of an action that may, or may not, have occurred yet.
      */
-    private void checkVersion(final Future<Boolean> aFuture) {
+    private void checkVersion(final Promise<Boolean> aPromise) {
         final String versionFilePath = getVersionFilePath();
 
         myFileSystem.exists(versionFilePath, result -> {
@@ -186,12 +193,12 @@ public class FsPairtree extends AbstractPairtree {
                         LOGGER.debug(MessageCodes.PT_DEBUG_008, versionFilePath);
                     }
 
-                    checkPrefix(aFuture);
+                    checkPrefix(aPromise);
                 } else {
-                    aFuture.complete(!result.result());
+                    aPromise.complete(!result.result());
                 }
             } else {
-                aFuture.fail(result.cause());
+                aPromise.fail(result.cause());
             }
         });
     }
@@ -199,9 +206,9 @@ public class FsPairtree extends AbstractPairtree {
     /**
      * Checks whether a Pairtree prefix file exists.
      *
-     * @param aFuture The result of an action that may, or may not, have occurred yet.
+     * @param aPromise The result of an action that may, or may not, have occurred yet.
      */
-    private void checkPrefix(final Future<Boolean> aFuture) {
+    private void checkPrefix(final Promise<Boolean> aPromise) {
         final String prefixFilePath = getPrefixFilePath();
 
         myFileSystem.exists(prefixFilePath, result -> {
@@ -212,21 +219,21 @@ public class FsPairtree extends AbstractPairtree {
                     }
 
                     if (result.result()) {
-                        aFuture.complete(result.result());
+                        aPromise.complete(result.result());
                     } else {
-                        aFuture.fail(new PairtreeException(MessageCodes.PT_013, prefixFilePath));
+                        aPromise.fail(new PairtreeException(MessageCodes.PT_013, prefixFilePath));
                     }
                 } else {
                     LOGGER.debug(MessageCodes.PT_DEBUG_009, prefixFilePath);
 
                     if (result.result()) {
-                        aFuture.fail(new PairtreeException(MessageCodes.PT_014, prefixFilePath));
+                        aPromise.fail(new PairtreeException(MessageCodes.PT_014, prefixFilePath));
                     } else {
-                        aFuture.complete(!result.result());
+                        aPromise.complete(!result.result());
                     }
                 }
             } else {
-                aFuture.fail(result.cause());
+                aPromise.fail(result.cause());
             }
         });
     }
@@ -234,9 +241,9 @@ public class FsPairtree extends AbstractPairtree {
     /**
      * Deletes a Pairtree version file.
      *
-     * @param aFuture The result of an action that may, or may not, have occurred yet.
+     * @param aPromise The result of an action that may, or may not, have occurred yet.
      */
-    private void deleteVersion(final Future<Void> aFuture) {
+    private void deleteVersion(final Promise<Void> aPromise) {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(MessageCodes.PT_DEBUG_006, myPath);
         }
@@ -244,12 +251,12 @@ public class FsPairtree extends AbstractPairtree {
         myFileSystem.delete(getVersionFilePath(), result -> {
             if (result.succeeded()) {
                 if (hasPrefix()) {
-                    deletePrefix(aFuture);
+                    deletePrefix(aPromise);
                 } else {
-                    aFuture.complete();
+                    aPromise.complete();
                 }
             } else {
-                aFuture.fail(result.cause());
+                aPromise.fail(result.cause());
             }
         });
     }
@@ -257,18 +264,18 @@ public class FsPairtree extends AbstractPairtree {
     /**
      * Deletes a Pairtree prefix file.
      *
-     * @param aFuture The result of an action that may, or may not, have occurred yet.
+     * @param aPromise The result of an action that may, or may not, have occurred yet.
      */
-    private void deletePrefix(final Future<Void> aFuture) {
+    private void deletePrefix(final Promise<Void> aPromise) {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(MessageCodes.PT_DEBUG_034, myPath);
         }
 
         myFileSystem.delete(getPrefixFilePath(), result -> {
             if (result.succeeded()) {
-                aFuture.complete();
+                aPromise.complete();
             } else {
-                aFuture.fail(result.cause());
+                aPromise.fail(result.cause());
             }
         });
     }
@@ -276,9 +283,9 @@ public class FsPairtree extends AbstractPairtree {
     /**
      * Creates a Pairtree version file.
      *
-     * @param aFuture The result of an action that may, or may not, have occurred yet.
+     * @param aPromise The result of an action that may, or may not, have occurred yet.
      */
-    private void setVersion(final Future<Void> aFuture) {
+    private void setVersion(final Promise<Void> aPromise) {
         final StringBuilder specNote = new StringBuilder();
         final String ptVersion = LOGGER.getMessage(MessageCodes.PT_011, VERSION_NUM);
         final String urlString = LOGGER.getMessage(MessageCodes.PT_012);
@@ -292,12 +299,12 @@ public class FsPairtree extends AbstractPairtree {
         myFileSystem.writeFile(getVersionFilePath(), Buffer.buffer(specNote.toString()), result -> {
             if (result.succeeded()) {
                 if (hasPrefix()) {
-                    setPrefix(aFuture);
+                    setPrefix(aPromise);
                 } else {
-                    aFuture.complete();
+                    aPromise.complete();
                 }
             } else {
-                aFuture.fail(result.cause());
+                aPromise.fail(result.cause());
             }
         });
     }
@@ -305,18 +312,18 @@ public class FsPairtree extends AbstractPairtree {
     /**
      * Creates a Pairtree prefix file.
      *
-     * @param aFuture The result of an action that may, or may not, have occurred yet.
+     * @param aPromise The result of an action that may, or may not, have occurred yet.
      */
-    private void setPrefix(final Future<Void> aFuture) {
+    private void setPrefix(final Promise<Void> aPromise) {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(MessageCodes.PT_DEBUG_033, myPath);
         }
 
         myFileSystem.writeFile(getPrefixFilePath(), Buffer.buffer(myPrefix.get()), result -> {
             if (result.succeeded()) {
-                aFuture.complete();
+                aPromise.complete();
             } else {
-                aFuture.fail(result.cause());
+                aPromise.fail(result.cause());
             }
         });
     }

@@ -39,9 +39,6 @@ THE SOFTWARE.
 
 package info.freelibrary.pairtree;
 
-import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
-import static info.freelibrary.pairtree.Constants.PATH_SEP;
-
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -57,7 +54,13 @@ import info.freelibrary.util.LoggerFactory;
 public final class PairtreeUtils {
 
     /** A logger for the Pairtree utilities class */
-    private static final Logger LOGGER = LoggerFactory.getLogger(PairtreeUtils.class, BUNDLE_NAME);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PairtreeUtils.class, MessageCodes.BUNDLE);
+
+    /** An equals sign */
+    private static final char EQUALS = '=';
+
+    /** A plus sign */
+    private static final char PLUS = '+';
 
     /** A colon */
     private static final char COLON = ':';
@@ -71,7 +74,12 @@ public final class PairtreeUtils {
     /** A comma */
     private static final char COMMA = ',';
 
-    /** A plus sign which replaces a colon when encoding */
+    /** A slash delimiter */
+    private static final char SLASH = '/';
+
+    /**
+     * A plus sign which replaces a colon when encoding
+     */
     private static final char PLUS_SIGN = '+';
 
     /** An equals sign which replaces a slash when encoding */
@@ -233,8 +241,7 @@ public final class PairtreeUtils {
      * @return The name of the encapsulating directory
      * @throws InvalidPathException If there is a problem extracting the encapsulating directory
      */
-    public static String getEncapsulatingDir(final String aBasePath, final String aPtPath)
-            throws InvalidPathException {
+    public static String getEncapsulatingDir(final String aBasePath, final String aPtPath) throws InvalidPathException {
         return getEncapsulatingDir(removeBasePath(aBasePath, aPtPath));
     }
 
@@ -256,10 +263,9 @@ public final class PairtreeUtils {
             // If part <= shorty length then no encapsulating directory
             if (pPathParts[0].length() <= myShortyLength) {
                 return null;
-            } else {
-                // Else no Pairtree path
-                throw new InvalidPathException(MessageCodes.PT_001, aPtPath);
             }
+            // Else no Pairtree path
+            throw new InvalidPathException(MessageCodes.PT_001, aPtPath);
         }
 
         // All parts up to next to last and last should have shorty length
@@ -419,12 +425,18 @@ public final class PairtreeUtils {
             final char character = idBuffer.charAt(index);
 
             // Encode characters that need to be encoded according to Pairtree specification
-            if (character == PATH_SEP) {
-                idBuffer.setCharAt(index, EQUALS_SIGN);
-            } else if (character == COLON) {
-                idBuffer.setCharAt(index, PLUS_SIGN);
-            } else if (character == PERIOD) {
-                idBuffer.setCharAt(index, COMMA);
+            switch (character) {
+                case SLASH:
+                    idBuffer.setCharAt(index, EQUALS);
+                    break;
+                case COLON:
+                    idBuffer.setCharAt(index, PLUS);
+                    break;
+                case PERIOD:
+                    idBuffer.setCharAt(index, COMMA);
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -446,23 +458,29 @@ public final class PairtreeUtils {
             final char character = aID.charAt(index);
 
             // Decode characters that need to be decoded according to Pairtree specification
-            if (character == EQUALS_SIGN) {
-                idBuf.append(PATH_SEP);
-            } else if (character == PLUS_SIGN) {
-                idBuf.append(COLON);
-            } else if (character == COMMA) {
-                idBuf.append(PERIOD);
-            } else if (character == HEX_INDICATOR) {
-                /* Get the next two characters since they are hex characters */
-                final String hex = aID.substring(index + 1, index + 3);
-                final char[] chars = Character.toChars(Integer.parseInt(hex, 16));
+            switch (character) {
+                case EQUALS_SIGN:
+                    idBuf.append(SLASH);
+                    break;
+                case PLUS_SIGN:
+                    idBuf.append(COLON);
+                    break;
+                case COMMA:
+                    idBuf.append(PERIOD);
+                    break;
+                case HEX_INDICATOR:
+                    /* Get the next two characters since they are hex characters */
+                    final String hex = aID.substring(index + 1, index + 3);
+                    final char[] chars = Character.toChars(Integer.parseInt(hex, 16));
 
-                assert chars.length == 1;
+                    assert chars.length == 1;
 
-                idBuf.append(chars[0]);
-                index = index + 2;
-            } else {
-                idBuf.append(character);
+                    idBuf.append(chars[0]);
+                    index = index + 2;
+                    break;
+                default:
+                    idBuf.append(character);
+                    break;
             }
         }
 

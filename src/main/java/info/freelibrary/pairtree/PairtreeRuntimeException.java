@@ -1,8 +1,6 @@
 
 package info.freelibrary.pairtree;
 
-import static info.freelibrary.pairtree.Constants.BUNDLE_NAME;
-
 import info.freelibrary.util.I18nRuntimeException;
 
 /**
@@ -21,7 +19,7 @@ public class PairtreeRuntimeException extends I18nRuntimeException {
      * @param aMessage The detailed message about the exception
      */
     public PairtreeRuntimeException(final String aMessage) {
-        super(BUNDLE_NAME, aMessage);
+        super(MessageCodes.BUNDLE, aMessage);
     }
 
     /**
@@ -32,7 +30,7 @@ public class PairtreeRuntimeException extends I18nRuntimeException {
      * @param aMoreDetails Additional details to insert into the message
      */
     public PairtreeRuntimeException(final String aMessage, final Object... aMoreDetails) {
-        super(BUNDLE_NAME, aMessage, aMoreDetails);
+        super(MessageCodes.BUNDLE, aMessage, aMoreDetails);
     }
 
     /**
@@ -42,7 +40,7 @@ public class PairtreeRuntimeException extends I18nRuntimeException {
      * @param aCause An upstream exception
      */
     public PairtreeRuntimeException(final Exception aCause, final String aMessage) {
-        super(aCause, BUNDLE_NAME, aMessage);
+        super(aCause, MessageCodes.BUNDLE, aMessage);
     }
 
     /**
@@ -54,7 +52,7 @@ public class PairtreeRuntimeException extends I18nRuntimeException {
      * @param aMoreDetails Additional details to insert into the message
      */
     public PairtreeRuntimeException(final Exception aCause, final String aMessage, final Object... aMoreDetails) {
-        super(aCause, BUNDLE_NAME, aMessage, aMoreDetails);
+        super(aCause, MessageCodes.BUNDLE, aMessage, aMoreDetails);
     }
 
 }

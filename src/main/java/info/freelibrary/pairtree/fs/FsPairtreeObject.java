@@ -6,16 +6,17 @@ import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.Optional;
 
+import info.freelibrary.util.Logger;
+import info.freelibrary.util.LoggerFactory;
+
 import info.freelibrary.pairtree.Constants;
 import info.freelibrary.pairtree.MessageCodes;
 import info.freelibrary.pairtree.PairtreeObject;
 import info.freelibrary.pairtree.PairtreeUtils;
-import info.freelibrary.util.Logger;
-import info.freelibrary.util.LoggerFactory;
 
 import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.file.FileSystem;
 
@@ -66,15 +67,17 @@ public class FsPairtreeObject implements PairtreeObject {
     public void exists(final Handler<AsyncResult<Boolean>> aHandler) {
         Objects.requireNonNull(aHandler, LOGGER.getMessage(MessageCodes.PT_010));
 
-        final Future<Boolean> future = Future.<Boolean>future().setHandler(aHandler);
+        final Promise<Boolean> promise = Promise.<Boolean>promise();
+
+        promise.future().onComplete(aHandler);
 
         LOGGER.debug(MessageCodes.PT_DEBUG_021, this);
 
         myFileSystem.exists(getPath(), result -> {
             if (result.succeeded()) {
-                future.complete(result.result());
+                promise.complete(result.result());
             } else {
-                future.fail(result.cause());
+                promise.fail(result.cause());
             }
         });
     }
@@ -83,15 +86,17 @@ public class FsPairtreeObject implements PairtreeObject {
     public void create(final Handler<AsyncResult<Void>> aHandler) {
         Objects.requireNonNull(aHandler, LOGGER.getMessage(MessageCodes.PT_010));
 
-        final Future<Void> future = Future.<Void>future().setHandler(aHandler);
+        final Promise<Void> promise = Promise.<Void>promise();
+
+        promise.future().onComplete(aHandler);
 
         LOGGER.debug(MessageCodes.PT_DEBUG_023, this);
 
         myFileSystem.mkdirs(getPath(), result -> {
             if (result.succeeded()) {
-                future.complete();
+                promise.complete();
             } else {
-                future.fail(result.cause());
+                promise.fail(result.cause());
             }
         });
     }
@@ -100,15 +105,17 @@ public class FsPairtreeObject implements PairtreeObject {
     public void delete(final Handler<AsyncResult<Void>> aHandler) {
         Objects.requireNonNull(aHandler, LOGGER.getMessage(MessageCodes.PT_010));
 
-        final Future<Void> future = Future.<Void>future().setHandler(aHandler);
+        final Promise<Void> promise = Promise.<Void>promise();
+
+        promise.future().onComplete(aHandler);
 
         LOGGER.debug(MessageCodes.PT_DEBUG_022, this);
 
         myFileSystem.deleteRecursive(getPath(), true, result -> {
             if (result.succeeded()) {
-                future.complete();
+                promise.complete();
             } else {
-                future.fail(result.cause());
+                promise.fail(result.cause());
             }
         });
     }
@@ -129,16 +136,18 @@ public class FsPairtreeObject implements PairtreeObject {
     }
 
     @Override
-    public String getPath(final String aResourcePath) {
-        return Paths.get(getPath(), aResourcePath).toString();
+    public String getPath(final String aPtPath) {
+        return Paths.get(getPath(), aPtPath).toString();
     }
 
     @Override
-    public void put(final String aPath, final Buffer aBuffer, final Handler<AsyncResult<Void>> aHandler) {
+    public void put(final String aPtPath, final Buffer aBuffer, final Handler<AsyncResult<Void>> aHandler) {
         Objects.requireNonNull(aHandler, LOGGER.getMessage(MessageCodes.PT_010));
 
-        final Path resourcePath = Paths.get(getPath(), aPath);
-        final Future<Void> future = Future.<Void>future().setHandler(aHandler);
+        final Path resourcePath = Paths.get(getPath(), aPtPath);
+        final Promise<Void> promise = Promise.<Void>promise();
+
+        promise.future().onComplete(aHandler);
 
         LOGGER.debug(MessageCodes.PT_DEBUG_026, resourcePath);
 
@@ -148,23 +157,47 @@ public class FsPairtreeObject implements PairtreeObject {
                 // Then, write the Pairtree object resource into that directory
                 myFileSystem.writeFile(resourcePath.toString(), aBuffer, writeResult -> {
                     if (writeResult.succeeded()) {
-                        future.complete();
+                        promise.complete();
                     } else {
-                        future.fail(writeResult.cause());
+                        promise.fail(writeResult.cause());
                     }
                 });
             } else {
-                future.fail(mkdirsResult.cause());
+                promise.fail(mkdirsResult.cause());
             }
         });
     }
 
     @Override
-    public void get(final String aPath, final Handler<AsyncResult<Buffer>> aHandler) {
+    public void put(final String aPtPath, final String aFilePath, final Handler<AsyncResult<Void>> aHandler) {
+        final Path resourcePath = Paths.get(getPath(), aPtPath);
+        final Promise<Void> promise = Promise.promise();
+
+        LOGGER.debug(MessageCodes.PT_DEBUG_026, resourcePath);
+
+        promise.future().onComplete(aHandler);
+
+        // First, create the parent directory path if it doesn't already exist
+        myFileSystem.mkdirs(resourcePath.getParent().toString(), mkdirsResult -> {
+            if (mkdirsResult.succeeded()) {
+                // Then, write the Pairtree object resource into that directory
+                myFileSystem.copy(aFilePath, resourcePath.toString()).onSuccess(copyResult -> {
+                    promise.complete();
+                }).onFailure(error -> promise.fail(error));
+            } else {
+                promise.fail(mkdirsResult.cause());
+            }
+        });
+    }
+
+    @Override
+    public void get(final String aPtPath, final Handler<AsyncResult<Buffer>> aHandler) {
         Objects.requireNonNull(aHandler, LOGGER.getMessage(MessageCodes.PT_010));
 
-        final String resourcePath = Paths.get(getPath(), aPath).toString();
-        final Future<Buffer> future = Future.<Buffer>future().setHandler(aHandler);
+        final String resourcePath = Paths.get(getPath(), aPtPath).toString();
+        final Promise<Buffer> future = Promise.<Buffer>promise();
+
+        future.future().onComplete(aHandler);
 
         LOGGER.debug(MessageCodes.PT_DEBUG_027, resourcePath);
 
@@ -178,19 +211,21 @@ public class FsPairtreeObject implements PairtreeObject {
     }
 
     @Override
-    public void find(final String aPath, final Handler<AsyncResult<Boolean>> aHandler) {
+    public void find(final String aPtPath, final Handler<AsyncResult<Boolean>> aHandler) {
         Objects.requireNonNull(aHandler, LOGGER.getMessage(MessageCodes.PT_010));
 
-        final String resourcePath = Paths.get(getPath(), aPath).toString();
-        final Future<Boolean> future = Future.<Boolean>future().setHandler(aHandler);
+        final String resourcePath = Paths.get(getPath(), aPtPath).toString();
+        final Promise<Boolean> promise = Promise.<Boolean>promise();
+
+        promise.future().onComplete(aHandler);
 
         LOGGER.debug(MessageCodes.PT_DEBUG_025, resourcePath);
 
         myFileSystem.exists(resourcePath, result -> {
             if (result.succeeded()) {
-                future.complete(result.result());
+                promise.complete(result.result());
             } else {
-                future.fail(result.cause());
+                promise.fail(result.cause());
             }
         });
     }
